@@ -78,8 +78,8 @@ class EnhancedZohoReportClient(report_client.ReportClient):
 
 
     def data_upload(self,import_content:str,table_name:str,import_mode="TRUNCATEADD",
-                    matching_columns=None,
-                    database_name:str=None,
+                    matching_columns=Optional[str],
+                    database_name:str=Optional[str],
                     retry_limit=0)->Optional[report_client.ImportResult]:
         """ data is a csv-style string, newline separated. Matching columns is a comma separated string"""
         retry_count = 0
@@ -112,7 +112,7 @@ class EnhancedZohoReportClient(report_client.ReportClient):
 
     def data_export_using_sql(self,sql,table_name, database_name: str = None)->csv.DictReader:
         """ returns a csv.DictReader after querying with the sql provided.
-        The Zoho API insists on a table or report name"""
+        The Zoho API insists on a table or report name, but it doesn't seem to restrict the query"""
 
         uri = self.getURI(dbOwnerName=self.login_email_id, dbName=database_name or self.default_databasename,
                           tableOrReportName=table_name)
@@ -126,7 +126,7 @@ class EnhancedZohoReportClient(report_client.ReportClient):
         return reader
 
 
-    def delete_rows(self,table_name,sql, database_name: str = None):
+    def delete_rows(self,table_name,sql, database_name: Optional[str] = None):
         uri = self.getURI(dbOwnerName=self.login_email_id, dbName=database_name or self.default_databasename,
                           tableOrReportName=table_name)
 
