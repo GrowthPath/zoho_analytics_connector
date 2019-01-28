@@ -13,6 +13,8 @@ class Config:
 """ get a token: log in to Zoho Reports, dup a new tab and then paste https://accounts.zoho.com/apiauthtoken/create?SCOPE=ZohoReports/reportsapi"""
 
 class Sample:
+    """ This is test data from the original Zoho code. These tests are not run, only the pytests below are used
+    """
     rc = None
 
     def test(self,opt):
@@ -82,7 +84,7 @@ class Sample:
         return int(option)
 
 
-
+""" Tests for EnhancedZohoReportClient"""
 """ move the example code into unit tests, keep the Config class for now"""
 
 @pytest.fixture
@@ -101,6 +103,7 @@ def get_enhanced_zoho_report_client()->EnhancedZohoReportClient:
                 authtoken=Config.AUTHTOKEN,default_databasename=Config.DATABASENAME)
     return rc
 
+
 def test_get_database_metadata(get_enhanced_zoho_report_client):
     enhanced_rc = get_enhanced_zoho_report_client
     table_meta_data = enhanced_rc.get_table_metadata()
@@ -118,12 +121,27 @@ def test_data_upload(get_enhanced_zoho_report_client:EnhancedZohoReportClient):
     impResult = get_enhanced_zoho_report_client.data_upload(import_content=import_content,table_name="sales")
     assert(impResult)
 
+    try:
+        with open('Animals.csv', 'r') as f:
+            import_content2 = f.read()
+    except Exception as e:
+        print("Error Check if file Animals.csv exists in the current directory!! ", str(e))
+        return
+    impResult2 = get_enhanced_zoho_report_client.data_upload(import_content=import_content2, table_name="animals")
+    assert (impResult2)
+
+
+
 
 def test_data_download(get_enhanced_zoho_report_client):
     sql="select * from sales"
     result = get_enhanced_zoho_report_client.data_export_using_sql(sql=sql,table_name="sales")
     assert result
 
+    #the table name does not seem to actual matters
+    sql="select * from animals"
+    result = get_enhanced_zoho_report_client.data_export_using_sql(sql=sql,table_name="sales")
+    assert result
 
 def test_make_table():
     pass
