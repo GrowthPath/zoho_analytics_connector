@@ -14,7 +14,7 @@ setup(
         name=name,
         keywords=keywords,
         version=version,
-        packages=['zoho_crm_connector'],
+        packages=['zoho_analytics_connector'],
         python_requires='>=3.6',
         install_requires=['requests',
             ],
