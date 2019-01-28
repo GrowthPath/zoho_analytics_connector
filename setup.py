@@ -6,8 +6,8 @@ cmdclass = {'build_sphinx': BuildDoc}
 # https://pypi.org/classifiers/
 
 name='zoho_analytics_connector'
-keywords='zoho crm'
-version='0.1.0'
+keywords='zoho analytics'
+version='0.1.1'
 
 
 setup(
@@ -31,6 +31,7 @@ setup(
         author='Tim Richardson',
         author_email='tim@growthpath.com.au',
         description='Zoho Analytics connector',
+        long_description="Python 3-friendly wrapper for Zoho Analytics API (formely Zoho Reports)",
         cmdclass=cmdclass,
         # these are optional and override conf.py settings
         command_options={

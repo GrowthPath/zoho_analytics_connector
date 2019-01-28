@@ -15,7 +15,7 @@ from . import report_client
 
 """ add some helper functions on top of report_client"""
 
-class EnhancedZohoReportClient(report_client.ReportClient):
+class EnhancedZohoAnalyticsClient(report_client.ReportClient):
 
     @staticmethod
     def process_table_meta_data(catalog):
@@ -78,13 +78,14 @@ class EnhancedZohoReportClient(report_client.ReportClient):
 
 
     def data_upload(self,import_content:str,table_name:str,import_mode="TRUNCATEADD",
-                    matching_columns=Optional[str],
-                    database_name:str=Optional[str],
+                    matching_columns:Optional[str]=None,
+                    database_name:Optional[str]=None,
                     retry_limit=0)->Optional[report_client.ImportResult]:
         """ data is a csv-style string, newline separated. Matching columns is a comma separated string"""
         retry_count = 0
         impResult = None
-        uri = self.getURI(dbOwnerName=self.login_email_id, dbName=database_name or self.default_databasename, tableOrReportName=table_name)
+        database_name = database_name or self.default_databasename
+        uri = self.getURI(dbOwnerName=self.login_email_id, dbName=database_name, tableOrReportName=table_name)
 
             # import_modes = APPEND / TRUNCATEADD / UPDATEADD
         while True:
@@ -113,7 +114,7 @@ class EnhancedZohoReportClient(report_client.ReportClient):
     def data_export_using_sql(self,sql,table_name, database_name: str = None)->csv.DictReader:
         """ returns a csv.DictReader after querying with the sql provided.
         The Zoho API insists on a table or report name, but it doesn't seem to restrict the query"""
-
+        database_name = database_name or self.default_databasename
         uri = self.getURI(dbOwnerName=self.login_email_id, dbName=database_name or self.default_databasename,
                           tableOrReportName=table_name)
         r = self.exportDataUsingSQL(tableOrReportURI=uri, format='CSV', sql=sql)

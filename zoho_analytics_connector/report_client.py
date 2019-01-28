@@ -9,7 +9,6 @@ import requests
 from typing import MutableMapping, Optional, Union, List
 import logging
 
-
 logger = logging.getLogger()
 
 class ReportClient:

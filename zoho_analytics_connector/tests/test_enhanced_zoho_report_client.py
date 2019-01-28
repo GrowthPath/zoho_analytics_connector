@@ -3,13 +3,13 @@ import os
 import pytest
 from typing import MutableMapping
 from zoho_analytics_connector.report_client import ReportClient
-from zoho_analytics_connector.enhanced_report_client import EnhancedZohoReportClient
+from zoho_analytics_connector.enhanced_report_client import EnhancedZohoAnalyticsClient
 
 class Config:
     LOGINEMAILID = os.getenv('ZOHOANALYTICS_LOGINEMAIL')
     AUTHTOKEN = os.getenv('ZOHOANALYTICS_AUTHTOKEN')
     DATABASENAME = os.getenv('ZOHOANALYTICS_DATABASENAME')
-    TABLENAME = "StoreSales"
+    TABLENAME = "Sales"
 """ get a token: log in to Zoho Reports, dup a new tab and then paste https://accounts.zoho.com/apiauthtoken/create?SCOPE=ZohoReports/reportsapi"""
 
 class Sample:
@@ -84,7 +84,7 @@ class Sample:
         return int(option)
 
 
-""" Tests for EnhancedZohoReportClient"""
+""" Tests for EnhancedZohoAnalyticsClient"""
 """ move the example code into unit tests, keep the Config class for now"""
 
 @pytest.fixture
@@ -96,21 +96,21 @@ def get_report_client()->ReportClient:
 
 
 @pytest.fixture
-def get_enhanced_zoho_report_client()->EnhancedZohoReportClient:
+def get_enhanced_zoho_analytics_client()->EnhancedZohoAnalyticsClient:
     if (Config.AUTHTOKEN == ""):
         raise RuntimeError(Exception, "Please configure AUTHTOKEN in Config class")
-    rc = EnhancedZohoReportClient(login_email_id = Config.LOGINEMAILID,
-                authtoken=Config.AUTHTOKEN,default_databasename=Config.DATABASENAME)
+    rc = EnhancedZohoAnalyticsClient(login_email_id = Config.LOGINEMAILID,
+                                     authtoken=Config.AUTHTOKEN, default_databasename=Config.DATABASENAME)
     return rc
 
 
-def test_get_database_metadata(get_enhanced_zoho_report_client):
-    enhanced_rc = get_enhanced_zoho_report_client
+def test_get_database_metadata(get_enhanced_zoho_analytics_client):
+    enhanced_rc = get_enhanced_zoho_analytics_client
     table_meta_data = enhanced_rc.get_table_metadata()
     assert table_meta_data
 
 
-def test_data_upload(get_enhanced_zoho_report_client:EnhancedZohoReportClient):
+def test_data_upload(get_enhanced_zoho_analytics_client:EnhancedZohoAnalyticsClient):
     try:
         with open('StoreSales.csv', 'r') as f:
             import_content = f.read()
@@ -118,7 +118,7 @@ def test_data_upload(get_enhanced_zoho_report_client:EnhancedZohoReportClient):
         print("Error Check if file StoreSales.csv exists in the current directory!! ", str(e))
         return
         # import_modes = APPEND / TRUNCATEADD / UPDATEADD
-    impResult = get_enhanced_zoho_report_client.data_upload(import_content=import_content,table_name="sales")
+    impResult = get_enhanced_zoho_analytics_client.data_upload(import_content=import_content,table_name="sales")
     assert(impResult)
 
     try:
@@ -127,20 +127,18 @@ def test_data_upload(get_enhanced_zoho_report_client:EnhancedZohoReportClient):
     except Exception as e:
         print("Error Check if file Animals.csv exists in the current directory!! ", str(e))
         return
-    impResult2 = get_enhanced_zoho_report_client.data_upload(import_content=import_content2, table_name="animals")
+    impResult2 = get_enhanced_zoho_analytics_client.data_upload(import_content=import_content2, table_name="animals")
     assert (impResult2)
 
 
-
-
-def test_data_download(get_enhanced_zoho_report_client):
+def test_data_download(get_enhanced_zoho_analytics_client):
     sql="select * from sales"
-    result = get_enhanced_zoho_report_client.data_export_using_sql(sql=sql,table_name="sales")
+    result = get_enhanced_zoho_analytics_client.data_export_using_sql(sql=sql,table_name="sales")
     assert result
 
-    #the table name does not seem to actual matters
+    #the table name does not matter
     sql="select * from animals"
-    result = get_enhanced_zoho_report_client.data_export_using_sql(sql=sql,table_name="sales")
+    result = get_enhanced_zoho_analytics_client.data_export_using_sql(sql=sql,table_name="sales")
     assert result
 
 def test_make_table():
