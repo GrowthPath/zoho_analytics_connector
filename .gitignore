@@ -222,3 +222,4 @@ tags
 /docs/_static/
 /docs/_templates/
 /docs/_build/doctrees/
+/.idea/

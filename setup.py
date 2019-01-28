@@ -27,7 +27,7 @@ setup(
             'Topic :: Text Processing :: Linguistic',
             ],
         url='https://github.com/timrichardson/zoho_analytics_connector',
-        license='GPL v3',
+        license='MIT',
         author='Tim Richardson',
         author_email='tim@growthpath.com.au',
         description='Zoho Analytics connector',
