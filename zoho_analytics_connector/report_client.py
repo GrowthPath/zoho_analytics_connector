@@ -448,7 +448,7 @@ class ReportClient:
         @raise ParseError: If the server has responded but client was not able to parse the response.
         """
         payLoad = ReportClientHelper.getAsPayLoad([config], None, None)
-        url = ReportClientHelper.addQueryParams(dbURI, self.authtoken, "CREATETABLE", "XML")
+        url = ReportClientHelper.addQueryParams(dbURI, self.authtoken, "CREATETABLE", "JSON")
         #url += "&ZOHO_TABLE_DESIGN=" + urllib.parse.quote(tableDesign)
         url += "&ZOHO_TABLE_DESIGN=" + urllib.parse.quote_plus(tableDesign) #smaller URL, fits under limit better
 
@@ -1529,7 +1529,7 @@ class ReportClientHelper:
         url = ReportClientHelper.checkAndAppendQMark(url)
         if (authtoken == None):
             raise RuntimeError("Provide an AuthToken first")
-        url += "&ZOHO_ERROR_FORMAT=XML&ZOHO_ACTION=" + urllib.parse.quote(action)
+        url += "&ZOHO_ERROR_FORMAT=JSON&ZOHO_ACTION=" + urllib.parse.quote(action)
         url += "&ZOHO_OUTPUT_FORMAT=" + urllib.parse.quote(exportFormat)
         url += "&authtoken=" + urllib.parse.quote(authtoken) + "&ZOHO_API_VERSION=" + ReportClientHelper.API_VERSION
         if sql:

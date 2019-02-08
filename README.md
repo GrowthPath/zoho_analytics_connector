@@ -90,3 +90,36 @@ Do some stuff:
         sql="select * from animals"
         result = get_enhanced_zoho_analytics_client.data_export_using_sql(sql=sql,table_name="sales")
         assert result
+        
+        
+    #create a table
+        
+    zoho_sales_fact_table = {
+        'TABLENAME': 'sales_fact',
+        'COLUMNS': [
+            {'COLUMNNAME':'inv_date', 'DATATYPE':'DATE'},
+            {'COLUMNNAME':'customer', 'DATATYPE':'PLAIN'},
+            {'COLUMNNAME':'sku', 'DATATYPE':'PLAIN'},
+            {'COLUMNNAME':'qty_invoiced', 'DATATYPE':'NUMBER'},
+            {'COLUMNNAME':'line_total_excluding_tax', 'DATATYPE':'NUMBER'}]
+        }
+
+    def test_create_table(get_enhanced_zoho_analytics_client):
+        #is the table already defined?
+        try:
+            zoho_table_metadata = get_enhanced_zoho_analytics_client.get_table_metadata()
+        except  ServerError as e:
+            if getattr(e, 'message') == 'No view present in the workspace.':
+                zoho_table_metadata = {}
+            else:
+                raise
+        zoho_tables = set(zoho_table_metadata.keys())
+    
+        if "sales_fact" not in zoho_tables:
+            get_enhanced_zoho_analytics_client.create_table(table_design=zoho_sales_fact_table)
+        else:
+            #get an error, but error handling is not working, the API returns a 400 with no content in the message
+            r = get_enhanced_zoho_analytics_client.create_table(table_design=zoho_sales_fact_table)
+            print (r)
+
+
