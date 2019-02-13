@@ -137,6 +137,8 @@ def test_data_download(get_enhanced_zoho_analytics_client):
     assert result
 
     #the table name does not matter
+    # note: if the SQL contains things you need to escape, such as ' characters in a constant you
+    # are passing to IN(...), you have to escape it yourself
     sql="select * from animals"
     result = get_enhanced_zoho_analytics_client.data_export_using_sql(sql=sql,table_name="sales")
     assert result
