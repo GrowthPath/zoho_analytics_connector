@@ -7,7 +7,7 @@ cmdclass = {'build_sphinx': BuildDoc}
 
 name='zoho_analytics_connector'
 keywords='zoho analytics'
-version='0.1.3'
+version='0.1.5'
 
 
 setup(
@@ -21,7 +21,7 @@ setup(
         setup_requires=["pytest-runner",],
         tests_require=["pytest",],
         classifiers=[
-            'Development Status :: 3 - Alpha',
+            'Development Status :: 4 - Beta',
             'License :: OSI Approved :: MIT License',
             'Programming Language :: Python :: 3.7',
             'Topic :: Text Processing :: Linguistic',
