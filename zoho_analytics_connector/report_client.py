@@ -185,7 +185,7 @@ class ReportClient:
 
         r = requests.post(url=url, data=payLoad)
         if (r.status_code != 200):
-            raise ServerError(str(r) + f" criteria: {criteria}")
+            raise ServerError(r,criteria=criteria)
 
         return r  # r.content holds the returned data
 
@@ -1341,12 +1341,13 @@ class ServerError(Exception):
     request due to some error. For example if authorization failure.
     """
 
-    def __init__(self, urlResp):
+    def __init__(self, urlResp,**kwargs):
         self.httpStatusCode = urlResp.status_code  #:The http status code for the request.
         self.errorCode = self.httpStatusCode  # The error code sent by the server.
         self.uri = ""  #: The uri which threw this exception.
         self.action = ""  #:The action to be performed over the resource specified by the uri
         self.message = urlResp.content  #: Returns the message sent by the server.
+        self.extra = kwargs
 
         parseable = False
         contHeader = urlResp.headers["Content-Type"]
