@@ -185,7 +185,7 @@ class ReportClient:
 
         r = requests.post(url=url, data=payLoad)
         if (r.status_code != 200):
-            raise ServerError(r + f"criteria: {criteria}")
+            raise ServerError(str(r) + f" criteria: {criteria}")
 
         return r  # r.content holds the returned data
 

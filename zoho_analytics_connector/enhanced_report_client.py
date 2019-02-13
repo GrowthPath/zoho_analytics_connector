@@ -80,7 +80,8 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
     def data_upload(self,import_content:str,table_name:str,import_mode="TRUNCATEADD",
                     matching_columns:Optional[str]=None,
                     database_name:Optional[str]=None,
-                    retry_limit=0)->Optional[report_client.ImportResult]:
+                    retry_limit=0,
+                    date_format=None)->Optional[report_client.ImportResult]:
         """ data is a csv-style string, newline separated. Matching columns is a comma separated string"""
         retry_count = 0
         impResult = None
@@ -92,7 +93,9 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
 
             retry_count += 1
             try:
-                impResult = self.import_data(uri, import_mode=import_mode, import_content=import_content,matching_columns=matching_columns)
+                impResult = self.import_data(uri, import_mode=import_mode, import_content=import_content,
+                                             date_format=date_format,
+                                             matching_columns=matching_columns)
                 if impResult.result_code == 6001: #API limit exceeded
                     logger.error("API limit exceeded")
                     raise RuntimeError("API limit exceeded")
