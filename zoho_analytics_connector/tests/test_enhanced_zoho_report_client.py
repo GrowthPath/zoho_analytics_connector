@@ -134,7 +134,7 @@ def test_data_upload(get_enhanced_zoho_analytics_client:EnhancedZohoAnalyticsCli
 def test_data_download(get_enhanced_zoho_analytics_client):
     sql="select * from sales"
     result = get_enhanced_zoho_analytics_client.data_export_using_sql(sql=sql,table_name="sales")
-    assert result
+    assert len(list(result)) > 0
 
     #the table name does not matter
     # note: if the SQL contains things you need to escape, such as ' characters in a constant you
@@ -169,8 +169,8 @@ def test_create_table(get_enhanced_zoho_analytics_client):
         get_enhanced_zoho_analytics_client.create_table(table_design=zoho_sales_fact_table)
     else:
         #get an error, but error handling is not working, the API returns a 400 with no content in the message
-        r = get_enhanced_zoho_analytics_client.create_table(table_design=zoho_sales_fact_table)
-        print (r)
+        print(f"\nThe table sales_fact exists already; delete it manually")
+
 
 
 
