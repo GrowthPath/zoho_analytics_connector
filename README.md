@@ -4,7 +4,8 @@ Zoho Analytics Connector
 
 Zoho's SDK for Zoho Reports is very old, however it is very complete.
 This is a version which is Python 3 ready, tested on Python 3.7.
-There are not many test cases yet. It is patched to work.
+There are not many test cases yet. It is patched to work: 
+that is, it's been made Python 3.7 compatible with the least amount of effort.
 
 A more convenient wrapper class is in enhanced_report_client.
 
@@ -80,6 +81,8 @@ Do some stuff:
         impResult2 = get_enhanced_zoho_analytics_client.data_upload(import_content=import_content2, table_name="animals")
         assert (impResult2)
 
+#Run SQL. You can join tables. The rows are returned as a DictReader. If you pass ' characters into IN(...) clauses, 
+you need to escape them yourself (double ') 
 
     def test_data_download(get_enhanced_zoho_analytics_client):
         sql="select * from sales"
