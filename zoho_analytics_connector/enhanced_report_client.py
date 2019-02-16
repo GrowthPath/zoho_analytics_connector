@@ -9,11 +9,13 @@ import logging
 logger = logging.getLogger(__name__)
 import time
 import json
+import enum
 
 import requests
 from . import report_client
 
 """ add some helper functions on top of report_client"""
+
 
 class EnhancedZohoAnalyticsClient(report_client.ReportClient):
 
@@ -87,10 +89,8 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
         impResult = None
         database_name = database_name or self.default_databasename
         uri = self.getURI(dbOwnerName=self.login_email_id, dbName=database_name, tableOrReportName=table_name)
-
             # import_modes = APPEND / TRUNCATEADD / UPDATEADD
         while True:
-
             retry_count += 1
             try:
                 impResult = self.import_data(uri, import_mode=import_mode, import_content=import_content,
@@ -103,7 +103,7 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
                     logger.debug(
                         f"Table: {table_name}: Processed Rows: {impResult.totalRowCount} with {impResult.warningCount} warnings ")
                 break
-            except report_client.ParseError:
+            except report_client.ParseError as e:
                 if retry_count <= retry_limit:
                     logger.info(f"Retrying data_upload because of upload error")
                     time.sleep(1)

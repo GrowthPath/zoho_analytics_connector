@@ -310,7 +310,7 @@ class ReportClient:
 
         url = ReportClientHelper.addQueryParams(tableURI, self.authtoken, "IMPORT", "XML")
 
-        r = requests.post(url=url, data=payload)
+        r = self.requests_session.post(url=url, data=payload,timeout=60)
 
         return ImportResult(r.content)  # a parser from Zoho
 
