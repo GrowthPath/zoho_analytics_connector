@@ -6,10 +6,31 @@ import urllib
 import urllib3
 import json
 import requests
+from requests.adapters import HTTPAdapter,Retry
 from typing import MutableMapping, Optional, Union, List
 import logging
 
 logger = logging.getLogger()
+
+
+def requests_retry_session(
+        retries=10,
+        backoff_factor=2,
+        status_forcelist=(500, 502, 503, 504),
+        session=None,
+        ) -> requests.Session:
+    session = session or requests.Session()
+    retry = Retry(
+            total=retries,
+            read=retries,
+            connect=retries,
+            backoff_factor=backoff_factor,
+            status_forcelist=status_forcelist,
+            )
+    adapter = HTTPAdapter(max_retries=retry)
+    session.mount('http://', adapter)
+    session.mount('https://', adapter)
+    return session
 
 class ReportClient:
     """
@@ -25,7 +46,36 @@ class ReportClient:
         # self.iamServerURL="https://accounts.zoho.com"
         self.reportServerURL = "https://analyticsapi.zoho.com"
         self.authtoken = authtoken
+        self.requests_session = requests_retry_session()
 
+    def getResp_orig(self, url, httpMethod, payLoad):
+        """
+        Internal method.(For google app integ).
+        """
+        try:
+            http = urllib3.PoolManager()
+
+            resp = http.request(httpMethod,url, payLoad)
+            respObj = ResponseObj(resp)
+        except urllib3.exceptions.HTTPError as e:
+            respObj = ResponseObj(e)
+        return respObj
+
+
+    def getResp(self, url:str, httpMethod:str, payLoad):
+        """
+        Internal method.(For google app integ).
+        """
+        requests_session = self.requests_session or requests_retry_session()
+        if httpMethod.upper() == 'POST':
+            try:
+                resp = requests_session.post(url, data=payLoad,timeout=30)
+                respObj = ResponseObj(resp)
+            except requests.exceptions.RequestException as e:
+                respObj = ResponseObj(e)
+            return respObj
+        else:
+            raise RuntimeError("Unexpected httpMethod in getResp")
 
     def __sendRequest(self, url, httpMethod, payLoad, action, callBackData):
         respObj = self.getResp(url, httpMethod, payLoad)
@@ -350,7 +400,9 @@ class ReportClient:
         # addQueryParams  adds parameters to the URL, not in the POST body but that seems ok for zoho..   url += "&ZOHO_ERROR_FORMAT=XML&ZOHO_ACTION=" + urllib.parse.quote(action)
         # addQueryParams adds: ZOHO_ERROR_FORMAT, ZOHO_OUTPUT_FORMAT
         url = ReportClientHelper.addQueryParams(tableOrReportURI, self.authtoken, "EXPORT", format,sql=sql)  #urlencoding is done in here
-        r = requests.post(url=url, data=payload)
+        requests_session = self.requests_session or requests_retry_session()
+        r = requests_session.post(url=url, data=payload,timeout=30)
+
         return r  #r.content holds the returned data
 
     def copyDatabase(self, dbURI, config=None):
@@ -1124,18 +1176,7 @@ class ReportClient:
         value = value.replace("%5C", "(//)")
         return value
 
-    def getResp(self, url, httpMethod, payLoad):
-        """
-        Internal method.(For google app integ).
-        """
-        try:
-            http = urllib3.PoolManager()
 
-            resp = http.request(httpMethod,url, payLoad)
-            respObj = ResponseObj(resp)
-        except urllib3.exceptions.HTTPError as e:
-            respObj = ResponseObj(e)
-        return respObj
 
 
 class ShareInfo:
@@ -1485,10 +1526,10 @@ class ResponseObj:
     Internal class.
     """
 
-    def __init__(self, resp:urllib3.response.HTTPResponse):
+    def __init__(self, resp:requests.Response):
         """ updated to assume a urllib3 object"""
         self.content = resp.reason #This is used for communication about errors
-        self.status_code = resp.status
+        self.status_code = resp.status_code
         self.headers = {}
         self.headers = resp.headers
 
