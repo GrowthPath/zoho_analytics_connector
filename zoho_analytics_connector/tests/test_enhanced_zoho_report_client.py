@@ -2,22 +2,28 @@ import sys
 import os
 import pytest
 from typing import MutableMapping
-from zoho_analytics_connector.report_client import ReportClient,ServerError
+from zoho_analytics_connector.report_client import ReportClient, ServerError
 from zoho_analytics_connector.enhanced_report_client import EnhancedZohoAnalyticsClient
+
 
 class Config:
     LOGINEMAILID = os.getenv('ZOHOANALYTICS_LOGINEMAIL')
     AUTHTOKEN = os.getenv('ZOHOANALYTICS_AUTHTOKEN')
     DATABASENAME = os.getenv('ZOHOANALYTICS_DATABASENAME')
     TABLENAME = "Sales"
-""" get a token: log in to Zoho Reports, dup a new tab and then paste https://accounts.zoho.com/apiauthtoken/create?SCOPE=ZohoReports/reportsapi"""
+
+
+""" get a token: log in to Zoho Reports, dup a new tab and then paste 
+https://accounts.zoho.com/apiauthtoken/create?SCOPE=ZohoReports/reportsapi"""
+
 
 class Sample:
     """ This is test data from the original Zoho code. These tests are not run, only the pytests below are used
     """
     rc = None
 
-    def test(self,opt):
+
+    def test(self, opt):
 
         rc = self.getReportClient()
 
@@ -39,6 +45,7 @@ class Sample:
             sql = "select Region from " + Config.TABLENAME
             rc.exportDataUsingSQL(uri, "CSV", sys.stdout, sql, None)
 
+
     def getReportClient(self):
 
         if (Config.AUTHTOKEN == ""):
@@ -48,38 +55,46 @@ class Sample:
             Sample.rc = ReportClient(Config.AUTHTOKEN)
         return Sample.rc
 
+
     def addSingleRow(self, rc, uri):
-        rowData = {"Date": "01 Jan, 2009 00:00:00", "Region": "East", "Product Category": "Samples",
-                   "Product": "SampleProduct", "Customer Name": "Sample", "Sales": 2000,
-                   "Cost": 2000}
+        rowData = {
+            "Date": "01 Jan, 2009 00:00:00", "Region": "East", "Product Category": "Samples",
+            "Product": "SampleProduct", "Customer Name": "Sample", "Sales": 2000,
+            "Cost": 2000
+        }
         result = rc.addRow(uri, rowData, None)
-        print (result)
+        print(result)
 
 
     def updateData(self, rc, uri):
         updateInfo = {"Region": "West", "Product": "SampleProduct_2"}
         rc.updateData(uri, updateInfo, "\"Customer Name\"='Sample'", None)
 
+
     def deleteData(self, rc, uri):
         rc.deleteData(uri, "\"Customer Name\"='Sample'", None)
+
 
     def importData(self, rc, uri):
         try:
             with open('StoreSales.csv', 'r') as f:
                 importContent = f.read()
         except Exception as e:
-            print("Error Check if file StoreSales.csv exists in the current directory!! ",str(e))
+            print("Error Check if file StoreSales.csv exists in the current directory!! ", str(e))
             return
-        #import_modes = APPEND / TRUNCATEADD / UPDATEADD
+        # import_modes = APPEND / TRUNCATEADD / UPDATEADD
         impResult = rc.import_data(uri, import_mode="TRNCATEADD", import_content=importContent)
-        print( "Added Rows :" + str(impResult.successRowCount) + " and Columns :" + str(impResult.selectedColCount))
+        print("Added Rows :" + str(impResult.successRowCount) + " and Columns :" + str(impResult.selectedColCount))
+
 
     def getOption(self):
-        print( "\n\nOptions\n 1 - Add Single Row\n 2 - Update Data\n 3 - Delete Data\n 4 - Import Data\n 5 - Export Data\n 6 - Export Data Using SQL")
-        print( "\nEnter option : ")
+        print(
+            "\n\nOptions\n 1 - Add Single Row\n 2 - Update Data\n 3 - Delete Data\n 4 - Import Data\n 5 - Export "
+            "Data\n 6 - Export Data Using SQL")
+        print("\nEnter option : ")
         option = sys.stdin.readline().strip()
         while ((option == "") or (int(option) < 1) or (int(option) > 6)):
-            print( "Enter proper option.")
+            print("Enter proper option.")
             option = sys.stdin.readline().strip()
         return int(option)
 
@@ -87,8 +102,9 @@ class Sample:
 """ Tests for EnhancedZohoAnalyticsClient"""
 """ move the example code into unit tests, keep the Config class for now"""
 
+
 @pytest.fixture
-def get_report_client()->ReportClient:
+def get_report_client() -> ReportClient:
     if (Config.AUTHTOKEN == ""):
         raise RuntimeError(Exception, "Please configure AUTHTOKEN in Config class")
     rc = ReportClient(Config.AUTHTOKEN)
@@ -96,10 +112,10 @@ def get_report_client()->ReportClient:
 
 
 @pytest.fixture
-def get_enhanced_zoho_analytics_client()->EnhancedZohoAnalyticsClient:
+def get_enhanced_zoho_analytics_client() -> EnhancedZohoAnalyticsClient:
     if (Config.AUTHTOKEN == ""):
         raise RuntimeError(Exception, "Please configure AUTHTOKEN in Config class")
-    rc = EnhancedZohoAnalyticsClient(login_email_id = Config.LOGINEMAILID,
+    rc = EnhancedZohoAnalyticsClient(login_email_id=Config.LOGINEMAILID,
                                      authtoken=Config.AUTHTOKEN, default_databasename=Config.DATABASENAME)
     return rc
 
@@ -110,7 +126,7 @@ def test_get_database_metadata(get_enhanced_zoho_analytics_client):
     assert table_meta_data
 
 
-def test_data_upload(get_enhanced_zoho_analytics_client:EnhancedZohoAnalyticsClient):
+def test_data_upload(get_enhanced_zoho_analytics_client: EnhancedZohoAnalyticsClient):
     try:
         with open('StoreSales.csv', 'r') as f:
             import_content = f.read()
@@ -118,8 +134,8 @@ def test_data_upload(get_enhanced_zoho_analytics_client:EnhancedZohoAnalyticsCli
         print("Error Check if file StoreSales.csv exists in the current directory!! ", str(e))
         return
         # import_modes = APPEND / TRUNCATEADD / UPDATEADD
-    impResult = get_enhanced_zoho_analytics_client.data_upload(import_content=import_content,table_name="sales")
-    assert(impResult)
+    impResult = get_enhanced_zoho_analytics_client.data_upload(import_content=import_content, table_name="sales")
+    assert (impResult)
 
     try:
         with open('Animals.csv', 'r') as f:
@@ -132,30 +148,31 @@ def test_data_upload(get_enhanced_zoho_analytics_client:EnhancedZohoAnalyticsCli
 
 
 def test_data_download(get_enhanced_zoho_analytics_client):
-    sql="select * from sales"
-    result = get_enhanced_zoho_analytics_client.data_export_using_sql(sql=sql,table_name="sales")
+    sql = "select * from sales"
+    result = get_enhanced_zoho_analytics_client.data_export_using_sql(sql=sql, table_name="sales")
     assert len(list(result)) > 0
 
-    #the table name does not matter
+    # the table name does not matter
     # note: if the SQL contains things you need to escape, such as ' characters in a constant you
     # are passing to IN(...), you have to escape it yourself
-    sql="select * from animals"
-    result = get_enhanced_zoho_analytics_client.data_export_using_sql(sql=sql,table_name="sales")
+    sql = "select * from animals"
+    result = get_enhanced_zoho_analytics_client.data_export_using_sql(sql=sql, table_name="sales")
     assert result
 
 
 zoho_sales_fact_table = {
-        'TABLENAME': 'sales_fact',
-        'COLUMNS': [
-            {'COLUMNNAME':'inv_date', 'DATATYPE':'DATE'},
-            { 'COLUMNNAME':'customer', 'DATATYPE':'PLAIN'},
-            {'COLUMNNAME':'sku', 'DATATYPE':'PLAIN'},
-            {'COLUMNNAME':'qty_invoiced', 'DATATYPE':'NUMBER'},
-            {'COLUMNNAME':'line_total_excluding_tax', 'DATATYPE':'NUMBER'}]
-}
+    'TABLENAME': 'sales_fact',
+    'COLUMNS': [
+        {'COLUMNNAME': 'inv_date', 'DATATYPE': 'DATE'},
+        {'COLUMNNAME': 'customer', 'DATATYPE': 'PLAIN'},
+        {'COLUMNNAME': 'sku', 'DATATYPE': 'PLAIN'},
+        {'COLUMNNAME': 'qty_invoiced', 'DATATYPE': 'NUMBER'},
+        {'COLUMNNAME': 'line_total_excluding_tax', 'DATATYPE': 'NUMBER'}]
+    }
+
 
 def test_create_table(get_enhanced_zoho_analytics_client):
-    #is the table already defined?
+    # is the table already defined?
     try:
         zoho_table_metadata = get_enhanced_zoho_analytics_client.get_table_metadata()
     except  ServerError as e:
@@ -168,9 +185,5 @@ def test_create_table(get_enhanced_zoho_analytics_client):
     if "sales_fact" not in zoho_tables:
         get_enhanced_zoho_analytics_client.create_table(table_design=zoho_sales_fact_table)
     else:
-        #get an error, but error handling is not working, the API returns a 400 with no content in the message
+        # get an error, but error handling is not working, the API returns a 400 with no content in the message
         print(f"\nThe table sales_fact exists already; delete it manually")
-
-
-
-
