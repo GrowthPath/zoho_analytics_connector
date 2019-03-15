@@ -1447,7 +1447,9 @@ class ImportResult:
             self.result_code = 0
 
         if self.result_code == 6001: #api limit or rows exceeded
-            raise RuntimeError(f"API limit exceeded: {msg}")
+            raise RuntimeError(f"API daily limit exceeded: {msg}")
+        if self.result_code == 6045:  # api limit or rows exceeded
+            raise RuntimeError(f"API rate limit exceeded: {msg}")
         if self.result_code == 7232:
             raise RuntimeError(f"Error in data format: {msg} ")
         try:

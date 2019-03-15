@@ -7,7 +7,7 @@ cmdclass = {'build_sphinx': BuildDoc}
 
 name='zoho_analytics_connector'
 keywords='zoho analytics'
-version='0.1.6'
+version='0.2.1'
 
 
 setup(
