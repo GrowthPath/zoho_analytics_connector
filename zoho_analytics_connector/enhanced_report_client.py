@@ -87,7 +87,7 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
     def data_upload(self, import_content: str, table_name: str, import_mode="TRUNCATEADD",
                     matching_columns: Optional[str] = None,
                     database_name: Optional[str] = None,
-                    retry_limit=0,
+                    retry_limit=9,
                     date_format=None) -> Optional[report_client.ImportResult]:
         """ data is a csv-style string, newline separated. Matching columns is a comma separated string"""
         retry_count = 0
@@ -102,21 +102,28 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
                                              date_format=date_format,
                                              matching_columns=matching_columns)
                 if impResult.result_code == 6001:  # API limit exceeded
-                    logger.error("API limit exceeded")
-                    raise RuntimeError("API limit exceeded")
+                    if retry_count <= retry_limit:
+                        logger.error(f"API limit exceeded, will retry, next attempt: {retry_count}")
+                        time.sleep(retry_count*5)
+                        continue
+                    #raise RuntimeError("API limit exceeded")
                 else:
                     logger.debug(
                             f"Table: {table_name}: Processed Rows: "
                             f"{impResult.totalRowCount} with {impResult.warningCount} warnings ")
                 break
             except report_client.ParseError as e:
+                response_content_string =  e.responseContent.decode('utf-8',errors='ignore')
+                response_content_string = response_content_string or 'No response content'
+                if 'Invalid NUMBER value' in response_content_string:
+                    raise RuntimeError(f"Invalid data format in Zoho data upload, check table definitions: {response_content_string}")
                 if retry_count <= retry_limit:
-                    logger.info(f"Retrying data_upload because of upload error")
+                    logger.error(f"Retrying data_upload because of upload error: {response_content_string}")
                     time.sleep(1)
                     continue
                 else:
                     logger.info(f"Number of retry attempts exceeded")
-                    raise (requests.exceptions.ConnectionError)
+                    raise (requests.exceptions.ConnectionError(response_content_string))
         return impResult
 
 
