@@ -7,7 +7,7 @@ cmdclass = {'build_sphinx': BuildDoc}
 
 name='zoho_analytics_connector'
 keywords='zoho analytics'
-version='0.2.1'
+version='0.2.3'
 
 
 setup(
@@ -31,7 +31,7 @@ setup(
         author='Tim Richardson',
         author_email='tim@growthpath.com.au',
         description='Zoho Analytics connector',
-        long_description="Python 3-friendly wrapper for Zoho Analytics API (formely Zoho Reports)",
+        long_description="Python 3-friendly wrapper for Zoho Analytics API (formely Zoho Reports), (using AuthToken)",
         cmdclass=cmdclass,
         # these are optional and override conf.py settings
         command_options={
