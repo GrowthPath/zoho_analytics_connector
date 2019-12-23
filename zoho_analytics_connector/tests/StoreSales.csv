@@ -1,0 +1,707 @@
+"Date","Region","Product Category","Product","Customer Name","Sales","Cost","Profit","City","State","Country","Profit (Sales)"
+2019-01-01,"West","Stationary","Standard Labels","Augustine Paul",378.74,231.42,147.32,,,,147.32
+2019-01-02,"East","Furniture","Meeting Room Tables","Jency Johnah",9288.95,633.23,8655.72,,,,8655.72
+2019-01-03,"Central","Stationary","Art Supplies","Jim Courier",24.46,7.04,17.42,,,,17.42
+2019-01-04,"East","Furniture","Frames","Helen Magadalene",323.57,58.98,264.59,,,,264.59
+2019-01-05,"West","Stationary","Scissors","Harold Pawlan",510.92,110.57,400.35,,,,400.35
+2019-01-06,"Central","Furniture","Frames","Maxwell Schwartz",548.61,10.73,537.88,,,,537.88
+2019-01-07,"East","Grocery","Cereals","David Love",222.02,87.50,134.52,,,,134.52
+2019-01-08,"West","Stationary","Portable Storage","Florence Joy",509.35,156.98,352.37,,,,352.37
+2019-01-09,"Central","Stationary","Specialty Envelopes","Augustine Paul",4287.13,2031.75,2255.38,,,,2255.38
+2019-01-10,"Central","Stationary","Portable Storage","Rhino Augustus",923.30,120.98,802.32,,,,802.32
+2019-01-11,"Central","Grocery","Fruits and Vegetables","Lazar Mathew",3444.83,2088.17,1356.66,,,,1356.66
+2019-01-12,"East","Stationary","File Labels","David Flashing",127.98,74.75,53.23,,,,53.23
+2019-01-13,"Central","Stationary","Computer Paper","Barbara Fisher",1233.29,692.59,540.70,,,,540.70
+2019-01-14,"East","Stationary","Colored Envelopes","Hilary Holden",150.31,46.64,103.67,,,,103.67
+2019-01-15,"East","Stationary","Air Purifiers","Rozario Diego",716.12,143.90,572.22,,,,572.22
+2019-01-16,"East","Grocery","Fruits and Vegetables","William Brown",1531.90,470.95,1060.95,,,,1060.95
+2019-01-17,"East","Grocery","Fruits and Vegetables","Steve Waugh",1092.48,657.71,434.77,,,,434.77
+2019-01-18,"East","Stationary","Air Purifiers","Barbara Fisher",2195.88,916.68,1279.20,,,,1279.20
+2019-01-19,"East","Grocery","Fruits and Vegetables","Victor Price",8066.73,3389.77,4676.96,,,,4676.96
+2019-01-20,"East","Stationary","File Labels","Rozario Diego",61.45,28.66,32.79,,,,32.79
+2019-01-21,"East","Grocery","Fruits and Vegetables","Victor Price",176.97,80.40,96.57,,,,96.57
+2019-01-22,"East","Grocery","Fruits and Vegetables","Maxwell Schwartz",5569.84,2207.74,3362.10,,,,3362.10
+2019-01-23,"West","Furniture","Office Chairs","Munaf Patel",711.44,87.48,623.96,,,,623.96
+2019-01-24,"West","Stationary","Computer Paper","Hilary Holden",96.85,30.17,66.68,,,,66.68
+2019-01-25,"West","Furniture","Clocks","Shui Tom",400.64,34.86,365.78,,,,365.78
+2019-01-26,"West","Stationary","Computer Paper","Hilary Holden",96.85,30.17,66.68,,,,66.68
+2019-01-27,"West","Grocery","Fruits and Vegetables","Nathan Astle",924.53,493.02,431.51,,,,431.51
+2019-01-28,"East","Stationary","Scissors","Santa Cruz Clara",638.91,103.44,535.47,,,,535.47
+2019-01-29,"West","Stationary","Paper Clips","David Flashing",16.38,2.66,13.72,,,,13.72
+2019-01-30,"West","Grocery","Fruits and Vegetables","Peter Brian",908.01,84.46,823.55,,,,823.55
+2019-01-31,"West","Stationary","Paper Clips","David Flashing",16.38,2.66,13.72,,,,13.72
+2019-02-01,"West","Grocery","Fruits and Vegetables","Peter Brian",908.01,84.46,823.55,,,,823.55
+2019-02-02,"East","Grocery","Fruits and Vegetables","Catherine Rose",4797.36,1762.68,3034.68,,,,3034.68
+2019-02-03,"East","Furniture","Frames","Michael Nathan",288.92,3.64,285.28,,,,285.28
+2019-02-04,"East","Stationary","Computer Paper","Grace Kelly",833.43,485.87,347.56,,,,347.56
+2019-02-05,"West","Grocery","Cereals","Augustine Paul",413.39,226.04,187.35,,,,187.35
+2019-02-06,"Central","Grocery","Spices","Shui Tom",11751.55,6365.29,5386.26,,,,5386.26
+2019-02-07,"East","Stationary","Art Supplies","Michael Nathan",64.62,13.88,50.74,,,,50.74
+2019-02-08,"Central","Grocery","Spices","Shui Tom",11751.55,6365.29,5386.26,,,,5386.26
+2019-02-09,"Central","Stationary","File Labels","Rhino Augustus",132.23,60.81,71.42,,,,71.42
+2019-02-10,"East","Grocery","Fruits and Vegetables","Stephanie Ulpright",3757.05,1410.87,2346.18,,,,2346.18
+2019-02-11,"East","Grocery","Fruits and Vegetables","Wu Chang",855.98,500.39,355.59,,,,355.59
+2019-02-12,"East","Grocery","Fruits and Vegetables","Helen Magadalene",8076.90,2919.97,5156.93,,,,5156.93
+2019-02-13,"East","Stationary","Standard Labels","Paul Adams",74.94,31.79,43.15,,,,43.15
+2019-02-14,"East","Grocery","Meat","Venu Karthik",2103.63,876.85,1226.78,,,,1226.78
+2019-02-15,"East","Stationary","Computer Paper","Catherine Rose",572.07,238.04,334.03,,,,334.03
+2019-02-16,"East","Grocery","Meat","Venu Karthik",2103.63,876.85,1226.78,,,,1226.78
+2019-02-17,"Central","Stationary","Art Supplies","Pete Zachriah",334.65,22.40,312.25,,,,312.25
+2019-02-18,"East","Grocery","Fruits and Vegetables","Tina Thomas",3474.17,1093.84,2380.33,,,,2380.33
+2019-02-19,"Central","Stationary","Copy Paper","Andy Flower",778.26,217.39,560.87,,,,560.87
+2019-02-20,"East","Grocery","Fruits and Vegetables","Andy Roddick",2610.46,1118.33,1492.13,,,,1492.13
+2019-02-21,"East","Stationary","Colored Envelopes","Florence Joy",206.44,55.83,150.61,,,,150.61
+2019-02-22,"East","Grocery","Cereals","Harold Pawlan",613.62,267.88,345.74,,,,345.74
+2019-02-23,"East","Furniture","Metal Bookcases","Mary Elizabeth",3524.93,127.86,3397.07,,,,3397.07
+2019-02-24,"East","Stationary","Standard Labels","Angelus Mathew",14.31,6.63,7.68,,,,7.68
+2019-02-25,"East","Grocery","Fruits and Vegetables","Venus Powell",1519.57,490.38,1029.19,,,,1029.19
+2019-02-26,"West","Grocery","Fruits and Vegetables","Lazar Mathew",503.82,190.95,312.87,,,,312.87
+2019-02-27,"West","Grocery","Fruits and Vegetables","Carl Lewis",6318.74,2150.17,4168.57,,,,4168.57
+2019-02-28,"West","Stationary","File Labels","Roger Terrence",77.47,33.20,44.27,,,,44.27
+2019-03-01,"Central","Stationary","Computer Paper","Joseph Cairn",754.10,264.02,490.08,,,,490.08
+2019-03-02,"East","Grocery","Fruits and Vegetables","Pete Zachriah",754.30,300.48,453.82,,,,453.82
+2019-03-03,"Central","Stationary","Copy Paper","Benjamin Ross",15.58,3.91,11.67,,,,11.67
+2019-03-04,"East","Stationary","Computer Paper","Dean Jones",325.61,115.94,209.67,,,,209.67
+2019-03-05,"East","Grocery","Cereals","Rozario Diego",736.06,383.30,352.76,,,,352.76
+2019-03-06,"East","Grocery","Fruits and Vegetables","Rozario Diego",4605.69,1570.80,3034.89,,,,3034.89
+2019-03-07,"Central","Furniture","Office Chairs","Catherine Rose",1787.63,627.41,1160.22,,,,1160.22
+2019-03-08,"Central","Stationary","Copy Paper","Nathan Astle",19.31,1.34,17.97,,,,17.97
+2019-03-09,"East","Stationary","Round Ring Binders","Steffi Graf",150.61,30.69,119.92,,,,119.92
+2019-03-10,"East","Grocery","Fruits and Vegetables","Immaculate Anita",441.39,216.02,225.37,,,,225.37
+2019-03-11,"East","Grocery","Fruits and Vegetables","John Britto",276.59,116.37,160.22,,,,160.22
+2019-03-12,"West","Grocery","Fruits and Vegetables","Rhino Augustus",5521.04,2405.20,3115.84,,,,3115.84
+2019-03-13,"West","Grocery","Meat","Rhino Augustus",280.88,38.42,242.46,,,,242.46
+2019-03-14,"West","Stationary","File Labels","Helen Magadalene",22.78,11.46,11.32,,,,11.32
+2019-03-15,"East","Grocery","Fruits and Vegetables","Michael Nathan",1943.83,709.05,1234.78,,,,1234.78
+2019-03-16,"Central","Grocery","Biscuits","John Britto",2967.18,615.50,2351.68,,,,2351.68
+2019-03-17,"East","Stationary","Copy Paper","David Flashing",524.67,179.84,344.83,,,,344.83
+2019-03-18,"West","Stationary","Pins and Tacks","Helen Magadalene",6.02,0.83,5.19,,,,5.19
+2019-03-19,"East","Stationary","Copy Paper","Augustine Paul",141.32,10.06,131.26,,,,131.26
+2019-03-20,"East","Stationary","Binder Clips","Immaculate Anita",21.97,7.40,14.57,,,,14.57
+2019-03-21,"West","Stationary","Binding Supplies","Augustine Paul",432.50,57.56,374.94,,,,374.94
+2019-03-22,"West","Grocery","Fruits and Vegetables","David Love",4643.36,1548.54,3094.82,,,,3094.82
+2019-03-23,"East","Stationary","Computer Paper","Immaculate Anita",405.88,87.65,318.23,,,,318.23
+2019-03-24,"East","Grocery","Fruits and Vegetables","Vincent Herbert",668.82,182.98,485.84,,,,485.84
+2019-03-25,"East","Grocery","Fruits and Vegetables","Vincent Herbert",668.82,182.98,485.84,,,,485.84
+2019-03-26,"East","Stationary","Pins and Tacks","Lance Willis",62.15,3.33,58.82,,,,58.82
+2019-03-27,"East","Stationary","Art Supplies","Catherine Rose",114.39,38.92,75.47,,,,75.47
+2019-03-28,"Central","Stationary","Writings Pads","Lela Donovan",422.04,202.64,219.40,,,,219.40
+2019-03-29,"East","Stationary","Standard Labels","Thomas Seio",245.62,130.90,114.72,,,,114.72
+2019-03-30,"West","Stationary","Computer Paper","Mathew Reese",2330.29,585.70,1744.59,,,,1744.59
+2019-03-31,"East","Stationary","Computer Paper","David Flashing",226.55,63.80,162.75,,,,162.75
+2019-04-01,"Central","Stationary","Art Supplies","Jency Johnah",61.04,12.84,48.20,,,,48.20
+2019-04-02,"East","Stationary","File Labels","Pete Zachriah",470.74,258.59,212.15,,,,212.15
+2019-04-03,"West","Furniture","Lighting","Sheri Gordon",239.30,55.27,184.03,,,,184.03
+2019-04-04,"East","Grocery","Fruits and Vegetables","Steve Harminson",406.15,129.71,276.44,,,,276.44
+2019-04-05,"East","Grocery","Fruits and Vegetables","Benjamin Ross",2132.80,793.78,1339.02,,,,1339.02
+2019-04-06,"Central","Stationary","Art Supplies","Rhino Augustus",44.42,0.59,43.83,,,,43.83
+2019-04-07,"East","Stationary","Art Supplies","Florence Joy",203.58,34.52,169.06,,,,169.06
+2019-04-08,"West","Stationary","Computer Paper","Barbara Fisher",52.55,27.99,24.56,,,,24.56
+2019-04-09,"West","Stationary","Storage Cabinets","Rick Reed",2939.52,270.08,2669.44,,,,2669.44
+2019-04-10,"East","Grocery","Fruits and Vegetables","Catherine Jordan",2096.44,1346.72,749.72,,,,749.72
+2019-04-11,"East","Grocery","Bread","Vincent Herbert",7370.84,3410.91,3959.93,,,,3959.93
+2019-04-12,"West","Stationary","Pins and Tacks","Munaf Patel",33.21,2.77,30.44,,,,30.44
+2019-04-13,"Central","Grocery","Fruits and Vegetables","Steven Roelle",3470.75,1300.53,2170.22,,,,2170.22
+2019-04-14,"East","Grocery","Meat","Lazar Mathew",1407.86,154.40,1253.46,,,,1253.46
+2019-04-15,"East","Grocery","Biscuits","Ian Fleming",3584.52,1161.60,2422.92,,,,2422.92
+2019-04-16,"East","Grocery","Fruits and Vegetables","Lazar Mathew",6589.07,2716.58,3872.49,,,,3872.49
+2019-04-17,"Central","Grocery","Fruits and Vegetables","Immaculate Anita",2371.30,1015.19,1356.11,,,,1356.11
+2019-04-18,"East","Furniture","Frames","Immaculate Anita",662.21,275.41,386.80,,,,386.80
+2019-04-19,"East","Grocery","Cereals","Mary Zewe",166.64,86.35,80.29,,,,80.29
+2019-04-20,"East","Stationary","Computer Paper","Benjamin Ross",964.11,573.11,391.00,,,,391.00
+2019-04-21,"East","Stationary","Computer Paper","Barbara Fisher",794.32,149.59,644.73,,,,644.73
+2019-04-22,"East","Stationary","Business Envelopes","Patrick O'Brill",2756.66,1629.98,1126.68,,,,1126.68
+2019-04-23,"West","Grocery","Fruits and Vegetables","David Flashing",3331.83,1179.90,2151.93,,,,2151.93
+2019-04-24,"Central","Grocery","Fruits and Vegetables","Catherine Rose",1523.22,435.46,1087.76,,,,1087.76
+2019-04-25,"East","Stationary","Copy Paper","Michael Angelo",13.05,4.07,8.98,,,,8.98
+2019-04-26,"West","Grocery","Fruits and Vegetables","Thomas Seio",8209.94,3071.37,5138.57,,,,5138.57
+2019-04-27,"Central","Stationary","Art Supplies","Ian Fleming",37.85,0.77,37.08,,,,37.08
+2019-04-28,"East","Grocery","Fruits and Vegetables","Mary Zewe",6607.25,2390.09,4217.16,,,,4217.16
+2019-04-29,"East","Stationary","Paper Clips","Michael Moore",86.33,14.80,71.53,,,,71.53
+2019-04-30,"Central","Stationary","Copy Paper","Harold Pawlan",409.33,43.67,365.66,,,,365.66
+2019-05-01,"West","Grocery","Fruits and Vegetables","Steffi Graf",165.01,99.82,65.19,,,,65.19
+2019-05-02,"Central","Stationary","Standard Labels","Jency Johnah",171.06,65.50,105.56,,,,105.56
+2019-05-03,"Central","Stationary","Art Supplies","Hallie Redmond",154.87,33.10,121.77,,,,121.77
+2019-05-04,"East","Stationary","Copy Paper","Mike Ballack",87.47,9.99,77.48,,,,77.48
+2019-05-05,"East","Grocery","Fruits and Vegetables","Lazar Mathew",4416.45,1809.23,2607.22,,,,2607.22
+2019-05-06,"West","Grocery","Fruits and Vegetables","John Britto",7772.04,2958.80,4813.24,,,,4813.24
+2019-05-07,"East","Grocery","Fruits and Vegetables","Thomas Seio",1803.74,663.95,1139.79,,,,1139.79
+2019-05-08,"East","Stationary","Heavy Duty Binders","Roger Terrence",56.72,13.22,43.50,,,,43.50
+2019-05-09,"East","Grocery","Fruits and Vegetables","Catherine Rose",8712.30,3770.40,4941.90,,,,4941.90
+2019-05-10,"East","Stationary","Art Supplies","Susan Juliet",39.64,3.82,35.82,,,,35.82
+2019-05-11,"Central","Stationary","Writings Pads","Mathew Reese",184.05,65.96,118.09,,,,118.09
+2019-05-12,"Central","Stationary","Art Supplies","Vincent Herbert",239.82,39.71,200.11,,,,200.11
+2019-05-13,"West","Furniture","Meeting Room Tables","Leena Mary",220.76,49.42,171.34,,,,171.34
+2019-05-14,"Central","Stationary","Computer Paper","Vincent Herbert",2048.30,1037.83,1010.47,,,,1010.47
+2019-05-15,"West","Grocery","Fruits and Vegetables","Susan Juliet",2159.20,568.21,1590.99,,,,1590.99
+2019-05-16,"West","Grocery","Fruits and Vegetables","Helen Magadalene",7538.07,2854.46,4683.61,,,,4683.61
+2019-05-17,"East","Stationary","Computer Paper","David Love",2354.28,958.94,1395.34,,,,1395.34
+2019-05-18,"East","Stationary","Copy Paper","Steven Roelle",218.67,67.67,151.00,,,,151.00
+2019-05-19,"East","Grocery","Fruits and Vegetables","Mary Zewe",9772.53,3614.50,6158.03,,,,6158.03
+2019-05-20,"West","Grocery","Fruits and Vegetables","Maxwell Schwartz",5084.34,1804.98,3279.36,,,,3279.36
+2019-05-21,"West","Grocery","Fruits and Vegetables","Joseph Aaron",1717.36,944.80,772.56,,,,772.56
+2019-05-22,"East","Grocery","Meat","Maurice Satty",604.95,108.99,495.96,,,,495.96
+2019-05-23,"East","Stationary","Round Ring Binders","Mary Elizabeth",143.10,55.19,87.91,,,,87.91
+2019-05-24,"East","Stationary","Computer Paper","Venu Karthik",1761.06,1014.00,747.06,,,,747.06
+2019-05-25,"West","Stationary","Art Supplies","Rhino Augustus",65.37,15.34,50.03,,,,50.03
+2019-05-26,"East","Stationary","Computer Paper","Michael Moore",1680.31,852.71,827.60,,,,827.60
+2019-05-27,"East","Stationary","Computer Paper","Michael Moore",1680.31,852.71,827.60,,,,827.60
+2019-05-28,"East","Grocery","Cereals","Lazar Mathew",670.46,357.68,312.78,,,,312.78
+2019-05-29,"West","Grocery","Fruits and Vegetables","Vincent Herbert",1265.60,528.50,737.10,,,,737.10
+2019-05-30,"West","Grocery","Fruits and Vegetables","Mathew Reese",3916.91,1231.38,2685.53,,,,2685.53
+2019-05-31,"East","Stationary","Art Supplies","Mary Zewe",48.93,8.58,40.35,,,,40.35
+2019-06-01,"East","Grocery","Fruits and Vegetables","Angelus Mathew",5731.46,2234.12,3497.34,,,,3497.34
+2019-06-02,"West","Stationary","Scissors","Hallie Redmond",321.95,42.72,279.23,,,,279.23
+2019-06-03,"East","Stationary","Art Supplies","Thomas Seio",229.77,43.81,185.96,,,,185.96
+2019-06-04,"East","Stationary","Art Supplies","Lance Willis",7.49,2.06,5.43,,,,5.43
+2019-06-05,"East","Stationary","Portable Storage","Leena Mary",562.57,15.51,547.06,,,,547.06
+2019-06-06,"East","Stationary","Standard Labels","Susan Juliet",75.73,35.76,39.97,,,,39.97
+2019-06-07,"East","Stationary","Writings Pads","Maxwell Schwartz",147.96,50.23,97.73,,,,97.73
+2019-06-08,"East","Stationary","Binder Clips","Steven Gerrard",18.25,4.92,13.33,,,,13.33
+2019-06-09,"East","Stationary","Computer Paper","Peter McVee",531.09,122.78,408.31,,,,408.31
+2019-06-10,"East","Stationary","Computer Paper","Lance Willis",1750.00,670.34,1079.66,,,,1079.66
+2019-06-11,"East","Furniture","Frames","Pete Zachriah",405.87,85.14,320.73,,,,320.73
+2019-06-12,"East","Grocery","Fruits and Vegetables","Lela Donovan",1188.59,380.95,807.64,,,,807.64
+2019-06-13,"Central","Stationary","Round Ring Binders","William Brown",54.33,0.60,53.73,,,,53.73
+2019-06-14,"East","Stationary","Writings Pads","Florence Joy",58.48,7.30,51.18,,,,51.18
+2019-06-15,"Central","Grocery","Fruits and Vegetables","Lance Willis",1887.12,222.08,1665.04,,,,1665.04
+2019-06-16,"Central","Grocery","Fruits and Vegetables","Lance Willis",1887.12,222.08,1665.04,,,,1665.04
+2019-06-17,"East","Grocery","Fruits and Vegetables","Maurice Satty",1188.94,243.55,945.39,,,,945.39
+2019-06-18,"Central","Stationary","Surge Protectors","Steve Harminson",84.01,26.63,57.38,,,,57.38
+2019-06-19,"East","Grocery","Fruits and Vegetables","Stephanie Ulpright",2542.06,1427.86,1114.20,,,,1114.20
+2019-06-20,"Central","Stationary","Writings Pads","Nathan Astle",76.52,23.70,52.82,,,,52.82
+2019-06-21,"East","Stationary","Art Supplies","Immaculate Anita",140.60,33.82,106.78,,,,106.78
+2019-06-22,"East","Stationary","Copy Paper","Michael Moore",11.67,4.53,7.14,,,,7.14
+2019-06-23,"West","Grocery","Fruits and Vegetables","Patrick O'Brill",3842.67,1383.98,2458.69,,,,2458.69
+2019-06-24,"West","Grocery","Fruits and Vegetables","Patrick O'Brill",3842.67,1383.98,2458.69,,,,2458.69
+2019-06-25,"Central","Grocery","Fruits and Vegetables","Mathew Reese",2683.34,824.24,1859.10,,,,1859.10
+2019-06-26,"Central","Stationary","Heavy Duty Binders","Michael Moore",210.80,103.93,106.87,,,,106.87
+2019-06-27,"East","Stationary","File Labels","Olvera Toch",133.49,63.67,69.82,,,,69.82
+2019-06-28,"East","Grocery","Fruits and Vegetables","Joseph Cairn",4443.26,1240.16,3203.10,,,,3203.10
+2019-06-29,"Central","Grocery","Fruits and Vegetables","Dean Jones",1361.44,405.88,955.56,,,,955.56
+2019-06-30,"West","Stationary","File Labels","William Brown",231.85,110.61,121.24,,,,121.24
+2019-07-01,"East","Grocery","Fruits and Vegetables","Peter McVee",9393.00,4037.14,5355.86,,,,5355.86
+2019-07-02,"East","Grocery","Fruits and Vegetables","Susan Juliet",4186.52,1409.12,2777.40,,,,2777.40
+2019-07-03,"Central","Grocery","Fruits and Vegetables","Neil Seth",3316.16,1298.73,2017.43,,,,2017.43
+2019-07-04,"East","Stationary","Art Supplies","Richard Agassi",99.66,3.08,96.58,,,,96.58
+2019-07-05,"West","Grocery","Fruits and Vegetables","Catherine Rose",8938.57,3526.02,5412.55,,,,5412.55
+2019-07-06,"East","Stationary","Art Supplies","Richard Agassi",99.66,3.08,96.58,,,,96.58
+2019-07-07,"East","Stationary","Computer Paper","Wu Chang",2551.08,1350.47,1200.61,,,,1200.61
+2019-07-08,"East","Grocery","Fruits and Vegetables","Wu Chang",847.20,465.81,381.39,,,,381.39
+2019-07-09,"East","Grocery","Fruits and Vegetables","John Britto",2446.44,205.80,2240.64,,,,2240.64
+2019-07-10,"Central","Furniture","Meeting Room Tables","Thomas Mondrake",9362.54,1955.08,7407.46,,,,7407.46
+2019-07-11,"Central","Stationary","Standard Labels","Maxwell Schwartz",157.34,73.64,83.70,,,,83.70
+2019-07-12,"East","Stationary","Binding Supplies","Roger Terrence",341.71,59.83,281.88,,,,281.88
+2019-07-13,"Central","Grocery","Fruits and Vegetables","Thomas Mondrake",4093.80,1408.27,2685.53,,,,2685.53
+2019-07-14,"East","Stationary","Business Envelopes","Maurice Satty",585.81,360.47,225.34,,,,225.34
+2019-07-15,"East","Stationary","Copy Paper","Mary Elizabeth",21.44,13.38,8.06,,,,8.06
+2019-07-16,"East","Grocery","Fruits and Vegetables","Munaf Patel",1965.44,714.55,1250.89,,,,1250.89
+2019-07-17,"East","Stationary","Round Ring Binders","David Flashing",1190.80,648.22,542.58,,,,542.58
+2019-07-18,"East","Grocery","Fruits and Vegetables","John Britto",3488.79,2027.77,1461.02,,,,1461.02
+2019-07-19,"East","Grocery","Fruits and Vegetables","Munaf Patel",1965.44,714.55,1250.89,,,,1250.89
+2019-07-20,"East","Stationary","Art Supplies","Munaf Patel",100.81,2.75,98.06,,,,98.06
+2019-07-21,"East","Grocery","Fruits and Vegetables","John Britto",7707.28,2724.32,4982.96,,,,4982.96
+2019-07-22,"East","Grocery","Fruits and Vegetables","David Love",2464.68,1054.72,1409.96,,,,1409.96
+2019-07-23,"East","Furniture","Meeting Room Tables","Victor Price",224.50,40.60,183.90,,,,183.90
+2019-07-24,"East","Stationary","File Labels","Lazar Mathew",208.04,113.67,94.37,,,,94.37
+2019-07-25,"East","Furniture","Office Chairs","Mary Zewe",10498.72,3089.96,7408.76,,,,7408.76
+2019-07-26,"Central","Grocery","Fruits and Vegetables","Lela Donovan",723.28,253.57,469.71,,,,469.71
+2019-07-27,"East","Stationary","Art Supplies","Roger Terrence",105.44,30.44,75.00,,,,75.00
+2019-07-28,"East","Grocery","Fruits and Vegetables","Lazar Mathew",5798.40,2207.96,3590.44,,,,3590.44
+2019-07-29,"Central","Stationary","Computer Paper","Carl Lewis",2514.62,525.84,1988.78,,,,1988.78
+2019-07-30,"East","Stationary","File Labels","Steffi Graf",68.75,29.28,39.47,,,,39.47
+2019-07-31,"East","Grocery","Fruits and Vegetables","Leena Mary",1690.38,645.69,1044.69,,,,1044.69
+2019-08-01,"East","Stationary","Portable Storage","Santa Cruz Clara",6430.62,1731.01,4699.61,,,,4699.61
+2019-08-02,"East","Stationary","Paper Clips","Peter Brian",90.03,13.25,76.78,,,,76.78
+2019-08-03,"East","Stationary","Binding Supplies","Michael Nathan",390.83,113.72,277.11,,,,277.11
+2019-08-04,"Central","Grocery","Meat","Joseph Cairn",984.24,464.31,519.93,,,,519.93
+2019-08-05,"West","Stationary","Specialty Envelopes","Immaculate Anita",1559.68,724.35,835.33,,,,835.33
+2019-08-06,"West","Stationary","File Labels","Andy Flower",108.95,48.23,60.72,,,,60.72
+2019-08-07,"East","Stationary","Art Supplies","Susan Juliet",51.08,3.44,47.64,,,,47.64
+2019-08-08,"East","Grocery","Fruits and Vegetables","Mathew Reese",4595.64,1783.56,2812.08,,,,2812.08
+2019-08-09,"East","Grocery","Meat","Augustine Paul",362.44,0.33,362.11,,,,362.11
+2019-08-10,"East","Grocery","Meat","Augustine Paul",362.44,0.33,362.11,,,,362.11
+2019-08-11,"West","Stationary","File Labels","Joseph Aaron",101.25,48.40,52.85,,,,52.85
+2019-08-12,"East","Grocery","Fruits and Vegetables","Helen Magadalene",2047.01,674.07,1372.94,,,,1372.94
+2019-08-13,"Central","Stationary","Art Supplies","Immaculate Anita",106.28,24.16,82.12,,,,82.12
+2019-08-14,"West","Stationary","Standard Labels","Lazar Mathew",121.81,61.87,59.94,,,,59.94
+2019-08-15,"East","Grocery","Fruits and Vegetables","Immaculate Anita",4015.30,1460.22,2555.08,,,,2555.08
+2019-08-16,"Central","Grocery","Fruits and Vegetables","Jim Courier",8800.51,2853.41,5947.10,,,,5947.10
+2019-08-17,"West","Stationary","Pins and Tacks","Carl Lewis",79.83,9.03,70.80,,,,70.80
+2019-08-18,"Central","Grocery","Meat","Jim Courier",1976.00,339.64,1636.36,,,,1636.36
+2019-08-19,"East","Grocery","Biscuits","Jason Gross",3640.08,779.93,2860.15,,,,2860.15
+2019-08-20,"Central","Stationary","Computer Paper","Roger Terrence",1998.11,1109.89,888.22,,,,888.22
+2019-08-21,"West","Grocery","Meat","Catherine Rose",1482.06,176.49,1305.57,,,,1305.57
+2019-08-22,"East","Grocery","Fruits and Vegetables","Munaf Patel",3403.78,1254.91,2148.87,,,,2148.87
+2019-08-23,"Central","Grocery","Meat","Vincent Herbert",1229.77,24.31,1205.46,,,,1205.46
+2019-08-24,"East","Stationary","Art Supplies","Joseph Aaron",60.93,4.23,56.70,,,,56.70
+2019-08-25,"Central","Stationary","Round Ring Binders","Rozario Diego",56.87,24.46,32.41,,,,32.41
+2019-08-26,"Central","Stationary","Binder Clips","Benjamin Ross",54.29,21.53,32.76,,,,32.76
+2019-08-27,"West","Stationary","Air Purifiers","Steffi Graf",594.19,156.61,437.58,,,,437.58
+2019-08-28,"Central","Stationary","Round Ring Binders","Catherine Jordan",114.96,30.69,84.27,,,,84.27
+2019-08-29,"East","Stationary","Art Supplies","Augustine Paul",80.90,11.52,69.38,,,,69.38
+2019-08-30,"West","Stationary","Art Supplies","Mary Elizabeth",45.91,8.31,37.60,,,,37.60
+2019-08-31,"Central","Furniture","Meeting Room Tables","Hallie Redmond",238.29,6.24,232.05,,,,232.05
+2019-09-01,"West","Grocery","Fruits and Vegetables","John Britto",2367.06,102.31,2264.75,,,,2264.75
+2019-09-02,"West","Grocery","Fruits and Vegetables","Hilary Holden",2788.74,889.98,1898.76,,,,1898.76
+2019-09-03,"East","Grocery","Fruits and Vegetables","Rozario Diego",432.97,131.03,301.94,,,,301.94
+2019-09-04,"East","Stationary","Art Supplies","Munaf Patel",41.50,2.35,39.15,,,,39.15
+2019-09-05,"East","Stationary","Computer Paper","David Flashing",836.54,271.49,565.05,,,,565.05
+2019-09-06,"East","Stationary","Standard Labels","Immaculate Anita",129.74,61.92,67.82,,,,67.82
+2019-09-07,"East","Grocery","Fruits and Vegetables","Peter McVee",583.19,248.86,334.33,,,,334.33
+2019-09-08,"Central","Grocery","Fruits and Vegetables","Steven Gerrard",1497.96,470.25,1027.71,,,,1027.71
+2019-09-09,"West","Stationary","Art Supplies","Ian Fleming",48.96,8.68,40.28,,,,40.28
+2019-09-10,"West","Grocery","Meat","Paul Adams",384.63,72.41,312.22,,,,312.22
+2019-09-11,"West","Grocery","Fruits and Vegetables","Shui Tom",5196.06,1913.74,3282.32,,,,3282.32
+2019-09-12,"East","Grocery","Fruits and Vegetables","Mike Ballack",3255.08,1271.00,1984.08,,,,1984.08
+2019-09-13,"West","Grocery","Fruits and Vegetables","Joseph Aaron",4010.35,1098.95,2911.40,,,,2911.40
+2019-09-14,"East","Stationary","File Labels","Michael Angelo",110.43,51.23,59.20,,,,59.20
+2019-09-15,"East","Stationary","Computer Paper","Patrick O'Brill",981.47,316.91,664.56,,,,664.56
+2019-09-16,"East","Stationary","Portable Storage","Steven Gerrard",65.98,15.07,50.91,,,,50.91
+2019-09-17,"West","Grocery","Fruits and Vegetables","Joseph Aaron",4010.35,1098.95,2911.40,,,,2911.40
+2019-09-18,"East","Grocery","Cereals","Olvera Toch",315.90,120.89,195.01,,,,195.01
+2019-09-19,"East","Stationary","Standard Labels","Ian Fleming",36.36,16.37,19.99,,,,19.99
+2019-09-20,"West","Grocery","Fruits and Vegetables","Richard Agassi",3167.87,1183.64,1984.23,,,,1984.23
+2019-09-21,"West","Grocery","Cereals","Benjamin Ross",581.84,240.99,340.85,,,,340.85
+2019-09-22,"East","Grocery","Cereals","Olvera Toch",315.90,120.89,195.01,,,,195.01
+2019-09-23,"East","Grocery","Fruits and Vegetables","Michael Angelo",5531.40,2306.51,3224.89,,,,3224.89
+2019-09-24,"East","Grocery","Meat","Andy Roddick",973.73,232.57,741.16,,,,741.16
+2019-09-25,"Central","Stationary","Pencils","Neil Seth",22.87,8.24,14.63,,,,14.63
+2019-09-26,"East","Grocery","Cereals","Steve Waugh",54.25,22.03,32.22,,,,32.22
+2019-09-27,"East","Grocery","Meat","John Britto",1896.28,856.42,1039.86,,,,1039.86
+2019-09-28,"Central","Grocery","Fruits and Vegetables","Pete Zachriah",4976.75,1923.65,3053.10,,,,3053.10
+2019-09-29,"East","Grocery","Meat","Shui Tom",453.87,156.49,297.38,,,,297.38
+2019-09-30,"West","Grocery","Fruits and Vegetables","Steven Roelle",76.28,28.36,47.92,,,,47.92
+2019-10-01,"East","Grocery","Meat","John Britto",1896.28,856.42,1039.86,,,,1039.86
+2019-10-02,"Central","Stationary","Computer Paper","Neil Seth",2194.63,994.40,1200.23,,,,1200.23
+2019-10-03,"East","Grocery","Fruits and Vegetables","David Love",2041.59,617.31,1424.28,,,,1424.28
+2019-10-04,"West","Stationary","Computer Paper","Susan Juliet",386.43,172.68,213.75,,,,213.75
+2019-10-05,"East","Stationary","Standard Labels","Susan Juliet",32.03,13.71,18.32,,,,18.32
+2019-10-06,"Central","Stationary","Copy Paper","Rozario Diego",75.81,24.55,51.26,,,,51.26
+2019-10-07,"East","Grocery","Fruits and Vegetables","Joseph Airdo",1377.92,540.63,837.29,,,,837.29
+2019-10-08,"East","Grocery","Fruits and Vegetables","Michael Angelo",973.17,522.43,450.74,,,,450.74
+2019-10-09,"West","Stationary","File Labels","Lazar Mathew",235.22,139.97,95.25,,,,95.25
+2019-10-10,"East","Grocery","Meat","Ian Fleming",1131.90,72.86,1059.04,,,,1059.04
+2019-10-11,"West","Grocery","Cereals","Mathew Reese",334.23,147.09,187.14,,,,187.14
+2019-10-12,"East","Stationary","Binder Clips","Thomas Mondrake",125.21,43.23,81.98,,,,81.98
+2019-10-13,"East","Stationary","Air Purifiers","Andy Roddick",21.45,7.20,14.25,,,,14.25
+2019-10-14,"East","Stationary","Paper Clips","Steffi Graf",50.18,6.30,43.88,,,,43.88
+2019-10-15,"Central","Grocery","Fruits and Vegetables","Pete Zachriah",282.39,88.40,193.99,,,,193.99
+2019-10-16,"East","Grocery","Fruits and Vegetables","Augustine Paul",1652.16,346.69,1305.47,,,,1305.47
+2019-10-17,"East","Grocery","Fruits and Vegetables","Jason Gross",3144.71,1033.11,2111.60,,,,2111.60
+2019-10-18,"East","Grocery","Fruits and Vegetables","Steffi Graf",3992.47,1348.95,2643.52,,,,2643.52
+2019-10-19,"East","Furniture","Frames","Augustine Paul",356.83,41.10,315.73,,,,315.73
+2019-10-20,"West","Grocery","Fruits and Vegetables","David Love",1907.45,623.79,1283.66,,,,1283.66
+2019-10-21,"East","Stationary","Air Purifiers","Augustine Paul",257.50,72.37,185.13,,,,185.13
+2019-10-22,"West","Stationary","Art Supplies","Sheri Gordon",103.20,26.45,76.75,,,,76.75
+2019-10-23,"Central","Stationary","Binder Clips","Barbara Fisher",172.23,38.93,133.30,,,,133.30
+2019-10-24,"West","Grocery","Fruits and Vegetables","Paul Adams",2147.97,767.07,1380.90,,,,1380.90
+2019-10-25,"East","Stationary","Paper Clips","Venu Karthik",125.47,44.74,80.73,,,,80.73
+2019-10-26,"East","Grocery","Fruits and Vegetables","Steve Harminson",968.57,347.06,621.51,,,,621.51
+2019-10-27,"Central","Stationary","Air Purifiers","John Britto",218.55,4.82,213.73,,,,213.73
+2019-10-28,"West","Stationary","Paper Clips","Benjamin Ross",97.72,22.86,74.86,,,,74.86
+2019-10-29,"East","Stationary","Art Supplies","Jency Johnah",57.02,16.54,40.48,,,,40.48
+2019-10-30,"Central","Stationary","Air Purifiers","Neil Seth",728.38,206.65,521.73,,,,521.73
+2019-10-31,"Central","Stationary","Air Purifiers","Neil Seth",728.38,206.65,521.73,,,,521.73
+2019-11-01,"East","Stationary","Art Supplies","Helen Magadalene",526.27,134.21,392.06,,,,392.06
+2019-11-02,"East","Stationary","Art Supplies","Dean Jones",26.36,1.08,25.28,,,,25.28
+2019-11-03,"East","Stationary","Heavy Duty Binders","Benjamin Ross",363.61,44.00,319.61,,,,319.61
+2019-11-04,"West","Stationary","Storage Cabinets","Rick Reed",6152.80,1004.59,5148.21,,,,5148.21
+2019-11-05,"East","Stationary","Art Supplies","Benjamin Ross",26.33,3.20,23.13,,,,23.13
+2019-11-06,"West","Stationary","File Labels","Rhino Augustus",67.45,29.50,37.95,,,,37.95
+2019-11-07,"West","Stationary","Computer Paper","Steffi Graf",831.40,419.07,412.33,,,,412.33
+2019-11-08,"West","Stationary","Portable Storage","Benjamin Ross",2008.54,641.83,1366.71,,,,1366.71
+2019-11-09,"West","Stationary","Computer Paper","Steffi Graf",831.40,419.07,412.33,,,,412.33
+2019-11-10,"Central","Grocery","Meat","Joseph Cairn",93.24,9.14,84.10,,,,84.10
+2019-11-11,"East","Grocery","Fruits and Vegetables","Joseph Aaron",1218.66,463.90,754.76,,,,754.76
+2019-11-12,"West","Furniture","End Tables","Olvera Toch",8239.08,584.34,7654.74,,,,7654.74
+2019-11-13,"East","Stationary","File Labels","Helen Magadalene",111.45,49.22,62.23,,,,62.23
+2019-11-14,"Central","Grocery","Fruits and Vegetables","Jason Gross",1540.24,592.28,947.96,,,,947.96
+2019-11-15,"West","Stationary","Air Purifiers","William Brown",1085.40,314.28,771.12,,,,771.12
+2019-11-16,"East","Stationary","Copy Paper","David Love",20.93,13.26,7.67,,,,7.67
+2019-11-17,"Central","Stationary","Business Envelopes","Dean Jones",72.28,26.15,46.13,,,,46.13
+2019-11-18,"East","Stationary","Computer Paper","Mike Ballack",894.07,79.42,814.65,,,,814.65
+2019-11-19,"West","Stationary","Computer Paper","Paul Adams",66.76,31.44,35.32,,,,35.32
+2019-11-20,"East","Grocery","Beverages","Mike Ballack",4056.49,2129.71,1926.78,,,,1926.78
+2019-11-21,"West","Grocery","Fruits and Vegetables","Peter Brian",617.37,269.63,347.74,,,,347.74
+2019-11-22,"East","Stationary","File Labels","Mary Elizabeth",362.11,193.43,168.68,,,,168.68
+2019-11-23,"West","Grocery","Fruits and Vegetables","Michael Angelo",853.88,298.40,555.48,,,,555.48
+2019-11-24,"East","Furniture","Office Chairs","Steven Gerrard",905.94,277.43,628.51,,,,628.51
+2019-11-25,"East","Stationary","File Labels","Mary Elizabeth",362.11,193.43,168.68,,,,168.68
+2019-11-26,"East","Grocery","Fruits and Vegetables","Olvera Toch",970.17,160.06,810.11,,,,810.11
+2019-11-27,"Central","Stationary","Art Supplies","Mathew Reese",70.68,4.63,66.05,,,,66.05
+2019-11-28,"West","Grocery","Fruits and Vegetables","Steven Roelle",4873.22,1671.37,3201.85,,,,3201.85
+2019-11-29,"East","Grocery","Bread","Michael Moore",9256.33,4071.59,5184.74,,,,5184.74
+2019-11-30,"East","Grocery","Fruits and Vegetables","Michael Moore",497.91,190.57,307.34,,,,307.34
+2019-12-01,"East","Grocery","Fruits and Vegetables","Carl Lewis",5560.56,2079.55,3481.01,,,,3481.01
+2019-12-02,"West","Grocery","Fruits and Vegetables","Richard Agassi",2251.39,906.48,1344.91,,,,1344.91
+2019-12-03,"West","Grocery","Fruits and Vegetables","Steve Harminson",5021.86,1513.71,3508.15,,,,3508.15
+2019-12-04,"Central","Stationary","Standard Labels","Hilary Holden",167.27,64.64,102.63,,,,102.63
+2019-12-05,"West","Stationary","Round Ring Binders","Barbara Fisher",136.75,10.41,126.34,,,,126.34
+2019-12-06,"Central","Stationary","Art Supplies","Lela Donovan",59.34,2.03,57.31,,,,57.31
+2019-12-07,"Central","Grocery","Fruits and Vegetables","Hilary Holden",10815.05,4784.33,6030.72,,,,6030.72
+2019-12-08,"Central","Stationary","Standard Labels","Andy Flower",143.00,80.72,62.28,,,,62.28
+2019-12-09,"East","Grocery","Fruits and Vegetables","Rhino Augustus",4546.90,1832.40,2714.50,,,,2714.50
+2019-12-10,"Central","Grocery","Meat","Dean Jones",901.09,126.85,774.24,,,,774.24
+2019-12-11,"East","Grocery","Fruits and Vegetables","Richard Agassi",3073.06,838.20,2234.86,,,,2234.86
+2019-12-12,"East","Grocery","Fruits and Vegetables","Joseph Cairn",3564.84,1335.19,2229.65,,,,2229.65
+2019-12-13,"East","Furniture","Frames","Catherine Jordan",118.82,55.17,63.65,,,,63.65
+2019-12-14,"East","Grocery","Fruits and Vegetables","Joseph Cairn",3564.84,1335.19,2229.65,,,,2229.65
+2019-12-15,"Central","Stationary","Round Ring Binders","Rozario Diego",55.85,17.63,38.22,,,,38.22
+2019-12-16,"Central","Grocery","Fruits and Vegetables","Thomas Mondrake",875.26,17.18,858.08,,,,858.08
+2019-12-17,"West","Stationary","Art Supplies","Dean Jones",153.39,9.20,144.19,,,,144.19
+2019-12-18,"East","Stationary","Rubber Bands","Catherine Rose",12.21,0.08,12.13,,,,12.13
+2019-12-19,"East","Stationary","File Labels","Olvera Toch",208.53,86.30,122.23,,,,122.23
+2019-12-20,"West","Stationary","Binder Clips","Joseph Cairn",26.11,7.89,18.22,,,,18.22
+2019-12-21,"East","Grocery","Fruits and Vegetables","Jason Gross",381.37,223.76,157.61,,,,157.61
+2019-12-22,"East","Grocery","Fruits and Vegetables","Paul Adams",723.43,279.05,444.38,,,,444.38
+2019-12-23,"East","Stationary","File Labels","Tina Thomas",55.15,16.64,38.51,,,,38.51
+2019-12-24,"Central","Stationary","Storage Cabinets","Tina Thomas",5452.90,876.71,4576.19,,,,4576.19
+2019-12-25,"East","Stationary","Computer Paper","Wu Chang",1991.93,1049.38,942.55,,,,942.55
+2019-12-26,"Central","Stationary","Colored Envelopes","Rozario Diego",105.98,28.08,77.90,,,,77.90
+2019-12-27,"West","Stationary","Art Supplies","Barbara Fisher",263.63,71.96,191.67,,,,191.67
+2019-12-28,"Central","Stationary","Cardboard Storage","Rozario Diego",8037.65,2708.91,5328.74,,,,5328.74
+2019-12-29,"West","Stationary","Art Supplies","Carl Lewis",99.39,5.11,94.28,,,,94.28
+2019-12-30,"West","Stationary","Computer Paper","Steven Gerrard",871.32,397.14,474.18,,,,474.18
+2019-12-31,"West","Grocery","Fruits and Vegetables","Richard Agassi",1964.73,789.11,1175.62,,,,1175.62
+2020-01-01,"East","Furniture","Office Chairs","Peter McVee",2163.44,785.07,1378.37,,,,1378.37
+2020-01-02,"Central","Stationary","Heavy Duty Binders","Steve Harminson",220.84,78.12,142.72,,,,142.72
+2020-01-03,"East","Stationary","Computer Paper","Steve Harminson",490.29,164.79,325.50,,,,325.50
+2020-01-04,"East","Grocery","Fruits and Vegetables","Steve Harminson",5036.45,2086.04,2950.41,,,,2950.41
+2020-01-05,"East","Stationary","Scissors","Munaf Patel",692.69,137.37,555.32,,,,555.32
+2020-01-06,"East","Grocery","Fruits and Vegetables","Sheri Gordon",6136.45,2280.67,3855.78,,,,3855.78
+2020-01-07,"East","Grocery","Fruits and Vegetables","Harold Pawlan",1685.75,567.34,1118.41,,,,1118.41
+2020-01-08,"West","Grocery","Fruits and Vegetables","Joseph Aaron",3948.43,1218.99,2729.44,,,,2729.44
+2020-01-09,"West","Grocery","Fruits and Vegetables","Joseph Cairn",6052.79,2375.32,3677.47,,,,3677.47
+2020-01-10,"Central","Stationary","Computer Paper","Paul Adams",564.56,119.03,445.53,,,,445.53
+2020-01-11,"East","Stationary","Binding Supplies","Helen Magadalene",1697.21,479.02,1218.19,,,,1218.19
+2020-01-12,"West","Stationary","Colored Envelopes","Rick Reed",35.66,0.21,35.45,,,,35.45
+2020-01-13,"East","Stationary","Binding Supplies","Peter McVee",830.33,167.09,663.24,,,,663.24
+2020-01-14,"East","Grocery","Fruits and Vegetables","Maxwell Schwartz",744.37,278.84,465.53,,,,465.53
+2020-01-15,"Central","Furniture","Frames","Jason Gross",339.63,90.78,248.85,,,,248.85
+2020-01-16,"East","Grocery","Fruits and Vegetables","David Boon",2509.80,913.50,1596.30,,,,1596.30
+2020-01-17,"West","Stationary","Art Supplies","Mike Ballack",13.29,5.88,7.41,,,,7.41
+2020-01-18,"East","Grocery","Fruits and Vegetables","Helen Magadalene",2021.87,243.91,1777.96,,,,1777.96
+2020-01-19,"West","Stationary","Art Supplies","Mike Ballack",13.29,5.88,7.41,,,,7.41
+2020-01-20,"West","Grocery","Fruits and Vegetables","Olvera Toch",1535.33,121.15,1414.18,,,,1414.18
+2020-01-21,"West","Grocery","Meat","Tina Thomas",576.29,90.00,486.29,,,,486.29
+2020-01-22,"East","Stationary","Writings Pads","Grace Kelly",6.97,3.07,3.90,,,,3.90
+2020-01-23,"East","Stationary","Writings Pads","Grace Kelly",6.97,3.07,3.90,,,,3.90
+2020-01-24,"Central","Grocery","Fruits and Vegetables","Mary Elizabeth",530.34,23.29,507.05,,,,507.05
+2020-01-25,"East","Grocery","Fruits and Vegetables","Rhino Augustus",4060.39,1727.50,2332.89,,,,2332.89
+2020-01-26,"East","Stationary","Computer Paper","Mathew Reese",1052.07,392.90,659.17,,,,659.17
+2020-01-27,"West","Grocery","Fruits and Vegetables","Nathan Astle",8993.00,3212.00,5781.00,,,,5781.00
+2020-01-28,"West","Grocery","Fruits and Vegetables","William Brown",2818.51,972.77,1845.74,,,,1845.74
+2020-01-29,"Central","Grocery","Fruits and Vegetables","Harold Pawlan",2843.78,899.24,1944.54,,,,1944.54
+2020-01-30,"Central","Grocery","Fruits and Vegetables","Catherine Rose",6171.62,2110.42,4061.20,,,,4061.20
+2020-01-31,"West","Grocery","Fruits and Vegetables","Peter McVee",1607.30,590.42,1016.88,,,,1016.88
+2020-02-01,"Central","Grocery","Fruits and Vegetables","Rick Reed",411.34,166.01,245.33,,,,245.33
+2020-02-02,"Central","Stationary","Copy Paper","Andy Flower",15.73,3.79,11.94,,,,11.94
+2020-02-03,"East","Furniture","End Tables","Rick Reed",10552.11,785.72,9766.39,,,,9766.39
+2020-02-04,"East","Grocery","Fruits and Vegetables","Vincent Herbert",1300.17,808.54,491.63,,,,491.63
+2020-02-05,"East","Grocery","Beverages","Vincent Herbert",385.81,35.39,350.42,,,,350.42
+2020-02-06,"East","Furniture","Clocks","Pete Zachriah",568.19,213.33,354.86,,,,354.86
+2020-02-07,"East","Grocery","Cereals","Stephanie Ulpright",75.92,26.15,49.77,,,,49.77
+2020-02-08,"East","Furniture","Clocks","Pete Zachriah",568.19,213.33,354.86,,,,354.86
+2020-02-09,"East","Grocery","Fruits and Vegetables","Peter Brian",2866.95,392.14,2474.81,,,,2474.81
+2020-02-10,"East","Stationary","Art Supplies","Neil Seth",293.95,87.71,206.24,,,,206.24
+2020-02-11,"East","Grocery","Meat","Maxwell Schwartz",164.63,80.73,83.90,,,,83.90
+2020-02-12,"West","Stationary","Binding Supplies","Lela Donovan",274.05,16.77,257.28,,,,257.28
+2020-02-13,"Central","Stationary","Round Ring Binders","Benjamin Ross",115.91,43.29,72.62,,,,72.62
+2020-02-14,"Central","Grocery","Fruits and Vegetables","Augustine Paul",1413.33,450.50,962.83,,,,962.83
+2020-02-15,"East","Grocery","Fruits and Vegetables","Catherine Jordan",1868.65,252.58,1616.07,,,,1616.07
+2020-02-16,"West","Stationary","Art Supplies","John Britto",483.93,83.16,400.77,,,,400.77
+2020-02-17,"West","Stationary","Writings Pads","Mary Elizabeth",469.85,254.83,215.02,,,,215.02
+2020-02-18,"East","Grocery","Meat","Patrick O'Brill",36.91,17.08,19.83,,,,19.83
+2020-02-19,"East","Grocery","Fruits and Vegetables","Vincent Herbert",491.09,192.70,298.39,,,,298.39
+2020-02-20,"West","Grocery","Fruits and Vegetables","Helen Magadalene",5092.07,2035.47,3056.60,,,,3056.60
+2020-02-21,"East","Stationary","Binding Supplies","Steve Waugh",965.18,315.12,650.06,,,,650.06
+2020-02-22,"East","Grocery","Fruits and Vegetables","Vincent Herbert",491.09,192.70,298.39,,,,298.39
+2020-02-23,"East","Grocery","Fruits and Vegetables","Mike Ballack",4222.09,1633.48,2588.61,,,,2588.61
+2020-02-24,"West","Stationary","Art Supplies","Jency Johnah",140.69,4.08,136.61,,,,136.61
+2020-02-25,"West","Stationary","Art Supplies","Jency Johnah",140.69,4.08,136.61,,,,136.61
+2020-02-26,"East","Stationary","Heavy Duty Binders","Venus Powell",1444.41,784.83,659.58,,,,659.58
+2020-02-27,"Central","Stationary","Standard Labels","Rhino Augustus",47.37,24.54,22.83,,,,22.83
+2020-02-28,"West","Stationary","Computer Paper","Steven Roelle",976.31,346.20,630.11,,,,630.11
+2020-02-29,"East","Stationary","Binding Supplies","Wu Chang",1067.31,214.58,852.73,,,,852.73
+2020-03-01,"East","Stationary","Art Supplies","Steven Gerrard",38.86,9.32,29.54,,,,29.54
+2020-03-02,"East","Stationary","Art Supplies","Wu Chang",3.44,1.04,2.40,,,,2.40
+2020-03-03,"East","Grocery","Fruits and Vegetables","Benjamin Ross",4036.79,1064.73,2972.06,,,,2972.06
+2020-03-04,"West","Grocery","Fruits and Vegetables","Rick Reed",1697.96,503.41,1194.55,,,,1194.55
+2020-03-05,"West","Stationary","Standard Labels","Peter Brian",229.55,91.74,137.81,,,,137.81
+2020-03-06,"West","Stationary","Heavy Duty Binders","David Boon",217.04,119.93,97.11,,,,97.11
+2020-03-07,"East","Grocery","Fruits and Vegetables","Andy Roddick",6298.87,2304.16,3994.71,,,,3994.71
+2020-03-08,"West","Stationary","Computer Paper","Angelus Mathew",201.59,34.54,167.05,,,,167.05
+2020-03-09,"East","Stationary","Computer Paper","Hallie Redmond",1423.66,738.46,685.20,,,,685.20
+2020-03-10,"East","Grocery","Fruits and Vegetables","Rozario Diego",168.87,17.61,151.26,,,,151.26
+2020-03-11,"East","Stationary","Binder Clips","Santa Cruz Clara",126.66,48.32,78.34,,,,78.34
+2020-03-12,"East","Stationary","Computer Paper","Catherine Rose",1143.51,549.68,593.83,,,,593.83
+2020-03-13,"East","Stationary","Round Ring Binders","Joseph Aaron",14.58,4.86,9.72,,,,9.72
+2020-03-14,"West","Grocery","Meat","Susan Juliet",28.73,5.87,22.86,,,,22.86
+2020-03-15,"West","Grocery","Meat","Angelus Mathew",1901.35,807.52,1093.83,,,,1093.83
+2020-03-16,"East","Stationary","Copy Paper","Maxwell Schwartz",120.42,34.98,85.44,,,,85.44
+2020-03-17,"West","Stationary","Copy Paper","Jency Johnah",1344.94,49.66,1295.28,,,,1295.28
+2020-03-18,"Central","Grocery","Fruits and Vegetables","Dean Jones",2626.35,886.12,1740.23,,,,1740.23
+2020-03-19,"West","Stationary","Highlighters","Joseph Airdo",57.07,0.35,56.72,,,,56.72
+2020-03-20,"East","Grocery","Fruits and Vegetables","Hilary Holden",3918.43,1249.18,2669.25,,,,2669.25
+2020-03-21,"West","Stationary","Art Supplies","Hilary Holden",69.82,14.31,55.51,,,,55.51
+2020-03-22,"Central","Stationary","Standard Labels","Ian Fleming",50.51,25.53,24.98,,,,24.98
+2020-03-23,"Central","Grocery","Fruits and Vegetables","Harold Pawlan",740.48,227.56,512.92,,,,512.92
+2020-03-24,"East","Stationary","Art Supplies","Thomas Mondrake",8.57,1.57,7.00,,,,7.00
+2020-03-25,"East","Stationary","Computer Paper","Steve Waugh",159.11,31.82,127.29,,,,127.29
+2020-03-26,"West","Stationary","Round Ring Binders","Helen Magadalene",235.69,83.67,152.02,,,,152.02
+2020-03-27,"West","Stationary","Copy Paper","Paul Adams",21.07,12.85,8.22,,,,8.22
+2020-03-28,"West","Stationary","Pencils","Victor Price",120.72,5.41,115.31,,,,115.31
+2020-03-29,"West","Grocery","Fruits and Vegetables","Hallie Redmond",3700.82,1295.72,2405.10,,,,2405.10
+2020-03-30,"East","Stationary","Portable Storage","Nathan Astle",928.16,258.75,669.41,,,,669.41
+2020-03-31,"West","Stationary","Copy Paper","Steven Roelle",517.75,172.60,345.15,,,,345.15
+2020-04-01,"West","Grocery","Fruits and Vegetables","Carl Lewis",2381.21,635.39,1745.82,,,,1745.82
+2020-04-02,"East","Grocery","Fruits and Vegetables","Joseph Cairn",189.61,64.80,124.81,,,,124.81
+2020-04-03,"West","Stationary","Computer Paper","William Brown",1816.44,625.29,1191.15,,,,1191.15
+2020-04-04,"Central","Furniture","Office Chairs","Shui Tom",1684.18,679.04,1005.14,,,,1005.14
+2020-04-05,"West","Stationary","Highlighters","Joseph Aaron",37.48,0.13,37.35,,,,37.35
+2020-04-06,"East","Stationary","Standard Labels","Patrick O'Brill",225.84,99.76,126.08,,,,126.08
+2020-04-07,"West","Stationary","Copy Paper","Shui Tom",1149.79,367.91,781.88,,,,781.88
+2020-04-08,"East","Grocery","Fruits and Vegetables","Hilary Holden",955.88,573.23,382.65,,,,382.65
+2020-04-09,"Central","Stationary","Standard Labels","Mike Ballack",111.41,52.44,58.97,,,,58.97
+2020-04-10,"East","Stationary","Computer Paper","Pete Zachriah",27.69,9.51,18.18,,,,18.18
+2020-04-11,"East","Grocery","Fruits and Vegetables","Maurice Satty",22.08,2.16,19.92,,,,19.92
+2020-04-12,"East","Grocery","Fruits and Vegetables","Thomas Mondrake",4748.69,1725.72,3022.97,,,,3022.97
+2020-04-13,"East","Stationary","Portable Storage","Venus Powell",99.17,4.04,95.13,,,,95.13
+2020-04-14,"East","Stationary","Computer Paper","Neil Seth",2748.87,1149.33,1599.54,,,,1599.54
+2020-04-15,"West","Stationary","Copy Paper","Venus Powell",409.51,40.92,368.59,,,,368.59
+2020-04-16,"Central","Stationary","Round Ring Binders","Dean Jones",103.19,31.89,71.30,,,,71.30
+2020-04-17,"East","Stationary","Computer Paper","Leena Mary",709.91,389.52,320.39,,,,320.39
+2020-04-18,"West","Grocery","Fruits and Vegetables","Mathew Reese",4794.07,1850.13,2943.94,,,,2943.94
+2020-04-19,"West","Grocery","Fruits and Vegetables","Andy Roddick",3928.38,1386.98,2541.40,,,,2541.40
+2020-04-20,"East","Stationary","Copy Paper","Pete Zachriah",315.42,20.70,294.72,,,,294.72
+2020-04-21,"Central","Stationary","File Labels","Olvera Toch",49.96,27.28,22.68,,,,22.68
+2020-04-22,"East","Stationary","Specialty Envelopes","Pete Zachriah",455.08,195.66,259.42,,,,259.42
+2020-04-23,"Central","Stationary","Computer Paper","Mary Elizabeth",410.16,187.47,222.69,,,,222.69
+2020-04-24,"East","Grocery","Fruits and Vegetables","Carl Lewis",2974.81,986.08,1988.73,,,,1988.73
+2020-04-25,"East","Stationary","Round Ring Binders","Wu Chang",144.97,18.63,126.34,,,,126.34
+2020-04-26,"East","Grocery","Cereals","Olvera Toch",513.26,231.89,281.37,,,,281.37
+2020-04-27,"East","Stationary","Paper Clips","Hallie Redmond",71.32,12.68,58.64,,,,58.64
+2020-04-28,"East","Stationary","Art Supplies","Susan Juliet",45.31,12.93,32.38,,,,32.38
+2020-04-29,"West","Stationary","Portable Storage","Leena Mary",1024.93,234.55,790.38,,,,790.38
+2020-04-30,"Central","Grocery","Cereals","Michael Moore",4.08,1.05,3.03,,,,3.03
+2020-05-01,"West","Grocery","Fruits and Vegetables","Hallie Redmond",3632.14,1252.70,2379.44,,,,2379.44
+2020-05-02,"West","Grocery","Fruits and Vegetables","Lela Donovan",5342.57,1929.65,3412.92,,,,3412.92
+2020-05-03,"West","Grocery","Fruits and Vegetables","Hallie Redmond",3632.14,1252.70,2379.44,,,,2379.44
+2020-05-04,"West","Furniture","Office Chairs","Tina Thomas",8272.75,2576.73,5696.02,,,,5696.02
+2020-05-05,"East","Stationary","Standard Labels","David Flashing",573.15,336.39,236.76,,,,236.76
+2020-05-06,"East","Stationary","File Labels","Maxwell Schwartz",190.05,90.85,99.20,,,,99.20
+2020-05-07,"East","Grocery","Fruits and Vegetables","David Flashing",1957.12,564.70,1392.42,,,,1392.42
+2020-05-08,"East","Stationary","Art Supplies","Augustine Paul",183.63,18.00,165.63,,,,165.63
+2020-05-09,"West","Grocery","Meat","Jency Johnah",2869.27,1260.25,1609.02,,,,1609.02
+2020-05-10,"East","Stationary","Copy Paper","Steven Gerrard",32.72,2.03,30.69,,,,30.69
+2020-05-11,"East","Furniture","Frames","Joseph Cairn",71.49,0.17,71.32,,,,71.32
+2020-05-12,"West","Grocery","Fruits and Vegetables","David Flashing",2970.27,1635.85,1334.42,,,,1334.42
+2020-05-13,"East","Grocery","Meat","Steven Gerrard",4654.70,2221.74,2432.96,,,,2432.96
+2020-05-14,"East","Grocery","Meat","Steven Gerrard",4654.70,2221.74,2432.96,,,,2432.96
+2020-05-15,"West","Stationary","Standard Labels","Rhino Augustus",29.43,14.21,15.22,,,,15.22
+2020-05-16,"East","Furniture","Clocks","John Britto",272.34,14.58,257.76,,,,257.76
+2020-05-17,"East","Stationary","Art Supplies","Joseph Cairn",9.25,2.21,7.04,,,,7.04
+2020-05-18,"West","Grocery","Fruits and Vegetables","Rhino Augustus",417.50,152.33,265.17,,,,265.17
+2020-05-19,"West","Grocery","Fruits and Vegetables","Vincent Herbert",1682.39,200.05,1482.34,,,,1482.34
+2020-05-20,"West","Stationary","Paper Clips","Rhino Augustus",206.75,90.79,115.96,,,,115.96
+2020-05-21,"Central","Stationary","Computer Paper","Mike Ballack",119.80,69.77,50.03,,,,50.03
+2020-05-22,"Central","Grocery","Baby Food","Mike Ballack",680.75,154.24,526.51,,,,526.51
+2020-05-23,"East","Grocery","Fruits and Vegetables","Catherine Rose",1852.11,826.52,1025.59,,,,1025.59
+2020-05-24,"East","Grocery","Fruits and Vegetables","Pete Zachriah",3002.46,972.44,2030.02,,,,2030.02
+2020-05-25,"Central","Grocery","Fruits and Vegetables","Wu Chang",2110.32,555.63,1554.69,,,,1554.69
+2020-05-26,"West","Stationary","Binder Clips","Joseph Aaron",82.83,39.15,43.68,,,,43.68
+2020-05-27,"West","Stationary","Portable Storage","Jason Gross",707.86,207.90,499.96,,,,499.96
+2020-05-28,"East","Grocery","Fruits and Vegetables","Pete Zachriah",7836.20,3102.38,4733.82,,,,4733.82
+2020-05-29,"East","Stationary","File Labels","Paul Adams",33.31,24.24,9.07,,,,9.07
+2020-05-30,"East","Grocery","Fruits and Vegetables","Santa Cruz Clara",2875.25,1005.89,1869.36,,,,1869.36
+2020-05-31,"Central","Stationary","Specialty Envelopes","John Britto",3882.65,1392.25,2490.40,,,,2490.40
+2020-06-01,"West","Stationary","Surge Protectors","Sheri Gordon",179.26,12.34,166.92,,,,166.92
+2020-06-02,"East","Stationary","Art Supplies","Immaculate Anita",122.20,27.38,94.82,,,,94.82
+2020-06-03,"Central","Stationary","Computer Paper","William Brown",1269.38,603.32,666.06,,,,666.06
+2020-06-04,"West","Stationary","Art Supplies","Patrick O'Brill",124.47,24.55,99.92,,,,99.92
+2020-06-05,"West","Stationary","Computer Paper","Joseph Cairn",5628.42,2741.70,2886.72,,,,2886.72
+2020-06-06,"Central","Stationary","Art Supplies","Harold Pawlan",14.53,1.58,12.95,,,,12.95
+2020-06-07,"West","Stationary","Scissors","Rozario Diego",86.38,9.35,77.03,,,,77.03
+2020-06-08,"East","Stationary","Standard Labels","Neil Seth",58.25,28.11,30.14,,,,30.14
+2020-06-09,"East","Stationary","Surge Protectors","Steve Harminson",469.22,109.30,359.92,,,,359.92
+2020-06-10,"East","Stationary","Binder Clips","Thomas Mondrake",189.03,79.82,109.21,,,,109.21
+2020-06-11,"West","Grocery","Fruits and Vegetables","Rick Reed",360.78,164.12,196.66,,,,196.66
+2020-06-12,"East","Stationary","File Labels","Patrick O'Brill",97.79,39.35,58.44,,,,58.44
+2020-06-13,"Central","Grocery","Meat","Lela Donovan",6457.26,3017.56,3439.70,,,,3439.70
+2020-06-14,"East","Stationary","Computer Paper","Munaf Patel",487.00,261.71,225.29,,,,225.29
+2020-06-15,"East","Grocery","Fruits and Vegetables","Mike Ballack",2687.52,808.69,1878.83,,,,1878.83
+2020-06-16,"Central","Grocery","Fruits and Vegetables","Lela Donovan",811.00,82.80,728.20,,,,728.20
+2020-06-17,"East","Furniture","Frames","Maxwell Schwartz",398.29,7.45,390.84,,,,390.84
+2020-06-18,"West","Furniture","Clocks","Helen Magadalene",748.23,104.46,643.77,,,,643.77
+2020-06-19,"East","Stationary","Computer Paper","Grace Kelly",1139.51,656.12,483.39,,,,483.39
+2020-06-20,"West","Stationary","Art Supplies","Augustine Paul",43.03,16.92,26.11,,,,26.11
+2020-06-21,"West","Grocery","Fruits and Vegetables","Helen Magadalene",7209.59,2789.36,4420.23,,,,4420.23
+2020-06-22,"West","Stationary","Binding Machines","Helen Magadalene",141.60,55.55,86.05,,,,86.05
+2020-06-23,"East","Stationary","Writings Pads","Paul Adams",345.69,173.31,172.38,,,,172.38
+2020-06-24,"East","Stationary","Art Supplies","Pete Zachriah",19.29,0.18,19.11,,,,19.11
+2020-06-25,"West","Grocery","Fruits and Vegetables","Catherine Rose",1977.77,1228.05,749.72,,,,749.72
+2020-06-26,"Central","Stationary","Computer Paper","Thomas Mondrake",395.72,77.49,318.23,,,,318.23
+2020-06-27,"East","Stationary","Computer Paper","Victor Price",1223.16,641.20,581.96,,,,581.96
+2020-06-28,"Central","Stationary","Paper Clips","Nathan Astle",22.45,6.00,16.45,,,,16.45
+2020-06-29,"West","Stationary","Copy Paper","Roger Terrence",778.93,101.07,677.86,,,,677.86
+2020-06-30,"East","Stationary","Art Supplies","Thomas Mondrake",124.46,22.26,102.20,,,,102.20
+2020-07-01,"West","Grocery","Fruits and Vegetables","Rhino Augustus",8738.10,3429.12,5308.98,,,,5308.98
+2020-07-02,"East","Grocery","Fruits and Vegetables","Leena Mary",1118.45,476.62,641.83,,,,641.83
+2020-07-03,"Central","Grocery","Fruits and Vegetables","Maurice Satty",5372.47,1971.63,3400.84,,,,3400.84
+2020-07-04,"East","Stationary","Computer Paper","John Britto",212.74,109.66,103.08,,,,103.08
+2020-07-05,"West","Stationary","Binding Supplies","Venus Powell",611.71,173.16,438.55,,,,438.55
+2020-07-06,"East","Grocery","Fruits and Vegetables","Roger Terrence",1301.65,336.82,964.83,,,,964.83
+2020-07-07,"East","Stationary","Art Supplies","Michael Moore",5.53,0.47,5.06,,,,5.06
+2020-07-08,"Central","Furniture","Office Chairs","Steven Roelle",696.47,210.78,485.69,,,,485.69
+2020-07-09,"Central","Grocery","Fruits and Vegetables","Nathan Astle",2563.77,950.25,1613.52,,,,1613.52
+2020-07-10,"Central","Grocery","Fruits and Vegetables","Catherine Jordan",4145.68,1617.80,2527.88,,,,2527.88
+2020-07-11,"East","Grocery","Fruits and Vegetables","Rozario Diego",3509.03,1047.01,2462.02,,,,2462.02
+2020-07-12,"East","Grocery","Fruits and Vegetables","Jim Courier",718.86,412.39,306.47,,,,306.47
+2020-07-13,"East","Stationary","Binder Clips","Mathew Reese",111.20,17.89,93.31,,,,93.31
+2020-07-14,"East","Grocery","Fruits and Vegetables","Steven Roelle",3612.79,1295.86,2316.93,,,,2316.93
+2020-07-15,"Central","Grocery","Fruits and Vegetables","Benjamin Ross",3726.30,1235.66,2490.64,,,,2490.64
+2020-07-16,"West","Grocery","Fruits and Vegetables","Grace Kelly",331.23,138.09,193.14,,,,193.14
+2020-07-17,"West","Stationary","Scissors","Richard Agassi",127.56,37.16,90.40,,,,90.40
+2020-07-18,"Central","Stationary","Computer Paper","Andy Flower",1863.72,1013.13,850.59,,,,850.59
+2020-07-19,"Central","Stationary","Pencils","Andy Flower",364.05,30.27,333.78,,,,333.78
+2020-07-20,"West","Stationary","Art Supplies","Lela Donovan",179.11,13.48,165.63,,,,165.63
+2020-07-21,"East","Stationary","Computer Paper","Maxwell Schwartz",1057.52,446.81,610.71,,,,610.71
+2020-07-22,"Central","Grocery","Fruits and Vegetables","Joseph Airdo",986.25,371.58,614.67,,,,614.67
+2020-07-23,"Central","Stationary","Art Supplies","Patrick O'Brill",41.37,7.70,33.67,,,,33.67
+2020-07-24,"Central","Grocery","Fruits and Vegetables","Lance Willis",881.36,318.64,562.72,,,,562.72
+2020-07-25,"Central","Stationary","Art Supplies","Shui Tom",50.16,9.88,40.28,,,,40.28
+2020-07-26,"East","Grocery","Fruits and Vegetables","Augustine Paul",3162.42,1201.30,1961.12,,,,1961.12
+2020-07-27,"East","Stationary","Copy Paper","David Boon",780.70,304.62,476.08,,,,476.08
+2020-07-28,"East","Stationary","Copy Paper","David Boon",780.70,304.62,476.08,,,,476.08
+2020-07-29,"Central","Furniture","Office Chairs","Leena Mary",2287.45,1.06,2286.39,,,,2286.39
+2020-07-30,"West","Grocery","Meat","Carl Lewis",703.49,237.60,465.89,,,,465.89
+2020-07-31,"East","Stationary","Art Supplies","Hallie Redmond",40.37,5.36,35.01,,,,35.01
+2020-08-01,"West","Stationary","Standard Labels","Catherine Jordan",299.34,171.51,127.83,,,,127.83
+2020-08-02,"West","Grocery","Fruits and Vegetables","Steven Gerrard",1386.92,589.24,797.68,,,,797.68
+2020-08-03,"East","Stationary","Computer Paper","Santa Cruz Clara",137.43,56.69,80.74,,,,80.74
+2020-08-04,"West","Grocery","Fruits and Vegetables","David Flashing",1006.90,415.02,591.88,,,,591.88
+2020-08-05,"East","Stationary","Art Supplies","John Elliot",81.12,30.31,50.81,,,,50.81
+2020-08-06,"East","Stationary","Paper Clips","Catherine Rose",42.26,8.57,33.69,,,,33.69
+2020-08-07,"West","Grocery","Fruits and Vegetables","Augustine Paul",4202.36,1663.63,2538.73,,,,2538.73
+2020-08-08,"Central","Grocery","Meat","Patrick O'Brill",2686.55,1161.81,1524.74,,,,1524.74
+2020-08-09,"East","Grocery","Fruits and Vegetables","Mary Elizabeth",2881.19,1096.83,1784.36,,,,1784.36
+2020-08-10,"East","Grocery","Fruits and Vegetables","Tina Thomas",9034.72,3593.75,5440.97,,,,5440.97
+2020-08-11,"Central","Stationary","File Labels","Mary Zewe",105.87,42.12,63.75,,,,63.75
+2020-08-12,"East","Grocery","Fruits and Vegetables","Dean Jones",1728.58,564.70,1163.88,,,,1163.88
+2020-08-13,"Central","Stationary","Paper Clips","Jency Johnah",53.37,0.97,52.40,,,,52.40
+2020-08-14,"West","Grocery","Fruits and Vegetables","Hilary Holden",1370.99,441.44,929.55,,,,929.55
+2020-08-15,"East","Stationary","Art Supplies","Tina Thomas",24.89,6.39,18.50,,,,18.50
+2020-08-16,"East","Grocery","Fruits and Vegetables","Steven Gerrard",238.94,85.91,153.03,,,,153.03
+2020-08-17,"West","Stationary","Copy Paper","Peter Brian",254.13,25.95,228.18,,,,228.18
+2020-08-18,"East","Grocery","Fruits and Vegetables","Steven Gerrard",238.94,85.91,153.03,,,,153.03
+2020-08-19,"East","Stationary","Computer Paper","Rozario Diego",641.92,304.14,337.78,,,,337.78
+2020-08-20,"East","Stationary","Art Supplies","Rozario Diego",26.12,4.64,21.48,,,,21.48
+2020-08-21,"East","Furniture","Office Chairs","Mike Ballack",8999.43,3313.64,5685.79,,,,5685.79
+2020-08-22,"East","Stationary","Art Supplies","Rozario Diego",26.12,4.64,21.48,,,,21.48
+2020-08-23,"East","Stationary","File Labels","Olvera Toch",137.53,61.64,75.89,,,,75.89
+2020-08-24,"West","Grocery","Fruits and Vegetables","Peter Brian",1963.15,715.59,1247.56,,,,1247.56
+2020-08-25,"West","Furniture","Office Chairs","Joseph Aaron",8955.34,2723.44,6231.90,,,,6231.90
+2020-08-26,"East","Stationary","Air Purifiers","Lazar Mathew",179.06,44.42,134.64,,,,134.64
+2020-08-27,"Central","Stationary","File Labels","Andy Roddick",21.99,9.85,12.14,,,,12.14
+2020-08-28,"East","Stationary","Air Purifiers","Lazar Mathew",179.06,44.42,134.64,,,,134.64
+2020-08-29,"East","Furniture","Frames","Dean Jones",165.99,22.43,143.56,,,,143.56
+2020-08-30,"East","Stationary","Art Supplies","John Elliot",13.53,4.82,8.71,,,,8.71
+2020-08-31,"East","Grocery","Fruits and Vegetables","Maurice Satty",985.34,338.91,646.43,,,,646.43
+2020-09-01,"East","Grocery","Fruits and Vegetables","Hallie Redmond",611.95,226.56,385.39,,,,385.39
+2020-09-02,"East","Stationary","Pins and Tacks","Joseph Cairn",6.14,5.01,1.13,,,,1.13
+2020-09-03,"West","Stationary","Art Supplies","Maxwell Schwartz",14.83,2.39,12.44,,,,12.44
+2020-09-04,"West","Grocery","Bread","John Britto",19634.64,9265.15,10369.49,,,,10369.49
+2020-09-05,"East","Grocery","Fruits and Vegetables","Augustine Paul",2689.45,1011.67,1677.78,,,,1677.78
+2020-09-06,"West","Furniture","Lighting","Lela Donovan",208.48,40.69,167.79,,,,167.79
+2020-09-07,"East","Grocery","Fruits and Vegetables","Thomas Seio",1845.99,662.23,1183.76,,,,1183.76
+2020-09-08,"West","Stationary","Scissors","Andy Roddick",271.06,49.60,221.46,,,,221.46
+2020-09-09,"West","Stationary","Computer Paper","Lela Donovan",50.74,25.73,25.01,,,,25.01
+2020-09-10,"West","Grocery","Fruits and Vegetables","Andy Roddick",2561.05,703.61,1857.44,,,,1857.44
+2020-09-11,"Central","Stationary","Copy Paper","Mike Ballack",338.52,100.48,238.04,,,,238.04
+2020-09-12,"West","Grocery","Fruits and Vegetables","Nathan Astle",200.44,118.92,81.52,,,,81.52
+2020-09-13,"Central","Grocery","Fruits and Vegetables","Benjamin Ross",850.71,259.46,591.25,,,,591.25
+2020-09-14,"West","Grocery","Fruits and Vegetables","John Britto",3498.49,1061.77,2436.72,,,,2436.72
+2020-09-15,"East","Grocery","Fruits and Vegetables","Hallie Redmond",2638.77,923.41,1715.36,,,,1715.36
+2020-09-16,"East","Grocery","Cereals","Mathew Reese",297.34,134.94,162.40,,,,162.40
+2020-09-17,"East","Stationary","Art Supplies","Steffi Graf",37.22,5.50,31.72,,,,31.72
+2020-09-18,"East","Grocery","Fruits and Vegetables","Michael Angelo",4642.41,1483.56,3158.85,,,,3158.85
+2020-09-19,"Central","Stationary","Art Supplies","Nathan Astle",37.74,7.67,30.07,,,,30.07
+2020-09-20,"Central","Stationary","File Labels","Peter McVee",33.99,15.55,18.44,,,,18.44
+2020-09-21,"Central","Grocery","Fruits and Vegetables","Lazar Mathew",1468.15,537.08,931.07,,,,931.07
+2020-09-22,"Central","Grocery","Fruits and Vegetables","Venus Powell",1250.57,221.83,1028.74,,,,1028.74
+2020-09-23,"Central","Grocery","Fruits and Vegetables","Michael Nathan",1055.11,64.48,990.63,,,,990.63
+2020-09-24,"Central","Grocery","Fruits and Vegetables","Joseph Cairn",735.28,147.86,587.42,,,,587.42
+2020-09-25,"East","Furniture","Metal Bookcases","Roger Terrence",2703.42,446.41,2257.01,,,,2257.01
+2020-09-26,"East","Stationary","Binder Clips","Stephanie Ulpright",19.62,1.81,17.81,,,,17.81
+2020-09-27,"East","Grocery","Fruits and Vegetables","Vincent Herbert",4656.70,1718.45,2938.25,,,,2938.25
+2020-09-28,"East","Grocery","Fruits and Vegetables","Vincent Herbert",4656.70,1718.45,2938.25,,,,2938.25
+2020-09-29,"West","Stationary","Art Supplies","David Flashing",53.44,3.85,49.59,,,,49.59
+2020-09-30,"West","Stationary","Computer Paper","Jason Gross",1001.17,373.14,628.03,,,,628.03
+2020-10-01,"West","Grocery","Fruits and Vegetables","Hilary Holden",3113.87,1212.94,1900.93,,,,1900.93
+2020-10-02,"East","Stationary","Standard Labels","Joseph Cairn",23.12,9.80,13.32,,,,13.32
+2020-10-03,"Central","Grocery","Fruits and Vegetables","Nathan Astle",788.48,208.44,580.04,,,,580.04
+2020-10-04,"West","Grocery","Fruits and Vegetables","Carl Lewis",7128.04,2919.74,4208.30,,,,4208.30
+2020-10-05,"East","Stationary","Pencils","Tina Thomas",31.39,1.35,30.04,,,,30.04
+2020-10-06,"East","Stationary","Pencils","David Boon",63.27,13.25,50.02,,,,50.02
+2020-10-07,"West","Grocery","Fruits and Vegetables","Steffi Graf",3348.45,1419.73,1928.72,,,,1928.72
+2020-10-08,"East","Stationary","Copy Paper","Ian Fleming",11.37,3.19,8.18,,,,8.18
+2020-10-09,"West","Stationary","Heavy Duty Binders","Helen Magadalene",578.01,252.83,325.18,,,,325.18
+2020-10-10,"Central","Grocery","Fruits and Vegetables","Ian Fleming",762.92,275.58,487.34,,,,487.34
+2020-10-11,"West","Stationary","Surge Protectors","Mary Elizabeth",228.60,57.21,171.39,,,,171.39
+2020-10-12,"East","Stationary","Heavy Duty Binders","Maxwell Schwartz",1306.17,691.56,614.61,,,,614.61
+2020-10-13,"West","Stationary","Copy Paper","Steven Gerrard",78.71,1.38,77.33,,,,77.33
+2020-10-14,"Central","Grocery","Fruits and Vegetables","Nathan Astle",806.73,326.43,480.30,,,,480.30
+2020-10-15,"West","Stationary","Copy Paper","Steven Gerrard",78.71,1.38,77.33,,,,77.33
+2020-10-16,"East","Furniture","Clocks","Michael Moore",700.43,217.82,482.61,,,,482.61
+2020-10-17,"East","Furniture","Clocks","Michael Moore",700.43,217.82,482.61,,,,482.61
+2020-10-18,"East","Stationary","Paper Clips","Catherine Rose",166.13,10.26,155.87,,,,155.87
+2020-10-19,"East","Stationary","Computer Paper","Roger Terrence",794.80,284.31,510.49,,,,510.49
+2020-10-20,"East","Grocery","Spices","Tina Thomas",1126.87,601.38,525.49,,,,525.49
+2020-10-21,"East","Stationary","Writings Pads","Maxwell Schwartz",84.67,23.59,61.08,,,,61.08
+2020-10-22,"East","Stationary","Standard Labels","Lance Willis",66.99,31.49,35.50,,,,35.50
+2020-10-23,"East","Grocery","Cereals","Steffi Graf",678.39,356.30,322.09,,,,322.09
+2020-10-24,"West","Grocery","Meat","Florence Joy",647.68,261.09,386.59,,,,386.59
+2020-10-25,"Central","Stationary","Pencils","Shui Tom",117.33,14.91,102.42,,,,102.42
+2020-10-26,"East","Furniture","Office Chairs","Santa Cruz Clara",310.39,100.89,209.50,,,,209.50
+2020-10-27,"East","Stationary","Business Envelopes","Tina Thomas",923.93,548.37,375.56,,,,375.56
+2020-10-28,"Central","Grocery","Fruits and Vegetables","Andy Roddick",4791.55,1577.02,3214.53,,,,3214.53
+2020-10-29,"East","Stationary","Business Envelopes","Tina Thomas",923.93,548.37,375.56,,,,375.56
+2020-10-30,"East","Grocery","Fruits and Vegetables","Barbara Fisher",137.72,47.04,90.68,,,,90.68
+2020-10-31,"West","Stationary","Standard Labels","Augustine Paul",115.81,51.14,64.67,,,,64.67
+2020-11-01,"East","Stationary","Round Ring Binders","Benjamin Ross",29.19,9.74,19.45,,,,19.45
+2020-11-02,"East","Grocery","Fruits and Vegetables","Venus Powell",241.47,21.48,219.99,,,,219.99
+2020-11-03,"East","Stationary","Paper Clips","Munaf Patel",110.49,43.88,66.61,,,,66.61
+2020-11-04,"West","Furniture","Meeting Room Tables","Augustine Paul",8306.20,817.64,7488.56,,,,7488.56
+2020-11-05,"East","Furniture","Frames","Munaf Patel",141.06,59.23,81.83,,,,81.83
+2020-11-06,"East","Stationary","Copy Paper","Joseph Cairn",372.59,113.97,258.62,,,,258.62
+2020-11-07,"East","Furniture","Meeting Room Tables","Santa Cruz Clara",7879.88,2324.29,5555.59,,,,5555.59
+2020-11-08,"West","Stationary","Computer Paper","Mary Elizabeth",670.79,240.31,430.48,,,,430.48
+2020-11-09,"Central","Grocery","Fruits and Vegetables","David Boon",3795.34,501.20,3294.14,,,,3294.14
+2020-11-10,"Central","Grocery","Beverages","Thomas Mondrake",558.05,176.56,381.49,,,,381.49
+2020-11-11,"West","Grocery","Bread","Roger Terrence",12502.07,6562.17,5939.90,,,,5939.90
+2020-11-12,"West","Stationary","Writings Pads","Harold Pawlan",524.10,285.19,238.91,,,,238.91
+2020-11-13,"West","Stationary","File Labels","Tina Thomas",130.64,71.50,59.14,,,,59.14
+2020-11-14,"East","Grocery","Fruits and Vegetables","Venu Karthik",1284.86,471.47,813.39,,,,813.39
+2020-11-15,"East","Stationary","Standard Labels","Hallie Redmond",233.90,129.01,104.89,,,,104.89
+2020-11-16,"Central","Stationary","Pencils","Andy Flower",129.57,27.16,102.41,,,,102.41
+2020-11-17,"West","Grocery","Fruits and Vegetables","Shui Tom",4218.38,1726.90,2491.48,,,,2491.48
+2020-11-18,"East","Stationary","Art Supplies","Sheri Gordon",137.25,28.17,109.08,,,,109.08
+2020-11-19,"Central","Grocery","Fruits and Vegetables","Nathan Astle",1669.65,669.57,1000.08,,,,1000.08
+2020-11-20,"West","Grocery","Fruits and Vegetables","Michael Nathan",2969.55,877.34,2092.21,,,,2092.21
+2020-11-21,"West","Grocery","Fruits and Vegetables","Steffi Graf",3221.68,1072.81,2148.87,,,,2148.87
+2020-11-22,"West","Grocery","Meat","Harold Pawlan",574.22,239.64,334.58,,,,334.58
+2020-11-23,"East","Stationary","Art Supplies","David Love",118.66,21.52,97.14,,,,97.14
+2020-11-24,"East","Grocery","Fruits and Vegetables","Munaf Patel",3715.50,1271.18,2444.32,,,,2444.32
+2020-11-25,"West","Furniture","Frames","Leena Mary",120.53,24.82,95.71,,,,95.71
+2020-11-26,"East","Stationary","Standard Labels","Mary Zewe",60.96,31.65,29.31,,,,29.31
+2020-11-27,"Central","Grocery","Fruits and Vegetables","Pete Zachriah",6789.43,2744.49,4044.94,,,,4044.94
+2020-11-28,"East","Stationary","Art Supplies","Lazar Mathew",55.82,20.07,35.75,,,,35.75
+2020-11-29,"East","Stationary","Computer Paper","Grace Kelly",535.36,154.30,381.06,,,,381.06
+2020-11-30,"Central","Stationary","File Labels","Susan Juliet",116.62,46.34,70.28,,,,70.28
+2020-12-01,"West","Stationary","Standard Labels","Barbara Fisher",121.15,64.63,56.52,,,,56.52
+2020-12-02,"Central","Grocery","Fruits and Vegetables","Jim Courier",1356.56,525.35,831.21,,,,831.21
+2020-12-03,"East","Grocery","Cakes","Lazar Mathew",898.31,271.39,626.92,,,,626.92
+2020-12-04,"East","Grocery","Fruits and Vegetables","Rozario Diego",2564.85,873.96,1690.89,,,,1690.89
+2020-12-05,"East","Grocery","Meat","Rozario Diego",2302.42,1067.59,1234.83,,,,1234.83
+2020-12-06,"West","Grocery","Meat","Lela Donovan",164.77,25.50,139.27,,,,139.27

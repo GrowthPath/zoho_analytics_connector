@@ -1,5 +1,7 @@
-""" this is rewritten from some very old python 2 code from zoho, although I merged their more recent OAuth support.
+""" this is rewritten from some very old code from zoho.
 Functions which are modified and tested have PEP8 underscore names
+
+***** This has been replaced with report_client_v2, into which the new oauth handling is merged (but not yet tested, however the new code passes the authtoken tests ****
 """
 import json
 import logging
@@ -8,6 +10,7 @@ import xml.dom.minidom
 from typing import MutableMapping, Optional, Union
 
 import requests
+import urllib3
 from requests.adapters import HTTPAdapter, Retry
 
 logger = logging.getLogger()
@@ -35,66 +38,41 @@ def requests_retry_session(
 
 class ReportClient:
     """
-     ReportClient provides the python based language binding to the https based API of Zoho Analytics.
-     @note: Authentication via authtoken is deprecated, use OAuth. kindly send parameter as ReportClient(token,clientId,clientSecret).
-     """
-    isOAuth = False
+    ReportClient provides the python based language binding to the https based api of ZohoReports.
+    """
 
-    def __init__(self, token, clientId=None, clientSecret=None):
+    def __init__(self, authtoken):
         """
         Creates a new C{ReportClient} instance.
-        @param token: User's authtoken or ( refresh token for OAUth).
-        @type token:string
-        @param clientId: User client id for OAUth
-        @type clientId:string
-        @param clientSecret: User client secret for OAuth
-        @type clientSecret:string
+        @param authtoken: User's authtoken.
+        @type authtoken:string
         """
-        self.iamServerURL = "https://accounts.zoho.com"
+        # self.iamServerURL="https://accounts.zoho.com"
         self.reportServerURL = "https://analyticsapi.zoho.com"
+        self.authtoken = authtoken
         self.requests_session = requests_retry_session()
-        if (clientId == None and clientSecret == None):
-            self.authtoken = token
-        else:
-            self.authtoken = self.getOAuthToken(clientId, clientSecret, token)
-            ReportClient.isOAuth = True
 
-    def getOAuthToken(self, clientId, clientSecret, refreshToken):
+    def getResp_orig(self, url, httpMethod, payLoad):
         """
-        Internal method for getting OAuth token.
+        Internal method.(For google app integ).
         """
-        dict = {}
-        dict["client_id"] = clientId
-        dict["client_secret"] = clientSecret
-        dict["refresh_token"] = refreshToken
-        dict["grant_type"] = "refresh_token"
-        dict = urllib.parse.urlencode(dict)
-        accUrl = self.iamServerURL + "/oauth/v2/token"
-        respObj = self.getResp(accUrl, "POST", dict)
-        if (respObj.status_code != 200):
-            raise ServerError(respObj)
-        else:
-            resp = respObj.content
-            resp = json.loads(resp)
-            if ("access_token" in resp):
-                return resp["access_token"]
-            else:
-                raise ValueError("Error while getting OAuth token ", resp)
+        try:
+            http = urllib3.PoolManager()
+
+            resp = http.request(httpMethod, url, payLoad)
+            respObj = ResponseObj(resp)
+        except urllib3.exceptions.HTTPError as e:
+            respObj = ResponseObj(e)
+        return respObj
 
     def getResp(self, url: str, httpMethod: str, payLoad):
         """
         Internal method.(For google app integ).
         """
         requests_session = self.requests_session or requests_retry_session()
-
         if httpMethod.upper() == 'POST':
-            headers = {}
-            if ReportClient.isOAuth:
-                headers["Authorization"] = "Zoho-oauthtoken " + self.authtoken
-
-            headers['User-Agent'] = "ZohoAnalytics PythonLibrary"
             try:
-                resp = requests_session.post(url, data=payLoad, headers=headers, timeout=30)
+                resp = requests_session.post(url, data=payLoad, timeout=30)
                 respObj = ResponseObj(resp)
             except requests.exceptions.RequestException as e:
                 respObj = ResponseObj(e)
@@ -1595,11 +1573,7 @@ class ReportClientHelper:
             raise RuntimeError("Provide an AuthToken first")
         url += "&ZOHO_ERROR_FORMAT=JSON&ZOHO_ACTION=" + urllib.parse.quote(action)
         url += "&ZOHO_OUTPUT_FORMAT=" + urllib.parse.quote(exportFormat)
-        url += "&ZOHO_API_VERSION=" + ReportClientHelper.API_VERSION
-        if ReportClient.isOAuth == False:
-            url += "&authtoken=" + urllib.parse.quote(authtoken)
-        if exportFormat == "JSON":
-            url += "&ZOHO_VALID_JSON=TRUE"
+        url += "&authtoken=" + urllib.parse.quote(authtoken) + "&ZOHO_API_VERSION=" + ReportClientHelper.API_VERSION
         if sql:
             url += "&ZOHO_SQLQUERY=" + urllib.parse.quote(sql)
         if criteria:

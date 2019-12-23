@@ -3,18 +3,15 @@
 """
 
 import csv
-from typing import MutableMapping, MutableSequence, Optional
 import logging
-
+from typing import MutableMapping, Optional
 
 logger = logging.getLogger(__name__)
 import time
 import json
-import enum
 
 import requests
-from . import report_client
-
+from . import report_client as report_client
 
 """ add some helper functions on top of report_client"""
 
@@ -45,26 +42,23 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
 
         return table_data
 
-
-    def __init__(self, login_email_id: str, authtoken: str, default_databasename: str = None):
+    def __init__(self, login_email_id: str, authtoken: str, default_databasename: str = None, clientId=None,
+                 clientSecret=None):
         self.login_email_id = login_email_id
         self.authtoken = authtoken
         self.default_databasename = default_databasename
-        super().__init__(authtoken=authtoken)
-
+        super().__init__(token=authtoken, clientId=clientId, clientSecret=clientSecret)
 
     def get_database_catalog(self, database_name: str = None) -> MutableMapping:
         db_uri = self.getDBURI(self.login_email_id, database_name or self.default_databasename)
         catalog_info = self.getDatabaseMetadata(requestURI=db_uri, metadata="ZOHO_CATALOG_INFO")
         return catalog_info
 
-
     def get_table_metadata(self, database_name: str = None) -> MutableMapping:
         database_name = database_name or self.default_databasename
         catalog_info = self.get_database_catalog(database_name=database_name)
         table_metadata = self.process_table_meta_data(catalog_info)
         return table_metadata
-
 
     def create_table(self, table_design, database_name=None) -> MutableMapping:
         db_uri = self.getDBURI(self.login_email_id, database_name or self.default_databasename)
@@ -82,7 +76,6 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
                 self.addColumn(tableURI=uri_addcol, columnName=col['COLUMNNAME'], dataType=col['DATATYPE'])
 
         return result
-
 
     def data_upload(self, import_content: str, table_name: str, import_mode="TRUNCATEADD",
                     matching_columns: Optional[str] = None,
@@ -104,19 +97,20 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
                 if impResult.result_code == 6001:  # API limit exceeded
                     if retry_count <= retry_limit:
                         logger.error(f"API limit exceeded, will retry, next attempt: {retry_count}")
-                        time.sleep(retry_count*5)
+                        time.sleep(retry_count * 5)
                         continue
-                    #raise RuntimeError("API limit exceeded")
+                    # raise RuntimeError("API limit exceeded")
                 else:
                     logger.debug(
-                            f"Table: {table_name}: Processed Rows: "
-                            f"{impResult.totalRowCount} with {impResult.warningCount} warnings ")
+                        f"Table: {table_name}: Processed Rows: "
+                        f"{impResult.totalRowCount} with {impResult.warningCount} warnings ")
                 break
             except report_client.ParseError as e:
-                response_content_string =  e.responseContent.decode('utf-8',errors='ignore')
+                response_content_string = e.responseContent.decode('utf-8', errors='ignore')
                 response_content_string = response_content_string or 'No response content'
                 if 'Invalid NUMBER value' in response_content_string:
-                    raise RuntimeError(f"Invalid data format in Zoho data upload, check table definitions: {response_content_string}")
+                    raise RuntimeError(
+                        f"Invalid data format in Zoho data upload, check table definitions: {response_content_string}")
                 if retry_count <= retry_limit:
                     logger.error(f"Retrying data_upload because of upload error: {response_content_string}")
                     time.sleep(1)
@@ -125,7 +119,6 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
                     logger.info(f"Number of retry attempts exceeded")
                     raise (requests.exceptions.ConnectionError(response_content_string))
         return impResult
-
 
     def data_export_using_sql(self, sql, table_name, database_name: str = None) -> csv.DictReader:
         """ returns a csv.DictReader after querying with the sql provided.
@@ -141,7 +134,6 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
             logger.info(f"Error in zoho sql export: {error_response.message}")
             reader = None
         return reader
-
 
     def delete_rows(self, table_name, sql, database_name: Optional[str] = None):
         uri = self.getURI(dbOwnerName=self.login_email_id, dbName=database_name or self.default_databasename,
