@@ -9,17 +9,18 @@ that is, it's been made Python 3.7 compatible with the least amount of effort.
 
 A more convenient wrapper class is in enhanced_report_client.
 
-This is alpha code: what is tested, works. But not much is tested.
+This is still Beta, but I have used it extensively in production. Beta because I don't use all of the API, and there are no test cases that cover the entire API.
 
-The Zoho code still shows its age and my added code was done in a hurry.
 I use it mostly for uploading data, and creating and modifying tables, at this point.
 
+Zoho updated the 2.7 code with oauth support, as the old tokens are deprecated. I have merged this code into my library, but I have not tested it yet.
 
 Authentication
 ==============
 
 Authentication is easy.
 You log in and visit a URL to gain a token, which does not expire.
+This is deprecated in favour of oauth. V 0.4.0 has Zoho's oauth changes, but I haven't tested them yet.
 
 Read more here
 https://www.zoho.com/analytics/api/#prerequisites
