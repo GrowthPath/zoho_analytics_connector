@@ -1,13 +1,16 @@
 from setuptools import setup
 from sphinx.setup_command import BuildDoc
-
+from os import path
 cmdclass = {'build_sphinx': BuildDoc}
 
 # https://pypi.org/classifiers/
 
 name = 'zoho_analytics_connector'
 keywords = 'zoho analytics'
-version = '0.3.0'
+version = '0.3.2'
+this_directory = path.abspath(path.dirname(__file__))
+with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
+    long_description = f.read()
 
 setup(
     name=name,
@@ -23,14 +26,15 @@ setup(
         'Development Status :: 4 - Beta',
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 3.7',
-        'Topic :: Text Processing :: Linguistic',
+        'Topic :: Office/Business',
     ],
     url='https://github.com/timrichardson/zoho_analytics_connector',
     license='MIT',
     author='Tim Richardson',
     author_email='tim@growthpath.com.au',
     description='Zoho Analytics connector',
-    long_description="Python 3-friendly wrapper for Zoho Analytics API (formely Zoho Reports), (using AuthToken and with untested oAuth2 support)",
+    long_description=long_description,
+    long_description_content_type='text/markdown',
     cmdclass=cmdclass,
     # these are optional and override conf.py settings
     command_options={

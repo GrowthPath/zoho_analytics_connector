@@ -20,7 +20,7 @@ Authentication
 
 Authentication is easy.
 You log in and visit a URL to gain a token, which does not expire.
-This is deprecated in favour of oauth. V 0.4.0 has Zoho's oauth changes, but I haven't tested them yet.
+This is deprecated in favour of oauth. V 0.3.0 has Zoho's oauth changes, but I haven't tested them yet.
 
 Read more here
 https://www.zoho.com/analytics/api/#prerequisites
