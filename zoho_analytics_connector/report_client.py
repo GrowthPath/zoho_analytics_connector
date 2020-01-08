@@ -40,7 +40,7 @@ class ReportClient:
      """
     isOAuth = False
 
-    def __init__(self, token, clientId=None, clientSecret=None):
+    def __init__(self, token, clientId=None, clientSecret=None,serverURL=None,reportServerURL=None):
         """
         Creates a new C{ReportClient} instance.
         @param token: User's authtoken or ( refresh token for OAUth).
@@ -50,8 +50,8 @@ class ReportClient:
         @param clientSecret: User client secret for OAuth
         @type clientSecret:string
         """
-        self.iamServerURL = "https://accounts.zoho.com"
-        self.reportServerURL = "https://analyticsapi.zoho.com"
+        self.iamServerURL = serverURL or "https://accounts.zoho.com"
+        self.reportServerURL = reportServerURL or "https://analyticsapi.zoho.com"
         self.requests_session = requests_retry_session()
         if (clientId == None and clientSecret == None):
             self.token = token

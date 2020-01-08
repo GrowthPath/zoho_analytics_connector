@@ -13,6 +13,9 @@ class Config:
     CLIENTID = os.getenv("ZOHOANALYTICS_CLIENTID")
     CLIENTSECRET = os.getenv("ZOHOANALYTICS_CLIENTSECRET")
     DATABASENAME = os.getenv("ZOHOANALYTICS_DATABASENAME")
+    SERVER_URL = os.getenv("ZOHO_SERVER_URL")
+    REPORT_SERVER_URL = os.getenv("ZOHO_REPORTS_SERVER_URL")
+
     TABLENAME = "Sales"
 
 
@@ -30,7 +33,7 @@ def get_report_client() -> ReportClient:
     )
     return rc
 
-TEST_OAUTH=False
+TEST_OAUTH=True
 @pytest.fixture
 def enhanced_zoho_analytics_client(zoho_email=None) -> EnhancedZohoAnalyticsClient:
     rc = EnhancedZohoAnalyticsClient(
@@ -39,6 +42,8 @@ def enhanced_zoho_analytics_client(zoho_email=None) -> EnhancedZohoAnalyticsClie
         clientSecret=Config.CLIENTSECRET if TEST_OAUTH else None,
         clientId=Config.CLIENTID if TEST_OAUTH else None,
         default_databasename=Config.DATABASENAME,
+        serverURL=Config.SERVER_URL,
+        reportServerURL=Config.REPORT_SERVER_URL
     )
     return rc
 
