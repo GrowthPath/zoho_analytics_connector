@@ -23,8 +23,6 @@ When you create EnhancedZohoAnalyticsClient or ReportClient, you need to pass Cl
 To use AuthToken, pass the AuthToken, and set ClientID and ClientSecret to none.
 The test cases give some hints.
 
-Note: This may need to some additional work to allow for .com.au Zoho accounts.
-
 
 For OAuth2:
 ----------
@@ -95,6 +93,15 @@ Make the API instance:
         rc = EnhancedZohoAnalyticsClient(login_email_id = Config.LOGINEMAILID,
                                          authtoken=Config.AUTHTOKEN, default_databasename=Config.DATABASENAME)
         return rc
+
+Australian and EU Zoho Servers
+------------------------------
+
+The default root of the main server is ```https://accounts.zoho.com```
+and the default root of the Analytics API server is ```https://analyticsapi.zoho.com```
+
+You can provide altnernataives via the parameters: ```serverURL``` and ```reportServerURL```
+
 
 Do some stuff
 -------------

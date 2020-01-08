@@ -49,6 +49,10 @@ class ReportClient:
         @type clientId:string
         @param clientSecret: User client secret for OAuth
         @type clientSecret:string
+        @param serverURL: Zoho server URL if .com default needs to be replaced
+        @type serverURL:string
+        @param reportServerURL:Zoho Analytics server URL if .com default needs to be replaced
+        @type reportServerURL:string
         """
         self.iamServerURL = serverURL or "https://accounts.zoho.com"
         self.reportServerURL = reportServerURL or "https://analyticsapi.zoho.com"
