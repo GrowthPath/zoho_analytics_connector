@@ -166,3 +166,4 @@ venv.bak/
 # mypy
 .mypy_cache/
 
+/zoho_analytics_connector/private/

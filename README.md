@@ -8,22 +8,64 @@ There are not many test cases yet. It is patched to work:
 that is, it's been made Python 3.7 compatible with the least amount of effort.
 
 A more convenient wrapper class is in enhanced_report_client.
-
-This is still Beta, but I have used it extensively in production. Beta because I don't use all of the API, and there are no test cases that cover the entire API.
-
 I use it mostly for uploading data, and creating and modifying tables, at this point.
 
-Zoho updated the 2.7 code with oauth support, as the old tokens are deprecated. I have merged this code into my library, but I have not tested it yet.
+
+This version introduces OAuth support. It passes the tests but has not been used in production yet.
+
 
 Authentication
 ==============
+AuthTokens are being deprecated soon.
 
-Authentication is easy.
-You log in and visit a URL to gain a token, which does not expire.
-This is deprecated in favour of oauth. V 0.3.0 has Zoho's oauth changes, but I haven't tested them yet.
+To use OAuth2, follow documentation.
+When you create EnhancedZohoAnalyticsClient or ReportClient, you need to pass ClientID, ClientSecret and a RefreshToken.
+To use AuthToken, pass the AuthToken, and set ClientID and ClientSecret to none.
+The test cases give some hints.
 
-Read more here
-https://www.zoho.com/analytics/api/#prerequisites
+Note: This may need to some additional work to allow for .com.au Zoho accounts.
+
+
+For OAuth2:
+----------
+
+Visit https://www.zoho.com/analytics/api/#oauth and follow the steps
+
+Self Clients are an easy start. You choose Self client when you register (create) a new app.
+
+They have purple hexagonal icons.
+
+Login as an account on the target organisation to
+
+https://api-console.zoho.com/
+
+and create a Self Client (at least, to experiement)
+
+
+
+<b>Tip: The scope for full access</b>
+
+ZohoReports.fullaccess.all
+
+
+Now with data gathered (client id, client secret, the code which expires in a few minutes, the scope, execute a POST to
+
+https://accounts.zoho.com/oauth/v2/token?code=
+
+You can do this from terminal with curl:
+
+    curl -d "code=1000.dedaa...&client_id=1000.2TY...&client_secret=b74103c...&grant_type=authorization_code&scope=ZohoReports.fullaccess.all" \
+    -X POST https://accounts.zoho.com/oauth/v2/token
+
+and you should get back JSON which looks like this:
+
+    {"access_token":"1000....","refresh_token":"1000.53e...","expires_in_sec":3600,"api_domain":"https://www.zohoapis.com","token_type":"Bearer","expires_in":3600000}
+
+save this somewhere, it is confidential. The refresh token is permanent, it is basically the same as the old authtoken.
+
+NOTE!!! For Australian-hosted Zoho accounts TO-DO
+The token URL may to be adapted for the server location. EG for Australia, post to https://accounts.zoho.com.au/oauth/v2/token
+
 
 
 Usage
@@ -54,13 +96,18 @@ Make the API instance:
                                          authtoken=Config.AUTHTOKEN, default_databasename=Config.DATABASENAME)
         return rc
 
-Do some stuff:
+Do some stuff
+-------------
+
+<b>Get table metadata </b>
+
 
     def test_get_database_metadata(get_enhanced_zoho_analytics_client):
         enhanced_rc = get_enhanced_zoho_analytics_client
         table_meta_data = enhanced_rc.get_table_metadata()
         assert table_meta_data
 
+<b>Push data </b>
 
     def test_data_upload(get_enhanced_zoho_analytics_client:EnhancedZohoAnalyticsClient):
         try:
@@ -82,7 +129,7 @@ Do some stuff:
         impResult2 = get_enhanced_zoho_analytics_client.data_upload(import_content=import_content2, table_name="animals")
         assert (impResult2)
 
-#Run SQL. You can join tables. The rows are returned as a DictReader. If you pass ' characters into IN(...) clauses, 
+ <b>Run SQL</b>. You can join tables. The rows are returned as a DictReader. If you pass ' characters into IN(...) clauses, 
 you need to escape them yourself (double ') 
 
     def test_data_download(get_enhanced_zoho_analytics_client):
@@ -96,7 +143,7 @@ you need to escape them yourself (double ')
         assert result
         
         
-    #create a table
+<b>create a table</b>
         
     zoho_sales_fact_table = {
         'TABLENAME': 'sales_fact',
