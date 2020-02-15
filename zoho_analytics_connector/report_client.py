@@ -109,7 +109,8 @@ class ReportClient:
 
     def __sendRequest(self, url, httpMethod, payLoad, action, callBackData):
         respObj = self.getResp(url, httpMethod, payLoad)
-        if (respObj.status_code != 200):
+        if (respObj.status_code not in [200,400]):
+            #400 errors be an API limit error, which are handled by the result parsing
             raise ServerError(respObj)
         else:
             return self.handleResponse(respObj, action, callBackData)
@@ -298,6 +299,7 @@ class ReportClient:
         Bulk import data into the table identified by the URI. import_content is a string in csv format (\n separated)
         The first line is column headers.
         Note: the API supports JSON too but it is not implemented here.
+        raises RuntimeError if api limits are exceeded
 
         @param tableURI: The URI of the table. See L{getURI<getURI>}.
         @type tableURI:string
@@ -1365,6 +1367,23 @@ class PlanInfo:
             @type:string
             """
 
+class RatelimitError(Exception):
+    """
+    RatelimitError is thrown if the report server has received a ratelimit error.
+    """
+
+    def __init__(self, urlResp, **kwargs):
+        self.httpStatusCode = urlResp.status_code  #:The http status code for the request.
+        self.errorCode = self.httpStatusCode  # The error code sent by the server.
+        self.uri = ""  #: The uri which threw this exception.
+        self.action = ""  #:The action to be performed over the resource specified by the uri
+        self.message = urlResp.content  #: Returns the message sent by the server.
+        self.extra = kwargs
+
+
+    def __str__(self):
+        return repr(self.message)
+
 
 class ServerError(Exception):
     """
@@ -1435,18 +1454,14 @@ class ImportResult:
         except  ParseError as e:
             # logger.debug(f"Note in import result: could not find result code {msg}")
             self.result_code = 0
+        if self.result_code in [6001,6043,6044,6045]:
+            raise RatelimitError(urlResp=response)
 
-        if self.result_code == 6001:  # api limit or rows exceeded
-            raise RuntimeError(f"API daily limit exceeded: {msg}")
-        if self.result_code == 6045:  # api limit or rows exceeded
-            raise RuntimeError(f"API rate limit exceeded: {msg}")
-        if self.result_code == 7232:
-            raise RuntimeError(f"Error in data format: {msg} ")
         try:
             self.totalColCount = int(ReportClientHelper.getInfo(dom, "totalColumnCount", response))
         except ParseError as e:
             logger.debug(f"Error in import result: did not get a good return message: {msg}")
-            raise ParseError(msg)
+            raise ParseError(responseContent=msg,message=None,origExcep=None)
         """
         The total columns that were present in the imported file.
         @type:integer
@@ -1520,11 +1535,11 @@ class ResponseObj:
 
     def __init__(self, resp: requests.Response):
         """ updated to assume a urllib3 object"""
-        self.content = resp.content
-        self.reason = resp.reason  # This is used for communication about errors
-        self.status_code = resp.status_code
+        self.content = getattr(resp,'content',None)
+        self.reason = getattr(resp,'reason',None)  # This is used for communication about errors
+        self.status_code = getattr(resp,'status_code',None)
         self.headers = {}
-        self.headers = resp.headers
+        self.headers = getattr(resp,'headers',None)
         self.response = resp
 
 

@@ -100,7 +100,7 @@ Australian and EU Zoho Servers
 The default root of the main server is ```https://accounts.zoho.com```
 and the default root of the Analytics API server is ```https://analyticsapi.zoho.com```
 
-You can provide altnernataives via the parameters: ```serverURL``` and ```reportServerURL```
+You can provide alternatives via the parameters: ```serverURL``` and ```reportServerURL```
 
 
 Do some stuff

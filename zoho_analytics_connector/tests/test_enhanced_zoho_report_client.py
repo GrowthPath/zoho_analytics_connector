@@ -36,6 +36,7 @@ def get_report_client() -> ReportClient:
 TEST_OAUTH=True
 @pytest.fixture
 def enhanced_zoho_analytics_client(zoho_email=None) -> EnhancedZohoAnalyticsClient:
+    assert (not TEST_OAUTH and Config.AUTHTOKEN) or (TEST_OAUTH and Config.REFRESHTOKEN)
     rc = EnhancedZohoAnalyticsClient(
         login_email_id=zoho_email or Config.LOGINEMAILID,
         token=Config.REFRESHTOKEN if TEST_OAUTH else Config.AUTHTOKEN,
