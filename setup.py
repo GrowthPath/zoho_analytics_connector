@@ -7,7 +7,7 @@ cmdclass = {'build_sphinx': BuildDoc}
 
 name = 'zoho_analytics_connector'
 keywords = 'zoho analytics'
-version = '0.4.7.1'
+version = '0.4.7.2'
 this_directory = path.abspath(path.dirname(__file__))
 with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()

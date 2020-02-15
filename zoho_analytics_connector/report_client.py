@@ -10,7 +10,11 @@ from typing import MutableMapping, Optional, Union
 import requests
 from requests.adapters import HTTPAdapter, Retry
 
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+ch = logging.StreamHandler()
+ch.setLevel(logging.DEBUG)
+logger.addHandler(ch)
 
 
 def requests_retry_session(
@@ -116,6 +120,7 @@ class ReportClient:
             try:
                 j = respObj.response.json()
                 code = j['response']['error']['code']
+                logger.debug(f"API returned a 400 result and an error code: {code}")
                 if code in [6045,]:
                     raise RecoverableRateLimitError(urlResp=respObj)
                 else:
