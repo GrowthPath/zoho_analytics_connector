@@ -94,20 +94,23 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
                 impResult = self.import_data(uri, import_mode=import_mode, import_content=import_content,
                                              date_format=date_format,
                                              matching_columns=matching_columns)
-                if impResult.result_code in [6043,6044]:  #
-                    logger.error(f"Zoho API daily limit exceeded, will not retry")
-                    raise RuntimeError(f"Zoho raised error {impResult.result_code} which means the daily API limit is exceeded")
-                if impResult.result_code in [6001,6045]:  # short term API limit exceeded
-                    if retry_count <= retry_limit:
-                        logger.error(f"Zoho API limit exceeded, will retry, next attempt: {retry_count}")
-                        time.sleep(retry_count * 10)
-                        continue
+
+                logger.debug(
+                    f"Table: {table_name}: Processed Rows: "
+                    f"{impResult.totalRowCount} with {impResult.warningCount} warnings ")
+                break
+            except report_client.RecoverableRateLimitError:
+                if retry_count <= retry_limit:
+                    logger.error(f"Zoho API limit exceeded, will retry, next attempt: {retry_count}")
+                    time.sleep(retry_count * 10)
+                    continue
                     # raise RuntimeError("API limit exceeded")
                 else:
-                    logger.debug(
-                        f"Table: {table_name}: Processed Rows: "
-                        f"{impResult.totalRowCount} with {impResult.warningCount} warnings ")
-                break
+                    logger.info(f"Number of retry attempts exceeded")
+                    raise RuntimeError("API Limit error: Number of retry attempts exceeded")
+            except report_client.UnrecoverableRateLimitError:
+                logger.error(f"Zoho API daily limit exceeded, will not retry")
+                raise
             except report_client.ParseError as e:
                 response_content_string = e.responseContent.decode('utf-8', errors='ignore')
                 response_content_string = response_content_string or 'No response content'

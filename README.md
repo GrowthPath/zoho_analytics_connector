@@ -102,6 +102,14 @@ and the default root of the Analytics API server is ```https://analyticsapi.zoho
 
 You can provide alternatives via the parameters: ```serverURL``` and ```reportServerURL```
 
+Retry exceptions
+---------------
+in development: calling `enhanced_zoho_analytics_client.data_upload(...)` or `report_client.import_data(...)` can raise one of two exceptions for API limits:
+UnrecoverableRateLimitError
+RecoverableRateLimitError
+
+This is a partially implemented experimental feature.
+
 
 Do some stuff
 -------------
