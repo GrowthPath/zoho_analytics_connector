@@ -127,7 +127,7 @@ class ReportClient:
                 if code in [6045,]:
                     logger.debug(f"Raising a RecoverableRateLimitError")
                     raise RecoverableRateLimitError(urlResp=respObj)
-                else:
+                elif code in [6001,]:
                     logger.debug(f"Raising an UnrecoverableRateLimitError")
                     raise UnrecoverableRateLimitError(urlResp=respObj)
             except (RecoverableRateLimitError,UnrecoverableRateLimitError):

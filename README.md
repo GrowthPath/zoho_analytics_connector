@@ -108,7 +108,7 @@ in development: calling `enhanced_zoho_analytics_client.data_upload(...)` or `re
 UnrecoverableRateLimitError
 RecoverableRateLimitError
 
-This is a partially implemented experimental feature.
+This is a partially implemented experimental feature. `data_upload` uses it.
 
 
 Do some stuff
