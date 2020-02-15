@@ -71,6 +71,28 @@ def test_data_upload(enhanced_zoho_analytics_client: EnhancedZohoAnalyticsClient
     )
     assert impResult
 
+def test_rate_limits_data_upload(enhanced_zoho_analytics_client: EnhancedZohoAnalyticsClient):
+    try:
+        with open("StoreSales.csv", "r") as f:
+            import_content = f.read()
+    except Exception as e:
+        print(
+            "Error Check if file StoreSales.csv exists in the current directory!! ",
+            str(e),
+        )
+        return
+        # import_modes = APPEND / TRUNCATEADD / UPDATEADD
+    i = 0
+    while True:
+        i += 1
+        try:
+            impResult = enhanced_zoho_analytics_client.data_upload(
+                import_content=import_content, table_name="sales"
+            )
+            print (f"Import {i} done")
+        except Exception as e:
+            print (e)
+
 
 def test_data_download(enhanced_zoho_analytics_client):
     sql = "select * from sales"

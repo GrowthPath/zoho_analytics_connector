@@ -109,17 +109,19 @@ class ReportClient:
 
     def __sendRequest(self, url, httpMethod, payLoad, action, callBackData):
         respObj = self.getResp(url, httpMethod, payLoad)
-        if (respObj.status_code not in [200,]):
+        if (respObj.status_code in [200,]):
             return self.handleResponse(respObj, action, callBackData)
         elif (respObj.status_code in [400,]):
             #400 errors be an API limit error, which are handled by the result parsing
             try:
                 j = respObj.response.json()
                 code = j['response']['error']['code']
-                if code in [6045]:
+                if code in [6045,]:
                     raise RecoverableRateLimitError(urlResp=respObj)
                 else:
                     raise UnrecoverableRateLimitError(urlResp=respObj)
+            except (RecoverableRateLimitError,UnrecoverableRateLimitError):
+                raise
             except Exception as e:
                 raise ServerError(respObj)
         else:
