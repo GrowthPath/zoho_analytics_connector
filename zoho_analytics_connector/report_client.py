@@ -109,11 +109,21 @@ class ReportClient:
 
     def __sendRequest(self, url, httpMethod, payLoad, action, callBackData):
         respObj = self.getResp(url, httpMethod, payLoad)
-        if (respObj.status_code not in [200,400]):
-            #400 errors be an API limit error, which are handled by the result parsing
-            raise ServerError(respObj)
-        else:
+        if (respObj.status_code not in [200,]):
             return self.handleResponse(respObj, action, callBackData)
+        elif (respObj.status_code in [400,]):
+            #400 errors be an API limit error, which are handled by the result parsing
+            try:
+                j = respObj.response.json()
+                code = j['response']['error']['code']
+                if code in [6045]:
+                    raise RecoverableRateLimitError(urlResp=respObj)
+                else:
+                    raise UnrecoverableRateLimitError(urlResp=respObj)
+            except Exception as e:
+                raise ServerError(respObj)
+        else:
+            raise ServerError(respObj)
 
     def handle_response_v2(self, response: requests.Response, action: str, callBackData) -> Optional[
         Union[MutableMapping, 'ImportResult', 'ShareInfo', 'PlanInfo']]:
@@ -238,7 +248,7 @@ class ReportClient:
         @type config:dictionary
         @return: The values of the row.
         @rtype:dictionary
-        @raise ServerError: If the server has recieved the request but did not process the request 
+        @raise ServerError: If the server has recieved the request but did not process the request
         due to some error.
         @raise ParseError: If the server has responded but client was not able to parse the response.
         """
@@ -256,7 +266,7 @@ class ReportClient:
         @type criteria:string
         @param config: Contains any additional control parameters. Can be C{None}.
         @type config:dictionary
-        @raise ServerError: If the server has recieved the request but did not process the request 
+        @raise ServerError: If the server has recieved the request but did not process the request
         due to some error.
         @raise ParseError: If the server has responded but client was not able to parse the response.
         """
@@ -281,7 +291,7 @@ class ReportClient:
         @type criteria:Optional[string]
         @param config: Contains any additional control parameters. Can be C{None}.
         @type config:dictionary
-        @raise ServerError: If the server has recieved the request but did not process the request 
+        @raise ServerError: If the server has recieved the request but did not process the request
         due to some error.
         @raise ParseError: If the server has responded but client was not able to parse the response.
         """
@@ -309,7 +319,7 @@ class ReportClient:
          2. TRUNCATEADD
          3. UPDATEADD
         See U{Import types<http://zohoreportsapi.wiki.zoho.com/Importing-CSV-File.html>} for more details.
-        @type import_mode:string       
+        @type import_mode:string
         @param import_content: The data in csv format.
         @type import_content:string
         @param import_config: Contains any additional control parameters.
@@ -351,13 +361,13 @@ class ReportClient:
         the supported types.
         @type format:string
         @param exportToFileObj: File (or file like object) to which the exported data is to be written
-        @type exportToFileObj:file        
+        @type exportToFileObj:file
         @param criteria: The criteria to be applied for exporting. Only rows matching the criteria will be
         exported. Can be C{None}. Incase it is C{None}, then all rows will be exported.
-        @type criteria:string        
+        @type criteria:string
         @param config: Contains any additional control parameters. Can be C{None}.
         @type config:dictionary
-        @raise ServerError: If the server has recieved the request but did not process the request 
+        @raise ServerError: If the server has recieved the request but did not process the request
         due to some error.
         @raise ParseError: If the server has responded but client was not able to parse the response.
         """
@@ -375,12 +385,12 @@ class ReportClient:
         the supported types.
         @type format:string
         @param exportToFileObj: File (or file like object) to which the exported data is to be written
-        @type exportToFileObj:file        
+        @type exportToFileObj:file
         @param sql: The sql whose output need to be exported.
-        @type sql:string        
+        @type sql:string
         @param config: Contains any additional control parameters. Can be C{None}.
         @type config:dictionary
-        @raise ServerError: If the server has recieved the request but did not process the request 
+        @raise ServerError: If the server has recieved the request but did not process the request
         due to some error.
         @raise ParseError: If the server has responded but client was not able to parse the response.
         """
@@ -408,7 +418,7 @@ class ReportClient:
         @type config:dictionary
         @return: The new database id.
         @rtype: string
-        @raise ServerError: If the server has recieved the request but did not process the request 
+        @raise ServerError: If the server has recieved the request but did not process the request
         due to some error.
         @raise ParseError: If the server has responded but client was not able to parse the response.
         """
@@ -425,7 +435,7 @@ class ReportClient:
         @type databaseName:string
         @param config: Contains any additional control parameters.
         @type config:dictionary
-        @raise ServerError: If the server has recieved the request but did not process the request 
+        @raise ServerError: If the server has recieved the request but did not process the request
         due to some error.
         @raise ParseError: If the server has responded but client was not able to parse the response.
         """
@@ -447,7 +457,7 @@ class ReportClient:
         @type config:dictionary
         @return: Domain database status.
         @rtype:dictionary
-        @raise ServerError: If the server has recieved the request but did not process the request 
+        @raise ServerError: If the server has recieved the request but did not process the request
         due to some error.
         @raise ParseError: If the server has responded but client was not able to parse the response.
         """
@@ -470,7 +480,7 @@ class ReportClient:
         @type config:dictionary
         @return: Domain database status.
         @rtype:dictionary
-        @raise ServerError: If the server has recieved the request but did not process the request 
+        @raise ServerError: If the server has recieved the request but did not process the request
         due to some error.
         @raise ParseError: If the server has responded but client was not able to parse the response.
         """
@@ -489,7 +499,7 @@ class ReportClient:
         @type tableDesign:string
         @param config: Contains any additional control parameters. Can be C{None}.
         @type config:dictionary
-        @raise ServerError: If the server has recieved the request but did not process the request 
+        @raise ServerError: If the server has recieved the request but did not process the request
         due to some error.
         @raise ParseError: If the server has responded but client was not able to parse the response.
         """
@@ -511,7 +521,7 @@ class ReportClient:
         @type config:dictionary
         @return: Auto generate report result.
         @rtype:dictionary
-        @raise ServerError: If the server has recieved the request but did not process the request 
+        @raise ServerError: If the server has recieved the request but did not process the request
         due to some error.
         @raise ParseError: If the server has responded but client was not able to parse the response.
         """
@@ -537,7 +547,7 @@ class ReportClient:
         @type config:dictionary
         @return: Generated reports status.
         @rtype:dictionary
-        @raise ServerError: If the server has recieved the request but did not process the request 
+        @raise ServerError: If the server has recieved the request but did not process the request
         due to some error.
         @raise ParseError: If the server has responded but client was not able to parse the response.
         """
@@ -562,7 +572,7 @@ class ReportClient:
         @type viewDesc:string
         @param config: Contains any additional control parameters. Can be C{None}.
         @type config:dictionary
-        @raise ServerError: If the server has recieved the request but did not process the request 
+        @raise ServerError: If the server has recieved the request but did not process the request
         due to some error.
         @raise ParseError: If the server has responded but client was not able to parse the response.
         """
@@ -586,7 +596,7 @@ class ReportClient:
         @type dbKey:string
         @param config: Contains any additional control parameters. Can be C{None}.
         @type config:dictionary
-        @raise ServerError: If the server has recieved the request but did not process the request 
+        @raise ServerError: If the server has recieved the request but did not process the request
         due to some error.
         @raise ParseError: If the server has responded but client was not able to parse the response.
         """
@@ -610,7 +620,7 @@ class ReportClient:
         @type dbKey:string
         @param config: Contains any additional control parameters. Can be C{None}.
         @type config:dictionary
-        @raise ServerError: If the server has recieved the request but did not process the request 
+        @raise ServerError: If the server has recieved the request but did not process the request
         due to some error.
         @raise ParseError: If the server has responded but client was not able to parse the response.
         """
@@ -632,7 +642,7 @@ class ReportClient:
         @type dataType:string
         @param config: Contains any additional control parameters.
         @type config:dictionary
-        @raise ServerError: If the server has recieved the request but did not process the request 
+        @raise ServerError: If the server has recieved the request but did not process the request
         due to some error.
         @raise ParseError: If the server has responded but client was not able to parse the response.
         """
@@ -651,7 +661,7 @@ class ReportClient:
         @type columnName:string
         @param config: Contains any additional control parameters.
         @type config:dictionary
-        @raise ServerError: If the server has recieved the request but did not process the request 
+        @raise ServerError: If the server has recieved the request but did not process the request
         due to some error.
         @raise ParseError: If the server has responded but client was not able to parse the response.
         """
@@ -671,7 +681,7 @@ class ReportClient:
         @type newColumnName:string
         @param config: Contains any additional control parameters.
         @type config:dictionary
-        @raise ServerError: If the server has recieved the request but did not process the request 
+        @raise ServerError: If the server has recieved the request but did not process the request
         due to some error.
         @raise ParseError: If the server has responded but client was not able to parse the response.
         """
@@ -692,7 +702,7 @@ class ReportClient:
         @type config:dictionary
         @return: Column status.
         @rtype:list
-        @raise ServerError: If the server has recieved the request but did not process the request 
+        @raise ServerError: If the server has recieved the request but did not process the request
         due to some error.
         @raise ParseError: If the server has responded but client was not able to parse the response.
         """
@@ -713,7 +723,7 @@ class ReportClient:
         @type config:dictionary
         @return: Column status.
         @rtype:list
-        @raise ServerError: If the server has recieved the request but did not process the request 
+        @raise ServerError: If the server has recieved the request but did not process the request
         due to some error.
         @raise ParseError: If the server has responded but client was not able to parse the response.
         """
@@ -738,7 +748,7 @@ class ReportClient:
         @type onError:string
         @param config: Contains any additional control parameters. Can be C{None}.
         @type config:dictionary
-        @raise ServerError: If the server has recieved the request but did not process the request 
+        @raise ServerError: If the server has recieved the request but did not process the request
         due to some error.
         @raise ParseError: If the server has responded but client was not able to parse the response.
         """
@@ -759,7 +769,7 @@ class ReportClient:
         @type columnName:string
         @param config: Contains any additional control parameters. Can be C{None}.
         @type config:dictionary
-        @raise ServerError: If the server has recieved the request but did not process the request 
+        @raise ServerError: If the server has recieved the request but did not process the request
         due to some error.
         @raise ParseError: If the server has responded but client was not able to parse the response.
         """
@@ -779,7 +789,7 @@ class ReportClient:
         @type config:dictionary
         @return: The metadata of the database.
         @rtype: dictionary
-        @raise ServerError: If the server has recieved the request but did not process the request 
+        @raise ServerError: If the server has recieved the request but did not process the request
         due to some error.
         @raise ParseError: If the server has responded but client was not able to parse the response.
         """
@@ -800,7 +810,7 @@ class ReportClient:
         @type config:dictionary
         @return: The Database name.
         @rtype: string
-        @raise ServerError: If the server has recieved the request but did not process the request 
+        @raise ServerError: If the server has recieved the request but did not process the request
         due to some error.
         @raise ParseError: If the server has responded but client was not able to parse the response.
         """
@@ -820,7 +830,7 @@ class ReportClient:
         @type config:dictionary
         @return: Return wheather the database is exist or not.
         @rtype:string
-        @raise ServerError: If the server has recieved the request but did not process the request 
+        @raise ServerError: If the server has recieved the request but did not process the request
         due to some error.
         @raise ParseError: If the server has responded but client was not able to parse the response.
         """
@@ -838,7 +848,7 @@ class ReportClient:
         @type config:dictionary
         @return: Copy Database key.
         @rtype:string
-        @raise ServerError: If the server has recieved the request but did not process the request 
+        @raise ServerError: If the server has recieved the request but did not process the request
         due to some error.
         @raise ParseError: If the server has responded but client was not able to parse the response.
         """
@@ -857,7 +867,7 @@ class ReportClient:
         @type config:dictionary
         @return: The View name.
         @rtype: string
-        @raise ServerError: If the server has recieved the request but did not process the request 
+        @raise ServerError: If the server has recieved the request but did not process the request
         due to some error.
         @raise ParseError: If the server has responded but client was not able to parse the response.
         """
@@ -875,7 +885,7 @@ class ReportClient:
         @type config:dictionary
         @return: The View-Id (object id) and Database-Id.
         @rtype: dictionary
-        @raise ServerError: If the server has recieved the request but did not process the request 
+        @raise ServerError: If the server has recieved the request but did not process the request
         due to some error.
         @raise ParseError: If the server has responded but client was not able to parse the response.
         """
@@ -896,7 +906,7 @@ class ReportClient:
         @type criteria:string
         @param config: Contains any additional control parameters. Can be C{None}.
         @type config:dictionary
-        @raise ServerError: If the server has recieved the request but did not process the request 
+        @raise ServerError: If the server has recieved the request but did not process the request
         due to some error.
         @raise ParseError: If the server has responded but client was not able to parse the response.
         """
@@ -915,7 +925,7 @@ class ReportClient:
         @type emailIds:string
         @param config: Contains any additional control parameters. Can be C{None}.
         @type config:dictionary
-        @raise ServerError: If the server has recieved the request but did not process the request 
+        @raise ServerError: If the server has recieved the request but did not process the request
         due to some error.
         @raise ParseError: If the server has responded but client was not able to parse the response.
         """
@@ -933,7 +943,7 @@ class ReportClient:
         @type emailIds:string
         @param config: Contains any additional control parameters. Can be C{None}.
         @type config:dictionary
-        @raise ServerError: If the server has recieved the request but did not process the request 
+        @raise ServerError: If the server has recieved the request but did not process the request
         due to some error.
         @raise ParseError: If the server has responded but client was not able to parse the response.
         """
@@ -951,7 +961,7 @@ class ReportClient:
         @type emailIds:string
         @param config: Contains any additional control parameters. Can be C{None}.
         @type config:dictionary
-        @raise ServerError: If the server has recieved the request but did not process the request 
+        @raise ServerError: If the server has recieved the request but did not process the request
         due to some error.
         @raise ParseError: If the server has responded but client was not able to parse the response.
         """
@@ -969,7 +979,7 @@ class ReportClient:
         @type config:dictionary
         @return: ShareInfo object.
         @rtype: ShareInfo
-        @raise ServerError: If the server has recieved the request but did not process the request 
+        @raise ServerError: If the server has recieved the request but did not process the request
         due to some error.
         @raise ParseError: If the server has responded but client was not able to parse the response.
         """
@@ -986,7 +996,7 @@ class ReportClient:
         @type config:dictionary
         @return: The view URI.
         @rtype: string
-        @raise ServerError: If the server has recieved the request but did not process the request 
+        @raise ServerError: If the server has recieved the request but did not process the request
         due to some error.
         @raise ParseError: If the server has responded but client was not able to parse the response.
         """
@@ -996,7 +1006,7 @@ class ReportClient:
 
     def getEmbedUrl(self, tableURI, criteria=None, config=None):
         """
-        This method is used to get the embed URL of the particular table / view. This API is available only for the White Label Administrator. 
+        This method is used to get the embed URL of the particular table / view. This API is available only for the White Label Administrator.
         @param tableURI: The URI of the table. See L{getURI<getURI>}.
         @type tableURI:string
         @param criteria: Set criteria for url. Can be C{None}.
@@ -1005,7 +1015,7 @@ class ReportClient:
         @type config:dictionary
         @return: The embed URI.
         @rtype: string
-        @raise ServerError: If the server has recieved the request but did not process the request 
+        @raise ServerError: If the server has recieved the request but did not process the request
         due to some error.
         @raise ParseError: If the server has responded but client was not able to parse the response.
         """
@@ -1022,7 +1032,7 @@ class ReportClient:
         @type config:dictionary
         @return: The list of user details.
         @rtype:list
-        @raise ServerError: If the server has recieved the request but did not process the request 
+        @raise ServerError: If the server has recieved the request but did not process the request
         due to some error.
         @raise ParseError: If the server has responded but client was not able to parse the response.
         """
@@ -1039,7 +1049,7 @@ class ReportClient:
         @type emailIds:string
         @param config: Contains any additional control parameters.
         @type config:dictionary
-        @raise ServerError: If the server has recieved the request but did not process the request 
+        @raise ServerError: If the server has recieved the request but did not process the request
         due to some error.
         @raise ParseError: If the server has responded but client was not able to parse the response.
         """
@@ -1057,7 +1067,7 @@ class ReportClient:
         @type emailIds:string
         @param config: Contains any additional control parameters.
         @type config:dictionary
-        @raise ServerError: If the server has recieved the request but did not process the request 
+        @raise ServerError: If the server has recieved the request but did not process the request
         due to some error.
         @raise ParseError: If the server has responded but client was not able to parse the response.
         """
@@ -1075,7 +1085,7 @@ class ReportClient:
         @type emailIds:string
         @param config: Contains any additional control parameters.
         @type config:dictionary
-        @raise ServerError: If the server has recieved the request but did not process the request 
+        @raise ServerError: If the server has recieved the request but did not process the request
         due to some error.
         @raise ParseError: If the server has responded but client was not able to parse the response.
         """
@@ -1093,7 +1103,7 @@ class ReportClient:
         @type emailIds:string
         @param config: Contains any additional control parameters.
         @type config:dictionary
-        @raise ServerError: If the server has recieved the request but did not process the request 
+        @raise ServerError: If the server has recieved the request but did not process the request
         due to some error.
         @raise ParseError: If the server has responded but client was not able to parse the response.
         """
@@ -1111,7 +1121,7 @@ class ReportClient:
         @type config:dictionary
         @return: PlanInfo object.
         @rtype: PlanInfo
-        @raise ServerError: If the server has recieved the request but did not process the request 
+        @raise ServerError: If the server has recieved the request but did not process the request
         due to some error.
         @raise ParseError: If the server has responded but client was not able to parse the response.
         """
@@ -1124,7 +1134,7 @@ class ReportClient:
         Returns the URI for the specified user..
         @param dbOwnerName: User email-id of the database.
         @type dbOwnerName:string
-        @return: The URI for the specified user. 
+        @return: The URI for the specified user.
         @rtype:string
         """
         url = self.reportServerURL + "/api/" + urllib.parse.quote(dbOwnerName)
@@ -1367,7 +1377,7 @@ class PlanInfo:
             @type:string
             """
 
-class RatelimitError(Exception):
+class RecoverableRateLimitError(Exception):
     """
     RatelimitError is thrown if the report server has received a ratelimit error.
     """
@@ -1384,7 +1394,22 @@ class RatelimitError(Exception):
     def __str__(self):
         return repr(self.message)
 
+class UnrecoverableRateLimitError(Exception):
+    """
+    RatelimitError is thrown if the report server has received a ratelimit error.
+    """
 
+    def __init__(self, urlResp, **kwargs):
+        self.httpStatusCode = urlResp.status_code  #:The http status code for the request.
+        self.errorCode = self.httpStatusCode  # The error code sent by the server.
+        self.uri = ""  #: The uri which threw this exception.
+        self.action = ""  #:The action to be performed over the resource specified by the uri
+        self.message = urlResp.content  #: Returns the message sent by the server.
+        self.extra = kwargs
+
+
+    def __str__(self):
+        return repr(self.message)
 class ServerError(Exception):
     """
     ServerError is thrown if the report server has recieved the request but did not process the
@@ -1454,8 +1479,7 @@ class ImportResult:
         except  ParseError as e:
             # logger.debug(f"Note in import result: could not find result code {msg}")
             self.result_code = 0
-        if self.result_code in [6001,6043,6044,6045]:
-            raise RatelimitError(urlResp=response)
+
 
         try:
             self.totalColCount = int(ReportClientHelper.getInfo(dom, "totalColumnCount", response))
