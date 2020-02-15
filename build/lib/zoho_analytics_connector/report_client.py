@@ -112,7 +112,7 @@ class ReportClient:
             raise RuntimeError("Unexpected httpMethod in getResp")
 
     def __sendRequest(self, url, httpMethod, payLoad, action, callBackData):
-        respObj = self.getResp(url, httpMethod, payLoad)  #this will raise a Requests exception
+        respObj = self.getResp(url, httpMethod, payLoad)  #this will raise a Requests exception in case of trouble
         if not respObj:
             logger.error(f"_sendRequest on action: {action} received None for respObj")
             raise RuntimeError(f"_sendRequest on action: {action} received None for respObj")
