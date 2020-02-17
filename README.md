@@ -4,14 +4,12 @@ Zoho Analytics Connector
 
 Zoho's SDK for Zoho Reports is very old, however it is very complete.
 This is a version which is Python 3 ready, tested on Python 3.7.
-There are not many test cases yet. It is patched to work: 
-that is, it's been made Python 3.7 compatible with the least amount of effort.
 
 A more convenient wrapper class is in enhanced_report_client.
-I use it mostly for uploading data, and creating and modifying tables, at this point.
+I use it mostly for uploading data, and creating and modifying tables.
 
-
-This version introduces OAuth support. It passes the tests but has not been used in production yet.
+AuthTokens are being deprecated, and in some Zoho domains they don't work any longer. 
+OAuths support works, see notes below.
 
 
 Authentication
