@@ -4,7 +4,7 @@ Functions which are modified and tested have PEP8 underscore names
 import json
 import logging
 import urllib
-import xml.dom.minidom
+import from xml.dom.minidom
 from typing import MutableMapping, Optional, Union
 
 import requests
@@ -123,13 +123,16 @@ class ReportClient:
             try:
                 j = respObj.response.json()
                 code = j['response']['error']['code']
-                logger.debug(f"Note: API returned a 400 result and an error code: {code}")
+                message = j['response']['error']['message']
+                logger.debug(f"Note: API returned a 400 result and an error code: {code} with message {message}")
                 if code in [6045,]:
                     logger.debug(f"Raising a RecoverableRateLimitError")
                     raise RecoverableRateLimitError(urlResp=respObj)
                 elif code in [6001,]:
                     logger.debug(f"Raising an UnrecoverableRateLimitError")
                     raise UnrecoverableRateLimitError(urlResp=respObj)
+                else:
+                    raise ServerError(respObj)
             except (RecoverableRateLimitError,UnrecoverableRateLimitError):
                 raise
             except Exception as e:
