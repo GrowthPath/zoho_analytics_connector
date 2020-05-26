@@ -4,7 +4,7 @@ Functions which are modified and tested have PEP8 underscore names
 import json
 import logging
 import urllib
-import from xml.dom.minidom
+import xml.dom.minidom
 from typing import MutableMapping, Optional, Union
 
 import requests

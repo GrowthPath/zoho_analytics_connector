@@ -109,7 +109,7 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
                     logger.info(f"Number of retry attempts exceeded")
                     raise RuntimeError("API Limit error: Number of retry attempts exceeded")
             except report_client.UnrecoverableRateLimitError:
-                logger.error(f"Zoho API daily limit exceeded, will not retry")
+                logger.error(f"Zoho API daily limit exceeded or row count exceeded, will not retry")
                 raise
             except report_client.ParseError as e:
                 response_content_string = e.responseContent.decode('utf-8', errors='ignore')
