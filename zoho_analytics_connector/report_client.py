@@ -2,6 +2,7 @@
 Functions which are modified and tested have PEP8 underscore names
 """
 import json
+import time
 import logging
 import urllib
 import xml.dom.minidom
@@ -42,7 +43,12 @@ class ReportClient:
      ReportClient provides the python based language binding to the https based API of Zoho Analytics.
      @note: Authentication via authtoken is deprecated, use OAuth. kindly send parameter as ReportClient(token,clientId,clientSecret).
      """
+
     isOAuth = False
+    # clientId = None
+    # clientSecret = None
+    # refresh_or_access_token = None
+    # token_timestamp = time.time()
 
     def __init__(self, token, clientId=None, clientSecret=None,serverURL=None,reportServerURL=None):
         """
@@ -61,20 +67,38 @@ class ReportClient:
         self.iamServerURL = serverURL or "https://accounts.zoho.com"
         self.reportServerURL = reportServerURL or "https://analyticsapi.zoho.com"
         self.requests_session = requests_retry_session()
-        if (clientId == None and clientSecret == None):
-            self.token = token
+        self.clientId = clientId
+        self.clientSecret = clientSecret
+        self.refresh_or_access_token = token
+        self.token_timestamp = time.time()  #this is a safe default
+        if (clientId == None and clientSecret == None): #not using OAuth2
+            self.__token = token
         else:
-            self.token = self.getOAuthToken(clientId, clientSecret, token)
+            self.getOAuthToken()  #this sets the instance variable
             ReportClient.isOAuth = True
 
-    def getOAuthToken(self, clientId, clientSecret, refreshToken):
+    @property
+    def token(self):
+        if ReportClient.isOAuth and time.time() - self.token_timestamp > 55 * 60:
+            token = self.getOAuthToken()
+            self.__token = token
+            self.token_timestamp = time.time()
+        return self.__token
+
+    @token.setter
+    def token(self,token):
+        self.__token = token
+        self.token_timestamp = time.time()
+
+
+    def getOAuthToken(self):
         """
         Internal method for getting OAuth token.
         """
         dict = {}
-        dict["client_id"] = clientId
-        dict["client_secret"] = clientSecret
-        dict["refresh_token"] = refreshToken
+        dict["client_id"] = self.clientId
+        dict["client_secret"] = self.clientSecret
+        dict["refresh_token"] = self.refresh_or_access_token
         dict["grant_type"] = "refresh_token"
         #dict = urllib.parse.urlencode(dict)  we should pass a dict, not a string
         accUrl = self.iamServerURL + "/oauth/v2/token"
@@ -84,6 +108,7 @@ class ReportClient:
         else:
             resp = respObj.response.json()
             if ("access_token" in resp):
+                self.__token = resp['access_token']
                 return resp["access_token"]
             else:
                 raise ValueError("Error while getting OAuth token ", resp)
@@ -96,7 +121,7 @@ class ReportClient:
 
         if httpMethod.upper() == 'POST':
             headers = {}
-            if ReportClient.isOAuth:
+            if ReportClient.isOAuth and hasattr(self,'token'): #check for token because this can be called during __init__ and isOAuth could be true.
                 headers["Authorization"] = "Zoho-oauthtoken " + self.token
 
             headers['User-Agent'] = "ZohoAnalytics PythonLibrary"
@@ -122,6 +147,9 @@ class ReportClient:
                 code = j['response']['error']['code']
                 logger.debug(f"API returned a 400 result and an error code: {code}")
                 if code in [6045,]:
+                    raise RecoverableRateLimitError(urlResp=respObj)
+                elif code in [8535,]: #invalid oauth token
+                    self.getOAuthToken()
                     raise RecoverableRateLimitError(urlResp=respObj)
                 else:
                     raise UnrecoverableRateLimitError(urlResp=respObj)

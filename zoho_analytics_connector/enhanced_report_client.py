@@ -45,7 +45,6 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
     def __init__(self, login_email_id: str, token: str, default_databasename: str = None, clientId=None,
                  clientSecret=None,serverURL=None,reportServerURL=None):
         self.login_email_id = login_email_id
-        self.token = token
         self.default_databasename = default_databasename
         super().__init__(token=token, clientId=clientId, clientSecret=clientSecret,serverURL=serverURL,reportServerURL=reportServerURL)
 
