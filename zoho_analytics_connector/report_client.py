@@ -152,7 +152,7 @@ class ReportClient:
                     self.getOAuthToken()
                     raise RecoverableRateLimitError(urlResp=respObj)
                 else:
-                    raise UnrecoverableRateLimitError(urlResp=respObj)
+                    raise ServerError(respObj)
             except (RecoverableRateLimitError,UnrecoverableRateLimitError):
                 raise
             except Exception as e:
