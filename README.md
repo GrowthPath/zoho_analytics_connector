@@ -3,20 +3,20 @@ Zoho Analytics Connector
 ========================
 
 Zoho's SDK for Zoho Reports is very old, however it is very complete.
-This is a version which is Python 3 ready, tested on Python 3.7.
+This is a version which is Python 3 ready, tested on Python 3.8. It has been in production use on several sites for more than 12 months.
 
 A more convenient wrapper class is in enhanced_report_client.
 I use it mostly for uploading data, and creating and modifying tables.
 
 AuthTokens are being deprecated, and in some Zoho domains they don't work any longer. 
-OAuths support works, see notes below.
+OAuth support works, see notes below.
 
 
 Authentication
 ==============
-AuthTokens are being deprecated soon.
+AuthTokens are deprecated.
 
-To use OAuth2, follow documentation.
+OAuth2 notes are below.
 When you create EnhancedZohoAnalyticsClient or ReportClient, you need to pass ClientID, ClientSecret and a RefreshToken.
 To use AuthToken, pass the AuthToken, and set ClientID and ClientSecret to none.
 The test cases give some hints.
@@ -25,23 +25,27 @@ The test cases give some hints.
 For OAuth2:
 ----------
 
-Visit https://www.zoho.com/analytics/api/#oauth and follow the steps
+Visit https://www.zoho.com/analytics/api/#oauth and follow the steps ... in conjunction with the tips here.
 
-Self Clients are an easy start. You choose Self client when you register (create) a new app.
+Self Clients are an easy start. You choose Self Client when you 'register' (create) a new app.
 
-They have purple hexagonal icons.
+In the UI, they have purple hexagonal icons. You ae limited to one self-client, so the scope may need to be shared with your other usages amongst Zoho APIs.
 
-Login as an account on the target organisation to
+The self-client needs to have access rights to the Zoho Analytics accounts, so use as an account on the target organisation with admin rights.
 
-https://api-console.zoho.com/
+<b>Site to visit</b>
 
-and create a Self Client (at least, to experiement)
+https://api-console.zoho.com/  or .com.au ...
 
+and create a Self Client (at least, to experiment)
+
+Choose the correct domain matching the Zoho Analytics account, e.g. api-console.zoho.com.au 
+<p></p>
 
 
 <b>Tip: The scope for full access</b>
 
-ZohoReports.fullaccess.all
+    ZohoReports.fullaccess.all
 
 
 Now with data gathered (client id, client secret, the code which expires in a few minutes, the scope, execute a POST to
@@ -59,8 +63,9 @@ and you should get back JSON which looks like this:
 
 save this somewhere, it is confidential. The refresh token is permanent, it is basically the same as the old authtoken.
 
-NOTE!!! For Australian-hosted Zoho accounts TO-DO
-The token URL may to be adapted for the server location. EG for Australia, post to https://accounts.zoho.com.au/oauth/v2/token
+NOTE!!! For Australian-hosted Zoho accounts and other regional variations:
+
+The token URL is adapted for the server location. e.g. for Australia, post to https://accounts.zoho.com.au/oauth/v2/token
 
 
 
@@ -106,7 +111,7 @@ in development: calling `enhanced_zoho_analytics_client.data_upload(...)` or `re
 UnrecoverableRateLimitError
 RecoverableRateLimitError
 
-This is a partially implemented experimental feature. `data_upload` uses it.
+Manager retries is a partially implemented experimental feature. `data_upload` uses it.
 
 
 Do some stuff
