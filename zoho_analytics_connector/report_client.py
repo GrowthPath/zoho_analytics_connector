@@ -289,7 +289,8 @@ class ReportClient:
         """
         payLoad = ReportClientHelper.getAsPayLoad([columnValues, config], None, None)
         url = ReportClientHelper.addQueryParams(tableURI, self.token, "ADDROW", "XML")
-        return self.__sendRequest(url, "POST", payLoad, "ADDROW", None)
+        url += "&" + payLoad
+        return self.__sendRequest(url, "POST", payLoad=None, action="ADDROW", callBackData=None)
 
     def deleteData(self, tableURI, criteria=None, config=None):
         """  This has been refactored to use requests.post

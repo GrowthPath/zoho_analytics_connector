@@ -5,7 +5,7 @@ Zoho Analytics Connector
 Zoho's SDK for Zoho Reports is very old, however it is very complete.
 This is a version which is Python 3 ready, tested on Python 3.8. It has been in production use on several sites for more than 12 months.
 
-A more convenient wrapper class is in enhanced_report_client.
+A more convenient wrapper class is in enhanced_report_client. This is based on Zoho's ReportClient but provides some more convenient features.
 I use it mostly for uploading data, and creating and modifying tables.
 
 AuthTokens are being deprecated, and in some Zoho domains they don't work any longer. 
@@ -74,7 +74,9 @@ Usage
 
 Zoho's full API is available through the ReportClient API.
 
-EnhancedZohoAnalyticsClient is a higher level layer.
+    class EnhancedZohoAnalyticsClient(ReportClient)
+    
+is a higher level layer.
 
 The tests show how to use it:
 

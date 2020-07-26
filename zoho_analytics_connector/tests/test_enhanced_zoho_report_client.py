@@ -1,5 +1,5 @@
 import os
-
+import io
 import pytest
 
 from zoho_analytics_connector.enhanced_report_client import EnhancedZohoAnalyticsClient
@@ -62,17 +62,29 @@ def get_enhanced_zoho_analytics_client(zoho_email=None) -> EnhancedZohoAnalytics
     return rc
 
 
-def test_get_database_metadata(enhanced_zoho_analytics_client:EnhancedZohoAnalyticsClient):
-    table_meta_data = enhanced_zoho_analytics_client.get_table_metadata()
-    assert table_meta_data
+def test_create_tables(enhanced_zoho_analytics_client):
+    # is the table already defined?
+    try:
+        zoho_table_metadata = enhanced_zoho_analytics_client.get_table_metadata()
+    except ServerError as e:
+        if getattr(e, "message") == "No view present in the workspace.":
+            zoho_table_metadata = {}
+        else:
+            raise
+    zoho_tables = set(zoho_table_metadata.keys())
 
-@pytest.mark.skip
-def test_multiple_clients():
-    #this does not work
-    enhance_client = get_enhanced_zoho_analytics_client()
-    enhance_client1 = get_enhanced_zoho_analytics_client()
-    table_meta_data = enhance_client1.get_table_metadata()
-    assert table_meta_data
+    if "sales_fact" not in zoho_tables:
+        enhanced_zoho_analytics_client.create_table(table_design=zoho_sales_fact_table)
+    else:
+        # get an error, but error handling is not working, the API returns a 400 with no content in the message
+        print(f"\nThe table sales_fact exists already; delete it manually to test")
+
+
+    if "animals" not in zoho_tables:
+        enhanced_zoho_analytics_client.create_table(table_design=animals_table)
+    else:
+        # get an error, but error handling is not working, the API returns a 400 with no content in the message
+        print(f"\nThe table animals table exists already; delete it manually to test")
 
 
 def test_data_upload():
@@ -91,6 +103,49 @@ def test_data_upload():
         import_content=import_content, table_name="sales"
     )
     assert impResult
+
+
+def test_get_database_metadata(enhanced_zoho_analytics_client:EnhancedZohoAnalyticsClient):
+    table_meta_data = enhanced_zoho_analytics_client.get_table_metadata()
+    assert table_meta_data
+
+
+@pytest.mark.skip
+def test_multiple_clients():
+    #this does not work
+    enhance_client = get_enhanced_zoho_analytics_client()
+    enhance_client1 = get_enhanced_zoho_analytics_client()
+    table_meta_data = enhance_client1.get_table_metadata()
+    assert table_meta_data
+
+
+def test_addRow():
+    #test the standard Zoho library function to add one row
+    enhanced_client = get_enhanced_zoho_analytics_client()
+    animals_table_uri = enhanced_client.getURI(dbOwnerName=enhanced_client.login_email_id, dbName=enhanced_client.default_databasename, tableOrReportName='animals')
+    new_row = {'common_name':'Rabbit','size':'small'}
+    enhanced_client.addRow( tableURI=animals_table_uri, columnValues=new_row)
+
+
+
+def test_exportData():
+    """ 
+    test the standard Zoho library function to export data
+    Note: the documentation claims to save the response in a file object, but this doesn't happen.
+    Instead, """
+    
+    
+    enhanced_client = get_enhanced_zoho_analytics_client()
+    animals_table_uri = enhanced_client.getURI(dbOwnerName=enhanced_client.login_email_id,
+                                               dbName=enhanced_client.default_databasename,
+                                               tableOrReportName='animals')
+    output = io.StringIO()
+    r = enhanced_client.exportData(tableOrReportURI=animals_table_uri,format='CSV',exportToFileObj=None)
+    assert (r)
+
+
+def test_deleteRow(enhanced_zoho_analytics_client):
+   pass
 
 
 @pytest.mark.skip
@@ -144,32 +199,17 @@ zoho_sales_fact_table = {
     ],
 }
 
-
-def test_create_table(enhanced_zoho_analytics_client):
-    # is the table already defined?
-    try:
-        zoho_table_metadata = enhanced_zoho_analytics_client.get_table_metadata()
-    except ServerError as e:
-        if getattr(e, "message") == "No view present in the workspace.":
-            zoho_table_metadata = {}
-        else:
-            raise
-    zoho_tables = set(zoho_table_metadata.keys())
-
-    if "sales_fact" not in zoho_tables:
-        enhanced_zoho_analytics_client.create_table(table_design=zoho_sales_fact_table)
-    else:
-        # get an error, but error handling is not working, the API returns a 400 with no content in the message
-        print(f"\nThe table sales_fact exists already; delete it manually to test")
-        pytest.fail(
-            "This test did not do anything because the table it needs to create exists before the test ran"
-        )
+animals_table = {
+    "TABLENAME": "animals",
+    "COLUMNS": [
+        {"COLUMNNAME": "common_name", "DATATYPE": "PLAIN"},
+         {"COLUMNNAME": "size", "DATATYPE": "PLAIN" }
+    ],
+}
 
 
-def test_delete_rows(enhanced_zoho_analytics_client):
-    sql = f"Region IN ('East','West')"
-    r = enhanced_zoho_analytics_client.delete_rows(table_name="sales", sql=sql)
-    assert r
+
+
 
 # needs a COPY_DB_KEY, refer to Zoho documentation
 def test_copy_report(enhanced_zoho_analytics_client):
