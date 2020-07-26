@@ -7,7 +7,7 @@ cmdclass = {'build_sphinx': BuildDoc}
 
 name = 'zoho_analytics_connector'
 keywords = 'zoho analytics'
-version = '0.5.99'
+version = '0.6.0'
 this_directory = path.abspath(path.dirname(__file__))
 with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
@@ -23,9 +23,11 @@ setup(
     setup_requires=['pytest-runner', 'wheel'],
     tests_require=["pytest", ],
     classifiers=[
-        'Development Status :: 4 - Beta',
+        'Development Status :: 5 - Production/Stable',
         'License :: OSI Approved :: MIT License',
+        'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
         'Topic :: Office/Business',
     ],
     url='https://github.com/timrichardson/zoho_analytics_connector',
