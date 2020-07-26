@@ -1,4 +1,3 @@
-
 Zoho Analytics Connector
 ========================
 

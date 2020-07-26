@@ -80,7 +80,8 @@ class ReportClient:
 
     @property
     def token(self):
-        if ReportClient.isOAuth and time.time() - self.token_timestamp > 55 * 60:
+        if ReportClient.isOAuth and time.time() - self.token_timestamp > 50 * 60:
+            logger.debug("Refreshing zoho analytics oauth token")
             token = self.getOAuthToken()
             self.__token = token
             self.token_timestamp = time.time()
@@ -103,7 +104,7 @@ class ReportClient:
         dict["grant_type"] = "refresh_token"
         #dict = urllib.parse.urlencode(dict)  we should pass a dict, not a string
         accUrl = self.iamServerURL + "/oauth/v2/token"
-        respObj = self.getResp(accUrl, "POST", dict)
+        respObj = self.getResp(accUrl, "POST", dict,add_token=False)
         if (respObj.status_code != 200):
             raise ServerError(respObj)
         else:
@@ -114,7 +115,7 @@ class ReportClient:
             else:
                 raise ValueError("Error while getting OAuth token ", resp)
 
-    def getResp(self, url: str, httpMethod: str, payLoad):
+    def getResp(self, url: str, httpMethod: str, payLoad,add_token=True):
         """
         Internal method.(For google app integ).
         """
@@ -122,7 +123,7 @@ class ReportClient:
 
         if httpMethod.upper() == 'POST':
             headers = {}
-            if ReportClient.isOAuth and hasattr(self,'token'): #check for token because this can be called during __init__ and isOAuth could be true.
+            if add_token and ReportClient.isOAuth and hasattr(self,'token'): #check for token because this can be called during __init__ and isOAuth could be true.
                 headers["Authorization"] = "Zoho-oauthtoken " + self.token
 
             headers['User-Agent'] = "ZohoAnalytics PythonLibrary"
