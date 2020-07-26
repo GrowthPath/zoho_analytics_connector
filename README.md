@@ -72,7 +72,15 @@ The token URL is adapted for the server location. e.g. for Australia, post to ht
 Usage
 =====
 
-Zoho's full API is available through the ReportClient API.
+Zoho's full API is available through the ReportClient API. However, there are bugs in this code.
+Recent 2020 changes have fixed some of these bugs, but I have hardly any test cases; I only have test cases
+for a handful of the standard functions of ReportClient. So proceed carefully if you use them.
+
+They are probably worth looking at. For instance, ReportClient.exportData now actually does use the file object you pass.
+But perhaps due to its python2 heritage, it expects a binary file object.
+
+Note that for data import and export, my EnhancedReportClient has its own methods, and these are what I use in production so they are much better tested.
+
 
     class EnhancedZohoAnalyticsClient(ReportClient)
     

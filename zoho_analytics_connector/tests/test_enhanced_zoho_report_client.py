@@ -1,5 +1,6 @@
 import os
 import io
+import json
 import pytest
 
 from zoho_analytics_connector.enhanced_report_client import EnhancedZohoAnalyticsClient
@@ -15,7 +16,6 @@ class Config:
     DATABASENAME = os.getenv("ZOHOANALYTICS_DATABASENAME")
     SERVER_URL = os.getenv("ZOHO_SERVER_URL")
     REPORT_SERVER_URL = os.getenv("ZOHO_REPORTS_SERVER_URL")
-
     TABLENAME = "Sales"
 
 
@@ -61,6 +61,24 @@ def get_enhanced_zoho_analytics_client(zoho_email=None) -> EnhancedZohoAnalytics
     )
     return rc
 
+zoho_sales_fact_table = {
+    "TABLENAME": "sales_fact",
+    "COLUMNS": [
+        {"COLUMNNAME": "inv_date", "DATATYPE": "DATE"},
+        {"COLUMNNAME": "customer", "DATATYPE": "PLAIN"},
+        {"COLUMNNAME": "sku", "DATATYPE": "PLAIN"},
+        {"COLUMNNAME": "qty_invoiced", "DATATYPE": "NUMBER"},
+        {"COLUMNNAME": "line_total_excluding_tax", "DATATYPE": "NUMBER"},
+    ],
+}
+
+animals_table = {
+    "TABLENAME": "animals",
+    "COLUMNS": [
+        {"COLUMNNAME": "common_name", "DATATYPE": "PLAIN"},
+         {"COLUMNNAME": "size", "DATATYPE": "PLAIN" }
+    ],
+}
 
 def test_create_tables(enhanced_zoho_analytics_client):
     # is the table already defined?
@@ -78,7 +96,6 @@ def test_create_tables(enhanced_zoho_analytics_client):
     else:
         # get an error, but error handling is not working, the API returns a 400 with no content in the message
         print(f"\nThe table sales_fact exists already; delete it manually to test")
-
 
     if "animals" not in zoho_tables:
         enhanced_zoho_analytics_client.create_table(table_design=animals_table)
@@ -120,33 +137,50 @@ def test_multiple_clients():
 
 
 def test_addRow():
-    #test the standard Zoho library function to add one row
+    #test the standard Zoho ReportClient library function to add two rows
     enhanced_client = get_enhanced_zoho_analytics_client()
     animals_table_uri = enhanced_client.getURI(dbOwnerName=enhanced_client.login_email_id, dbName=enhanced_client.default_databasename, tableOrReportName='animals')
     new_row = {'common_name':'Rabbit','size':'small'}
     enhanced_client.addRow( tableURI=animals_table_uri, columnValues=new_row)
+    new_row = {'common_name': 'Elephant', 'size': 'large'}
+    enhanced_client.addRow(tableURI=animals_table_uri, columnValues=new_row)
 
 
-
-def test_exportData():
-    """ 
-    test the standard Zoho library function to export data
-    Note: the documentation claims to save the response in a file object, but this doesn't happen.
-    Instead, """
-    
-    
+def test_exportData_csv():
+    # Testing a ReportClient function. a binary file object is required to pass in
     enhanced_client = get_enhanced_zoho_analytics_client()
     animals_table_uri = enhanced_client.getURI(dbOwnerName=enhanced_client.login_email_id,
                                                dbName=enhanced_client.default_databasename,
                                                tableOrReportName='animals')
-    output = io.StringIO()
-    r = enhanced_client.exportData(tableOrReportURI=animals_table_uri,format='CSV',exportToFileObj=None)
-    assert (r)
+    output = io.BytesIO()
+    r = enhanced_client.exportData(tableOrReportURI=animals_table_uri,format='CSV',exportToFileObj=output)
+    assert (output.getvalue())
 
 
-def test_deleteRow(enhanced_zoho_analytics_client):
-   pass
+def test_exportData_json():
+    # Testing a ReportClient function. a binary file object is required to pass in
+    enhanced_client = get_enhanced_zoho_analytics_client()
+    animals_table_uri = enhanced_client.getURI(dbOwnerName=enhanced_client.login_email_id,
+                                               dbName=enhanced_client.default_databasename,
+                                               tableOrReportName='animals')
+    output = io.BytesIO()
+    r = enhanced_client.exportData(tableOrReportURI=animals_table_uri,format='JSON',exportToFileObj=output)
+    assert (json.loads(output.getvalue()))
 
+def test_deleteData(enhanced_zoho_analytics_client):
+    """ This tests the underlying ReportClient function.
+    for criteria tips see https://www.zoho.com/analytics/api/?shell#applying-filter-criteria"""
+    enhanced_client = get_enhanced_zoho_analytics_client()
+    animals_table_uri = enhanced_client.getURI(dbOwnerName=enhanced_client.login_email_id,
+                                               dbName=enhanced_client.default_databasename,
+                                               tableOrReportName='animals')
+    criteria = """ 'Rabbit' in "common_name" """
+    row_count = enhanced_client.deleteData(tableURI=animals_table_uri,criteria=criteria)
+    #assert (row_count==1)
+
+    criteria = """ "common_name" like '%phant' """
+    row_count = enhanced_client.deleteData(tableURI=animals_table_uri,criteria=criteria)
+    #assert (row_count == 1)
 
 @pytest.mark.skip
 def test_rate_limits_data_upload():
@@ -162,7 +196,7 @@ def test_rate_limits_data_upload():
         return
         # import_modes = APPEND / TRUNCATEADD / UPDATEADD
     i = 0
-    while i < 200:
+    while i < 100:
         i += 1
         try:
             impResult = enhanced_client.data_upload(
@@ -187,31 +221,8 @@ def test_data_download(enhanced_zoho_analytics_client):
     # result = get_enhanced_zoho_analytics_client.data_export_using_sql(sql=sql, table_name="sales")
     # assert result
 
-
-zoho_sales_fact_table = {
-    "TABLENAME": "sales_fact",
-    "COLUMNS": [
-        {"COLUMNNAME": "inv_date", "DATATYPE": "DATE"},
-        {"COLUMNNAME": "customer", "DATATYPE": "PLAIN"},
-        {"COLUMNNAME": "sku", "DATATYPE": "PLAIN"},
-        {"COLUMNNAME": "qty_invoiced", "DATATYPE": "NUMBER"},
-        {"COLUMNNAME": "line_total_excluding_tax", "DATATYPE": "NUMBER"},
-    ],
-}
-
-animals_table = {
-    "TABLENAME": "animals",
-    "COLUMNS": [
-        {"COLUMNNAME": "common_name", "DATATYPE": "PLAIN"},
-         {"COLUMNNAME": "size", "DATATYPE": "PLAIN" }
-    ],
-}
-
-
-
-
-
 # needs a COPY_DB_KEY, refer to Zoho documentation
+@pytest.mark.skip
 def test_copy_report(enhanced_zoho_analytics_client):
     """ actually, it copies reports,tables and query tables"""
 

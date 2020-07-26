@@ -5,13 +5,17 @@
 import csv
 import logging
 from typing import MutableMapping, Optional
-
-logger = logging.getLogger(__name__)
 import time
 import json
 
 import requests
 from . import report_client as report_client
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+ch = logging.StreamHandler()
+ch.setLevel(logging.DEBUG)
+logger.addHandler(ch)
 
 """ add some helper functions on top of report_client"""
 
@@ -90,9 +94,9 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
         while True:
             retry_count += 1
             try:
-                impResult = self.import_data(uri, import_mode=import_mode, import_content=import_content,
-                                             date_format=date_format,
-                                             matching_columns=matching_columns)
+                impResult = self.importData_v2(uri, import_mode=import_mode, import_content=import_content,
+                                               date_format=date_format,
+                                               matching_columns=matching_columns)
 
                 logger.debug(
                     f"Table: {table_name}: Processed Rows: "
@@ -125,22 +129,19 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
                     raise (requests.exceptions.ConnectionError(response_content_string))
         return impResult
 
+
     def data_export_using_sql(self, sql, table_name, database_name: str = None) -> csv.DictReader:
         """ returns a csv.DictReader after querying with the sql provided.
         The Zoho API insists on a table or report name, but it doesn't seem to restrict the query"""
         database_name = database_name or self.default_databasename
         uri = self.getURI(dbOwnerName=self.login_email_id, dbName=database_name or self.default_databasename,
                           tableOrReportName=table_name)
-        r = self.exportDataUsingSQL(tableOrReportURI=uri, format='CSV', sql=sql)
-        if r.status_code == 200:
-            reader = csv.DictReader(r.content.decode('utf-8').splitlines())
-        else:
-            error_response = report_client.ServerError(r)
-            logger.info(f"Error in zoho sql export: {error_response.message}")
-            reader = None
+        callback_data = self.exportDataUsingSQL_v2(tableOrReportURI=uri, format='CSV', sql=sql)
+        reader = csv.DictReader(callback_data.getvalue().decode('utf-8').splitlines())
         return reader
 
     def delete_rows(self, table_name, sql, database_name: Optional[str] = None):
+        """ criteria is SQL fragments such as 'a' in ColA """
         uri = self.getURI(dbOwnerName=self.login_email_id, dbName=database_name or self.default_databasename,
                           tableOrReportName=table_name)
 
