@@ -1827,8 +1827,8 @@ class ServerError(Exception):
         self.extra = kwargs
 
         parseable = False
-        contHeader = urlResp.headers["Content-Type"]
-        if (contHeader.find("text/xml") > -1):
+        contHeader = urlResp.headers.get("Content-Type",None)
+        if (contHeader and contHeader.find("text/xml") > -1):
             self.__parseErrorResponse()
 
     def __parseErrorResponse(self):
