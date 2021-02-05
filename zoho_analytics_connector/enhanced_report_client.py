@@ -130,14 +130,24 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
         return impResult
 
 
-    def data_export_using_sql(self, sql, table_name, database_name: str = None) -> csv.DictReader:
+    def data_export_using_sql(self, sql, table_name, database_name: str = None,cache_object = None,cache_timeout_seconds=60) -> csv.DictReader:
         """ returns a csv.DictReader after querying with the sql provided.
-        The Zoho API insists on a table or report name, but it doesn't seem to restrict the query"""
-        database_name = database_name or self.default_databasename
-        uri = self.getURI(dbOwnerName=self.login_email_id, dbName=database_name or self.default_databasename,
-                          tableOrReportName=table_name)
-        callback_data = self.exportDataUsingSQL_v2(tableOrReportURI=uri, format='CSV', sql=sql)
-        reader = csv.DictReader(callback_data.getvalue().decode('utf-8').splitlines())
+        The Zoho API insists on a table or report name, but it doesn't seem to restrict the query
+        The cache object has a get and set function like the django cache does: https://docs.djangoproject.com/en/3.1/topics/cache/"""
+
+        if cache_object:
+            returned_data = cache_object.get(sql)
+        else:
+            returned_data = None
+        if not returned_data:
+            database_name = database_name or self.default_databasename
+            uri = self.getURI(dbOwnerName=self.login_email_id, dbName=database_name or self.default_databasename,
+                              tableOrReportName=table_name)
+            callback_data = self.exportDataUsingSQL_v2(tableOrReportURI=uri, format='CSV', sql=sql)
+            returned_data = callback_data.getvalue().decode('utf-8').splitlines()
+            if cache_object:
+                cache_object.set(sql,returned_data,cache_timeout_seconds)
+        reader = csv.DictReader(returned_data)
         return reader
 
     def delete_rows(self, table_name, sql, database_name: Optional[str] = None):
