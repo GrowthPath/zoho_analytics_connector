@@ -133,7 +133,8 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
     def data_export_using_sql(self, sql, table_name, database_name: str = None,cache_object = None,cache_timeout_seconds=60) -> csv.DictReader:
         """ returns a csv.DictReader after querying with the sql provided.
         The Zoho API insists on a table or report name, but it doesn't seem to restrict the query
-        The cache object has a get and set function like the django cache does: https://docs.djangoproject.com/en/3.1/topics/cache/"""
+        The cache object has a get and set function like the django cache does: https://docs.djangoproject.com/en/3.1/topics/cache/
+        The cache key is the sql query"""
 
         if cache_object:
             returned_data = cache_object.get(sql)

@@ -169,6 +169,21 @@ you need to escape them yourself (double ')
         result = get_enhanced_zoho_analytics_client.data_export_using_sql(sql=sql,table_name="sales")
         assert result
         
+You can cache a query too, if you provide a cache object which has the same interface as Django's cache. 
+https://docs.djangoproject.com/en/3.1/topics/cache/
+
+this is, the cache object needs to offer cache.set(...) and cache.get(...) as Django does
+
+    from django.core.cache import cache
+
+    def test_data_download(get_enhanced_zoho_analytics_client):
+        sql="select * from sales"
+        result = get_enhanced_zoho_analytics_client.data_export_using_sql(sql=sql,table_name="sales",cache_object=cache, cache_timeout_seconds=600)
+        assert result
+        
+        result = get_enhanced_zoho_analytics_client.data_export_using_sql(sql=sql,table_name="sales",cache_object=cache, cache_timeout_seconds=600)
+        assert result
+
         
 <b>create a table</b>
         

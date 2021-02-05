@@ -7,7 +7,7 @@ cmdclass = {'build_sphinx': BuildDoc}
 
 name = 'zoho_analytics_connector'
 keywords = 'zoho analytics'
-version = '1.0.0'
+version = '1.0.1'
 this_directory = path.abspath(path.dirname(__file__))
 with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
@@ -18,9 +18,8 @@ setup(
     version=version,
     packages=['zoho_analytics_connector'],
     python_requires='>=3.6',
-    install_requires=['requests',
-                      ],
-    setup_requires=['pytest-runner', 'wheel'],
+    install_requires=['requests',],
+    setup_requires=['pytest-runner', 'wheel', 'sphinx'],
     tests_require=["pytest", ],
     classifiers=[
         'Development Status :: 5 - Production/Stable',
