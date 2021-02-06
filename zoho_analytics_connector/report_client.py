@@ -1827,9 +1827,15 @@ class ServerError(Exception):
         self.extra = kwargs
 
         parseable = False
-        contHeader = urlResp.headers.get("Content-Type",None)
-        if (contHeader and contHeader.find("text/xml") > -1):
-            self.__parseErrorResponse()
+        if not urlResp:
+            logger.error(f"response object is None")
+        else:
+            try:
+                contHeader = urlResp.headers.get("Content-Type",None)
+                if (contHeader and contHeader.find("text/xml") > -1):
+                    self.__parseErrorResponse()
+            except AttributeError:
+                logger.error(f"response object is None")
 
     def __parseErrorResponse(self):
         try:
