@@ -238,7 +238,8 @@ this is, the cache object needs to offer cache.set(...) and cache.get(...) as Dj
 
 Changes
 -------------
-1.1.0 Treat "another import is in progress" as a recoverable error.
-    Move home-made retry logic to low level. Functions can pass retry_countdown to use retry. 
+1.1.0 Treat "another import is in progress" as a recoverable error (can be retried)
+    Move home-made retry logic to low level: report_client.__sendRequest(), and make retry optionally available to the key functions in EnhancedZohoAnalyticsClient. 
+    Functions can pass retry_countdown to use retry. The retry handling is coping well under some intial use in high volume production loads.
 1.0.4 Documentation improvements
 1.0.3 Some slightly better error handling if Zoho returns an empty response
