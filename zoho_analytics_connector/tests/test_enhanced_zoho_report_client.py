@@ -176,7 +176,7 @@ def test_deleteData(enhanced_zoho_analytics_client):
                                                dbName=enhanced_client.default_databasename,
                                                tableOrReportName='animals')
     criteria = """ 'Rabbit' in "common_name" """
-    row_count = enhanced_client.deleteData(tableURI=animals_table_uri,criteria=criteria)
+    row_count = enhanced_client.deleteData(tableURI=animals_table_uri,criteria=criteria,retry_countdown=10)
     #assert (row_count==1)
 
     criteria = """ "common_name" like '%phant' """

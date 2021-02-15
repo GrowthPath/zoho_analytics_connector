@@ -139,7 +139,6 @@ class ReportClient:
             raise RuntimeError("Unexpected httpMethod in getResp")
 
     def __sendRequest(self, url, httpMethod, payLoad, action, callBackData,retry_countdown=0):
-
         while retry_countdown >= 0:
             retry_countdown -= 1
             respObj = self.getResp(url, httpMethod, payLoad)
@@ -158,7 +157,10 @@ class ReportClient:
                         else:
                             continue
                     elif code in [8535,]: #invalid oauth token
-                        self.getOAuthToken()
+                        try:
+                            self.getOAuthToken()
+                        except:
+                            pass
                         logger.debug(f"Zoho API Recoverable error encountered (invalid oauth token)")
                         if retry_countdown < 0:
                             raise RecoverableRateLimitError(urlResp=respObj)

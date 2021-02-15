@@ -124,8 +124,12 @@ in development: calling `enhanced_zoho_analytics_client.data_upload(...)` or `re
 UnrecoverableRateLimitError
 RecoverableRateLimitError
 
-Manager retries is a partially implemented experimental feature. `data_upload` uses it.
+Manager retries is a partially implemented experimental feature. 
+The retry logic is in 
 
+    def __sendRequest(self, url, httpMethod, payLoad, action, callBackData,retry_countdown=0):
+
+It attempts to differentiate between recoverable and non-recoverable errors. It should be enhanced to use smarter retry timing, but first I will see if this works under production loads.
 
 Do some stuff
 -------------
@@ -170,7 +174,7 @@ you need to escape them yourself (double ')
 
         #the table name does not matter
         sql="select * from animals"
-        result = get_enhanced_zoho_analytics_client.data_export_using_sql(sql=sql,table_name="sales")
+        result = get_enhanced_zoho_analytics_client.data_export_using_sql(sql=sql,table_name="sales",retry_countdown=10)
         assert result
         
 You can cache a query too, if you provide a cache object which has the same interface as Django's cache. 
@@ -182,12 +186,24 @@ this is, the cache object needs to offer cache.set(...) and cache.get(...) as Dj
 
     def test_data_download(get_enhanced_zoho_analytics_client):
         sql="select * from sales"
-        result = get_enhanced_zoho_analytics_client.data_export_using_sql(sql=sql,table_name="sales",cache_object=cache, cache_timeout_seconds=600)
+        result = get_enhanced_zoho_analytics_client.data_export_using_sql(sql=sql,table_name="sales",cache_object=cache,
+            cache_timeout_seconds=600,retry_countdown=10)
         assert result
         
         result = get_enhanced_zoho_analytics_client.data_export_using_sql(sql=sql,table_name="sales",cache_object=cache, cache_timeout_seconds=600)
         assert result
 
+<b>Delete rows</b>
+
+    def test_deleteData(enhanced_zoho_analytics_client):
+        """ This tests the underlying ReportClient function.
+        for criteria tips see https://www.zoho.com/analytics/api/?shell#applying-filter-criteria"""
+        enhanced_client = get_enhanced_zoho_analytics_client()
+        animals_table_uri = enhanced_client.getURI(dbOwnerName=enhanced_client.login_email_id,
+                                                   dbName=enhanced_client.default_databasename,
+                                                   tableOrReportName='animals')
+        criteria = """ 'Rabbit' in "common_name" """
+        row_count = enhanced_client.deleteData(tableURI=animals_table_uri,criteria=criteria,retry_countdown=10)
         
 <b>create a table</b>
         
@@ -222,6 +238,7 @@ this is, the cache object needs to offer cache.set(...) and cache.get(...) as Dj
 
 Changes
 -------------
-1.0.5 Treat "another import is in progress" as a recoverable error
+1.1.0 Treat "another import is in progress" as a recoverable error.
+    Move home-made retry logic to low level. Functions can pass retry_countdown to use retry. 
 1.0.4 Documentation improvements
 1.0.3 Some slightly better error handling if Zoho returns an empty response
