@@ -155,6 +155,7 @@ class ReportClient:
                         if retry_countdown < 0:
                             raise RecoverableRateLimitError(urlResp=respObj)
                         else:
+                            time.sleep(min(10-retry_countdown,1)*10)
                             continue
                     elif code in [8535,]: #invalid oauth token
                         try:
@@ -165,12 +166,14 @@ class ReportClient:
                         if retry_countdown < 0:
                             raise RecoverableRateLimitError(urlResp=respObj)
                         else:
+                            time.sleep(min(10 - retry_countdown, 1) * 10)
                             continue
                     elif code in [10001,]:  #10001 is "Another import is in progress, so we can try this again"
                         logger.debug(f"Zoho API Recoverable error encountered (Another import is in progress)")
                         if retry_countdown < 0:
                             raise RecoverableRateLimitError(urlResp=respObj)
                         else:
+                            time.sleep(min(10 - retry_countdown, 1) * 10)
                             continue
                     else:
                         raise ServerError(respObj)
