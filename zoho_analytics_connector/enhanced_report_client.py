@@ -91,45 +91,51 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
         database_name = database_name or self.default_databasename
         uri = self.getURI(dbOwnerName=self.login_email_id, dbName=database_name, tableOrReportName=table_name)
         # import_modes = APPEND / TRUNCATEADD / UPDATEADD
-        while True:
-            retry_count += 1
-            try:
-                impResult = self.importData_v2(uri, import_mode=import_mode, import_content=import_content,
-                                               date_format=date_format,
-                                               matching_columns=matching_columns)
-                logger.debug(
-                    f"Table: {table_name}: Processed Rows: "
-                    f"{impResult.totalRowCount} with {impResult.warningCount} warnings ")
-                break
-            except report_client.RecoverableRateLimitError:
-                if retry_count <= retry_limit:
-                    logger.error(f"Zoho API limit exceeded, will retry, next attempt: {retry_count}")
-                    time.sleep(retry_count * 10)
-                    continue
-                    # raise RuntimeError("API limit exceeded")
-                else:
-                    logger.info(f"Number of retry attempts exceeded")
-                    raise RuntimeError("API Limit error: Number of retry attempts exceeded")
-            except report_client.UnrecoverableRateLimitError:
-                logger.error(f"Zoho API daily limit exceeded or row count exceeded, will not retry")
-                raise
-            except report_client.ParseError as e:
-                response_content_string = e.responseContent.decode('utf-8', errors='ignore')
-                response_content_string = response_content_string or 'No response content'
-                if 'Invalid NUMBER value' in response_content_string:
-                    raise RuntimeError(
-                        f"Invalid data format in Zoho data upload, check table definitions: {response_content_string}")
-                if retry_count <= retry_limit:
-                    logger.error(f"Retrying data_upload because of upload error: {response_content_string}")
-                    time.sleep(1)
-                    continue
-                else:
-                    logger.info(f"Number of retry attempts exceeded")
-                    raise (requests.exceptions.ConnectionError(response_content_string))
+        impResult = self.importData_v2(uri, import_mode=import_mode, import_content=import_content,
+                                       date_format=date_format,
+                                       matching_columns=matching_columns, retry_countdown=retry_limit)
+        logger.debug(
+                f"Table: {table_name}: Processed Rows: "
+                f"{impResult.totalRowCount} with {impResult.warningCount} warnings ")
+        # while True:
+        #     retry_count += 1
+        #     try:
+        #         impResult = self.importData_v2(uri, import_mode=import_mode, import_content=import_content,
+        #                                        date_format=date_format,
+        #                                        matching_columns=matching_columns,retry_countdown=retry_limit)
+        #         logger.debug(
+        #             f"Table: {table_name}: Processed Rows: "
+        #             f"{impResult.totalRowCount} with {impResult.warningCount} warnings ")
+        #         break
+        #     except report_client.RecoverableRateLimitError:
+        #         if retry_count <= retry_limit:
+        #             logger.error(f"Zoho API limit or some other recoverable error, will retry, next attempt: {retry_count}")
+        #             time.sleep(retry_count * 10)
+        #             continue
+        #             # raise RuntimeError("API limit exceeded")
+        #         else:
+        #             logger.info(f"Number of retry attempts exceeded")
+        #             raise RuntimeError("API Limit error: Number of retry attempts exceeded")
+        #     except report_client.UnrecoverableRateLimitError:
+        #         logger.error(f"Zoho API daily limit exceeded or row count exceeded, will not retry")
+        #         raise
+        #     except report_client.ParseError as e:
+        #         response_content_string = e.responseContent.decode('utf-8', errors='ignore')
+        #         response_content_string = response_content_string or 'No response content'
+        #         if 'Invalid NUMBER value' in response_content_string:
+        #             raise RuntimeError(
+        #                 f"Invalid data format in Zoho data upload, check table definitions: {response_content_string}")
+        #         if retry_count <= retry_limit:
+        #             logger.error(f"Retrying data_upload because of upload error: {response_content_string}")
+        #             time.sleep(1)
+        #             continue
+        #         else:
+        #             logger.info(f"Number of retry attempts exceeded")
+        #             raise (requests.exceptions.ConnectionError(response_content_string))
         return impResult
 
 
-    def data_export_using_sql(self, sql, table_name, database_name: str = None,cache_object = None,cache_timeout_seconds=60) -> csv.DictReader:
+    def data_export_using_sql(self, sql, table_name, database_name: str = None, cache_object = None, cache_timeout_seconds=60, retry_countdown = 0) -> csv.DictReader:
         """ returns a csv.DictReader after querying with the sql provided.
         The Zoho API insists on a table or report name, but it doesn't seem to restrict the query
         The cache object has a get and set function like the django cache does: https://docs.djangoproject.com/en/3.1/topics/cache/
@@ -143,17 +149,18 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
             database_name = database_name or self.default_databasename
             uri = self.getURI(dbOwnerName=self.login_email_id, dbName=database_name or self.default_databasename,
                               tableOrReportName=table_name)
-            callback_data = self.exportDataUsingSQL_v2(tableOrReportURI=uri, format='CSV', sql=sql)
+            callback_data = self.exportDataUsingSQL_v2(tableOrReportURI=uri, format='CSV', sql=sql,retry_countdown=retry_countdown)
             returned_data = callback_data.getvalue().decode('utf-8').splitlines()
             if cache_object:
                 cache_object.set(sql,returned_data,cache_timeout_seconds)
+
         reader = csv.DictReader(returned_data)
         return reader
 
-    def delete_rows(self, table_name, sql, database_name: Optional[str] = None):
+    def delete_rows(self, table_name, sql, database_name: Optional[str] = None,retry_countdown=0):
         """ criteria is SQL fragments such as 'a' in ColA """
         uri = self.getURI(dbOwnerName=self.login_email_id, dbName=database_name or self.default_databasename,
                           tableOrReportName=table_name)
 
-        r = self.deleteData(tableURI=uri, criteria=sql)
+        r = self.deleteData(tableURI=uri, criteria=sql,retry_countdown=retry_countdown)
         return r

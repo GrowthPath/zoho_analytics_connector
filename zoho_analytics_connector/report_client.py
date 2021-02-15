@@ -138,34 +138,46 @@ class ReportClient:
         else:
             raise RuntimeError("Unexpected httpMethod in getResp")
 
-    def __sendRequest(self, url, httpMethod, payLoad, action, callBackData):
-        respObj = self.getResp(url, httpMethod, payLoad)
-        if (respObj.status_code in [200,]):
-            return self.handleResponse(respObj, action, callBackData)
-        elif (respObj.status_code in [400,]):
-            #400 errors be an API limit error, which are handled by the result parsing
-            try:
-                j = respObj.response.json()
-                code = j['response']['error']['code']
-                logger.debug(f"API returned a 400 result and an error code: {code}")
-                if code in [6045]:
-                    logger.debug(f"Zoho API Recoverable rate limit encountered")
-                    raise RecoverableRateLimitError(urlResp=respObj)
-                elif code in [8535,]: #invalid oauth token
-                    self.getOAuthToken()
-                    logger.debug(f"Zoho API Recoverable error encountered (invalid oauth token)")
-                    raise RecoverableRateLimitError(urlResp=respObj)
-                elif code in [10001,]:  #10001 is "Another import is in progress, so we can try this again"
-                    logger.debug(f"Zoho API Recoverable error encountered (Another import is in progress)")
-                    raise RecoverableRateLimitError(urlResp=respObj)
-                else:
+    def __sendRequest(self, url, httpMethod, payLoad, action, callBackData,retry_countdown=0):
+
+        while retry_countdown >= 0:
+            retry_countdown -= 1
+            respObj = self.getResp(url, httpMethod, payLoad)
+            if (respObj.status_code in [200,]):
+                return self.handleResponse(respObj, action, callBackData)
+            elif (respObj.status_code in [400,]):
+                #400 errors be an API limit error, which are handled by the result parsing
+                try:
+                    j = respObj.response.json()
+                    code = j['response']['error']['code']
+                    logger.debug(f"API returned a 400 result and an error code: {code}")
+                    if code in [6045]:
+                        logger.debug(f"Zoho API Recoverable rate limit encountered")
+                        if retry_countdown < 0:
+                            raise RecoverableRateLimitError(urlResp=respObj)
+                        else:
+                            continue
+                    elif code in [8535,]: #invalid oauth token
+                        self.getOAuthToken()
+                        logger.debug(f"Zoho API Recoverable error encountered (invalid oauth token)")
+                        if retry_countdown < 0:
+                            raise RecoverableRateLimitError(urlResp=respObj)
+                        else:
+                            continue
+                    elif code in [10001,]:  #10001 is "Another import is in progress, so we can try this again"
+                        logger.debug(f"Zoho API Recoverable error encountered (Another import is in progress)")
+                        if retry_countdown < 0:
+                            raise RecoverableRateLimitError(urlResp=respObj)
+                        else:
+                            continue
+                    else:
+                        raise ServerError(respObj)
+                except (RecoverableRateLimitError,UnrecoverableRateLimitError):
+                    raise
+                except Exception as e:
                     raise ServerError(respObj)
-            except (RecoverableRateLimitError,UnrecoverableRateLimitError):
-                raise
-            except Exception as e:
+            else:
                 raise ServerError(respObj)
-        else:
-            raise ServerError(respObj)
 
     def handle_response_v2(self, response: requests.Response, action: str, callBackData) -> Optional[
         Union[MutableMapping, 'ImportResult', 'ShareInfo', 'PlanInfo']]:
@@ -318,7 +330,7 @@ class ReportClient:
         url += "&" + payLoad
         return self.__sendRequest(url, "POST", payLoad=None, action="ADDROW", callBackData=None)
 
-    def deleteData(self, tableURI, criteria=None, config=None):
+    def deleteData(self, tableURI, criteria=None, config=None,retry_countdown=0):
         """  This has been refactored to use requests.post
         Delete the data in the  specified table identified by the URI.
         @param tableURI: The URI of the table. See L{getURI<getURI>}.
@@ -335,7 +347,7 @@ class ReportClient:
         # payLoad = ReportClientHelper.getAsPayLoad([config], criteria, None)
         payload = None  # can't put the SQL in the body of the post request, the library is wrong or out of date
         url = ReportClientHelper.addQueryParams(tableURI, self.token, "DELETE", "JSON", criteria=criteria)
-        r = self.__sendRequest(url=url,httpMethod="POST",payLoad=payload,action="DELETE",callBackData=None)
+        r = self.__sendRequest(url=url,httpMethod="POST",payLoad=payload,action="DELETE",callBackData=None,retry_countdown=retry_countdown)
         return r
 
     def updateData(self, tableURI, columnValues, criteria, config=None):
@@ -421,7 +433,8 @@ class ReportClient:
                       import_content: str,
                       matching_columns: str = None,
                       date_format=None,
-                      import_config=None) -> 'ImportResult':
+                      import_config=None,
+                      retry_countdown=0) -> 'ImportResult':
         """ Send data to zoho using a string formatted in CSV style.
         This has been refactored to use requests.post.
         Bulk import data into the table identified by the URI. import_content is a string in csv format (\n separated)
@@ -464,7 +477,7 @@ class ReportClient:
             payload['ZOHO_MATCHING_COLUMNS'] = matching_columns
 
         url = ReportClientHelper.addQueryParams(tableURI, self.token, "IMPORT", "XML")
-        r = self.__sendRequest(url=url,httpMethod="POST",payLoad=payload,action="IMPORT",callBackData=None)
+        r = self.__sendRequest(url=url,httpMethod="POST",payLoad=payload,action="IMPORT",callBackData=None,retry_countdown=retry_countdown)
         return ImportResult(r.response)  # a parser from Zoho
 
     def importDataAsString(self, tableURI, importType, importContent, autoIdentify, onError, importConfig=None):
@@ -552,7 +565,7 @@ class ReportClient:
         url = ReportClientHelper.addQueryParams(tableOrReportURI, self.authtoken, "EXPORT", format)
         return self.__sendRequest(url, "POST", payLoad, "EXPORT", exportToFileObj)
 
-    def exportDataUsingSQL_v2(self, tableOrReportURI, format, sql, config=None) -> io.BytesIO:
+    def exportDataUsingSQL_v2(self, tableOrReportURI, format, sql, config=None,retry_countdown=0) -> io.BytesIO:
         """ This has been refactored to use requests.post
         Export the data with the  specified SQL query identified by the URI.
         @param tableOrReportURI: The URI of the database. See L{getDBURI<getDBURI>}.
@@ -584,7 +597,7 @@ class ReportClient:
         #requests_session = self.requests_session or requests_retry_session()
         #r = requests_session.post(url=url, data=payload, timeout=30)
         callback_object = io.BytesIO()
-        r = self.__sendRequest(url=url,httpMethod="POST",payLoad=payload,action="EXPORT",callBackData=callback_object)
+        r = self.__sendRequest(url=url,httpMethod="POST",payLoad=payload,action="EXPORT",callBackData=callback_object,retry_countdown=retry_countdown)
         return callback_object
 
     def copyDatabase(self, dbURI, config=None):
