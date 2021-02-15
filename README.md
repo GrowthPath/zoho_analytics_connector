@@ -13,11 +13,13 @@ OAuth support works, see notes below.
 
 Authentication
 ==============
-AuthTokens are deprecated.
+AuthTokens are now retired, replaced with OAuth2.
 
 OAuth2 notes are below.
 When you create EnhancedZohoAnalyticsClient or ReportClient, you need to pass ClientID, ClientSecret and a RefreshToken.
-To use AuthToken, pass the AuthToken, and set ClientID and ClientSecret to none.
+The RefreshToken is the equivalent of the old AuthToken.
+
+To use AuthToken (retired authentication method), pass the AuthToken, and set ClientID and ClientSecret to none.
 The test cases give some hints.
 
 
@@ -26,7 +28,9 @@ For OAuth2:
 
 Visit https://www.zoho.com/analytics/api/#oauth and follow the steps ... in conjunction with the tips here.
 
-Self Clients are an easy start. You choose Self Client when you 'register' (create) a new app.
+Self Clients are an easy start. You choose Self Client when you 'register' (create) a new app. A Self Client means that you interactively get a Refresh Token.
+OAuth2 is mostly designed for flows where the user interactively approves: the Self Client approach is the equivalent of the old AuthToken, requiring no user action.
+However, you need to access the Zoho Analytics account as the admin user or user who owns the Workspace.
 
 In the UI, they have purple hexagonal icons. You ae limited to one self-client, so the scope may need to be shared with your other usages amongst Zoho APIs.
 
@@ -216,3 +220,8 @@ this is, the cache object needs to offer cache.set(...) and cache.get(...) as Dj
             print (r)
 
 
+Changes
+-------------
+1.0.5 Treat "another import is in progress" as a recoverable error
+1.0.4 Documentation improvements
+1.0.3 Some slightly better error handling if Zoho returns an empty response

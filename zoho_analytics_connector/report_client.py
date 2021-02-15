@@ -148,12 +148,15 @@ class ReportClient:
                 j = respObj.response.json()
                 code = j['response']['error']['code']
                 logger.debug(f"API returned a 400 result and an error code: {code}")
-                if code in [6045,]:
+                if code in [6045]:
                     logger.debug(f"Zoho API Recoverable rate limit encountered")
                     raise RecoverableRateLimitError(urlResp=respObj)
                 elif code in [8535,]: #invalid oauth token
                     self.getOAuthToken()
                     logger.debug(f"Zoho API Recoverable error encountered (invalid oauth token)")
+                    raise RecoverableRateLimitError(urlResp=respObj)
+                elif code in [10001,]:  #10001 is "Another import is in progress, so we can try this again"
+                    logger.debug(f"Zoho API Recoverable error encountered (Another import is in progress)")
                     raise RecoverableRateLimitError(urlResp=respObj)
                 else:
                     raise ServerError(respObj)
