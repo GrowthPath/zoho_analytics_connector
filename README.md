@@ -2,7 +2,7 @@ Zoho Analytics Connector
 ========================
 
 Zoho's SDK for Zoho Reports is very old, however it is very complete.
-This is a version which is Python 3 ready, tested on Python 3.8. It has been in production use on several sites for more than 12 months.
+This is a version which is Python 3 ready, tested on Python 3.8 and 3.9.
 
 A more convenient wrapper class is in enhanced_report_client. This is based on Zoho's ReportClient but provides some more convenient features.
 I use it mostly for uploading data, and creating and modifying tables.
@@ -124,12 +124,14 @@ in development: calling `enhanced_zoho_analytics_client.data_upload(...)` or `re
 UnrecoverableRateLimitError
 RecoverableRateLimitError
 
-Manager retries is a partially implemented experimental feature. 
+Managing retries is a beta feature but I am using it in production. It is opt-in except where I was already doing retry.
 The retry logic is in 
 
     def __sendRequest(self, url, httpMethod, payLoad, action, callBackData,retry_countdown=0):
 
-It attempts to differentiate between recoverable and non-recoverable errors. It should be enhanced to use smarter retry timing, but first I will see if this works under production loads.
+It attempts to differentiate between recoverable and non-recoverable errors. Recoverable errors so far are temporary rate limit errors, errors due to another update running on the same table, and token refresh errors.
+
+It should be enhanced to use smarter retry timing, but first I will see if this works under production loads.
 
 Do some stuff
 -------------
@@ -238,8 +240,13 @@ this is, the cache object needs to offer cache.set(...) and cache.get(...) as Dj
 
 Changes
 -------------
+
+1.1.0.1 Documentation fixes
+
 1.1.0 Treat "another import is in progress" as a recoverable error (can be retried)
     Move home-made retry logic to low level: report_client.__sendRequest(), and make retry optionally available to the key functions in EnhancedZohoAnalyticsClient. 
-    Functions can pass retry_countdown to use retry. The retry handling is coping well under some intial use in high volume production loads.
+    Functions can pass retry_countdown to use retry. The retry handling is coping well under some initial use in high volume production loads.
+
 1.0.4 Documentation improvements
+
 1.0.3 Some slightly better error handling if Zoho returns an empty response
