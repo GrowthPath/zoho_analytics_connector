@@ -23,7 +23,7 @@ logger.addHandler(ch)
 class EnhancedZohoAnalyticsClient(report_client.ReportClient):
 
     @staticmethod
-    def process_table_meta_data(catalog):
+    def process_table_meta_data(catalog,force_lowercase_column_names=False):
         """ catalog is a ZOHO_CATALOG_INFO dict. Call this from get_database_metadata for example
          Return a dict keyed by tablename, each item being a dict keyed by column name, with the item being the
          catalog info for the col
@@ -42,7 +42,10 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
                 table_data[table['tableName']] = {}
                 col_data = table_data[table['tableName']]
                 for col in table['columns']:
-                    col_data[col['columnName']] = col
+                    if force_lowercase_column_names:
+                        col_data[col['columnName']] = col.lower()
+                    else:
+                        col_data[col['columnName']] = col
 
         return table_data
 
@@ -57,10 +60,10 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
         catalog_info = self.getDatabaseMetadata(requestURI=db_uri, metadata="ZOHO_CATALOG_INFO")
         return catalog_info
 
-    def get_table_metadata(self, database_name: str = None) -> MutableMapping:
+    def get_table_metadata(self, database_name: str = None,force_lowercase_column_names=False) -> MutableMapping:
         database_name = database_name or self.default_databasename
         catalog_info = self.get_database_catalog(database_name=database_name)
-        table_metadata = self.process_table_meta_data(catalog_info)
+        table_metadata = self.process_table_meta_data(catalog_info,force_lowercase_column_names=force_lowercase_column_names)
         return table_metadata
 
     def create_table(self, table_design, database_name=None) -> MutableMapping:
