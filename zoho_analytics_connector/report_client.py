@@ -330,10 +330,14 @@ class ReportClient:
         due to some error.
         @raise ParseError: If the server has responded but client was not able to parse the response.
         """
+        # payLoad = ReportClientHelper.getAsPayLoad([columnValues, config], None, None)
+        # url = ReportClientHelper.addQueryParams(tableURI, self.token, "ADDROW", "XML")
+        # url += "&" + payLoad
+        # return self.__sendRequest(url, "POST", payLoad=None, action="ADDROW", callBackData=None)
+
         payLoad = ReportClientHelper.getAsPayLoad([columnValues, config], None, None)
         url = ReportClientHelper.addQueryParams(tableURI, self.token, "ADDROW", "XML")
-        url += "&" + payLoad
-        return self.__sendRequest(url, "POST", payLoad=None, action="ADDROW", callBackData=None)
+        return self.__sendRequest(url, "POST", payLoad, "ADDROW", None)
 
     def deleteData(self, tableURI, criteria=None, config=None,retry_countdown=0):
         """  This has been refactored to use requests.post
@@ -1905,10 +1909,9 @@ class ImportResult:
         try:
             self.result_code = int(ReportClientHelper.getInfo(dom, "code", response))
 
-        except  ParseError as e:
+        except ParseError as e:
             # logger.debug(f"Note in import result: could not find result code {msg}")
             self.result_code = 0
-
 
         try:
             self.totalColCount = int(ReportClientHelper.getInfo(dom, "totalColumnCount", response))
@@ -2048,7 +2051,7 @@ class ReportClientHelper:
         return url
 
     @staticmethod
-    def getAsPayLoad(separateDicts, criteria, sql):
+    def getAsPayLoad(separateDicts, criteria, sql,encode_payload=False):
         payload = {}
         for i in separateDicts:
             if (i != None):
@@ -2060,8 +2063,11 @@ class ReportClientHelper:
         if (sql != None):
             payload["ZOHO_SQLQUERY"] = sql
 
-        if (len(payload) != 0):
-            payload = urllib.parse.urlencode(payload)
+        if len(payload) != 0:
+            if encode_payload:
+                payload = urllib.parse.urlencode(payload)
+            else:
+                pass
         else:
             payload = None
         return payload
