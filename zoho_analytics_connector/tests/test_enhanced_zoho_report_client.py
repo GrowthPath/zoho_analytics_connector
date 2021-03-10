@@ -120,6 +120,7 @@ def test_data_upload():
         import_content=import_content, table_name="sales"
     )
     assert impResult
+    assert impResult.successRowCount == impResult.totalRowCount
 
 
 
@@ -157,6 +158,17 @@ def test_exportData_csv():
     r = enhanced_client.exportData(tableOrReportURI=animals_table_uri,format='CSV',exportToFileObj=output)
     assert (output.getvalue())
 
+def test_exportData_csv_with_criteria():
+    # this test assumes that test_addRow has run
+    enhanced_client = get_enhanced_zoho_analytics_client()
+    animals_table_uri = enhanced_client.getURI(dbOwnerName=enhanced_client.login_email_id,
+                                               dbName=enhanced_client.default_databasename,
+                                               tableOrReportName='animals')
+    output = io.BytesIO()
+    r = enhanced_client.exportData(tableOrReportURI=animals_table_uri,format='CSV',exportToFileObj=output,criteria="size = 'small'")
+    returned_data = output.getvalue().decode()
+    #assert (output.getvalue())
+    assert len(returned_data.split()) == 2  #first row is the headers
 
 def test_exportData_json():
     # Testing a ReportClient function. a binary file object is required to pass in

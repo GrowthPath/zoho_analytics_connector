@@ -241,6 +241,8 @@ this is, the cache object needs to offer cache.set(...) and cache.get(...) as Dj
 Changes
 -------------
 
+1.1.2 fix issue #2 to fix criteria on export. Added test case.
+1.1.1 minor fixes
 1.1.0.1 Documentation fixes
 
 1.1.0 Treat "another import is in progress" as a recoverable error (can be retried)
