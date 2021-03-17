@@ -57,7 +57,8 @@ def get_enhanced_zoho_analytics_client(zoho_email=None) -> EnhancedZohoAnalytics
         clientId=Config.CLIENTID if TEST_OAUTH else None,
         default_databasename=Config.DATABASENAME,
         serverURL=Config.SERVER_URL,
-        reportServerURL=Config.REPORT_SERVER_URL
+        reportServerURL=Config.REPORT_SERVER_URL,
+        default_retries=3
     )
     return rc
 
@@ -177,6 +178,7 @@ def test_exportData_json():
                                                dbName=enhanced_client.default_databasename,
                                                tableOrReportName='animals')
     output = io.BytesIO()
+    enhanced_client.default_retries = 3
     r = enhanced_client.exportData(tableOrReportURI=animals_table_uri,format='JSON',exportToFileObj=output)
     assert (json.loads(output.getvalue()))
 

@@ -103,12 +103,16 @@ Config class is used in the testcases as a convenience.
 
 Make the API instance:
 
-    def get_enhanced_zoho_analytics_client()->EnhancedZohoAnalyticsClient:
-        if (Config.AUTHTOKEN == ""):
-            raise RuntimeError(Exception, "Please configure AUTHTOKEN in Config class")
-        rc = EnhancedZohoAnalyticsClient(login_email_id = Config.LOGINEMAILID,
-                                         authtoken=Config.AUTHTOKEN, default_databasename=Config.DATABASENAME)
-        return rc
+    rc = EnhancedZohoAnalyticsClient(
+        login_email_id=Config.LOGINEMAILID,
+        token=Config.REFRESHTOKEN if TEST_OAUTH else Config.AUTHTOKEN,
+        clientSecret=Config.CLIENTSECRET if TEST_OAUTH else None,
+        clientId=Config.CLIENTID if TEST_OAUTH else None,
+        default_databasename=Config.DATABASENAME,
+        serverURL=Config.SERVER_URL,
+        reportServerURL=Config.REPORT_SERVER_URL,
+        default_retries=3
+    )
 
 Australian and EU Zoho Servers
 ------------------------------
@@ -127,11 +131,19 @@ RecoverableRateLimitError
 Managing retries is a beta feature but I am using it in production. It is opt-in except where I was already doing retry.
 The retry logic is in 
 
-    def __sendRequest(self, url, httpMethod, payLoad, action, callBackData,retry_countdown=0):
+    def __sendRequest(self, url, httpMethod, payLoad, action, callBackData,retry_countdown=None):
 
 It attempts to differentiate between recoverable and non-recoverable errors. Recoverable errors so far are temporary rate limit errors, errors due to another update running on the same table, and token refresh errors.
 
 It should be enhanced to use smarter retry timing, but first I will see if this works under production loads.
+Change in v.1.2.0
+You can pass default_retries when creating the client, or you can set it on an existing client.
+This will be the retry count if none is specified. This means you can use retries with the report_client methods.
+
+e.g.
+    zoho_enhanced_client.default_retries = 5
+
+and then 'low-level' methods such as add_column()  will get the benefit of the retry logic.
 
 Do some stuff
 -------------
@@ -240,7 +252,7 @@ this is, the cache object needs to offer cache.set(...) and cache.get(...) as Dj
 
 Changes
 -------------
-
+1.2.0 Specify a default retry count when making report_client or enhanced_report_client
 1.1.2 fix issue #2 to fix criteria on export. Added test case.
 1.1.1 minor fixes
 1.1.0.1 Documentation fixes
