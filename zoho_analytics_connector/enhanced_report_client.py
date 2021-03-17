@@ -69,10 +69,11 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
     def create_table(self, table_design, database_name=None) -> MutableMapping:
         db_uri = self.getDBURI(self.login_email_id, database_name or self.default_databasename)
         columns = table_design['COLUMNS']
-        if len(columns) < 70:  # too many columns and zoho rejects the very long URL
+        BIG_NUMBER_OF_COLUMNS = 10
+        if len(columns) < BIG_NUMBER_OF_COLUMNS:  # too many columns and zoho rejects the very long URL
             result = self.createTable(dbURI=db_uri, tableDesign=json.dumps(table_design))
         else:
-            columns_initial, columns_residual = columns[:70], columns[70:]
+            columns_initial, columns_residual = columns[:BIG_NUMBER_OF_COLUMNS], columns[BIG_NUMBER_OF_COLUMNS:]
             table_design['COLUMNS'] = columns_initial
             table_name = table_design['TABLENAME']
             result = self.createTable(dbURI=db_uri, tableDesign=json.dumps(table_design))
