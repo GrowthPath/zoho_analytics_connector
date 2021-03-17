@@ -78,6 +78,7 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
             table_design['COLUMNS'] = columns_initial
             table_name = table_design['TABLENAME']
             result = self.createTable(dbURI=db_uri, tableDesign=json.dumps(table_design))
+            time.sleep(1)
             uri_addcol = self.getURI(self.login_email_id, database_name or self.default_databasename,
                                      tableOrReportName=table_name)
             for col in columns_residual:
