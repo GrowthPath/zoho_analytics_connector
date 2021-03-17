@@ -51,7 +51,7 @@ class ReportClient:
     # refresh_or_access_token = None
     # token_timestamp = time.time()
 
-    def __init__(self, token, clientId=None, clientSecret=None,serverURL=None,reportServerURL=None):
+    def __init__(self, token, clientId=None, clientSecret=None,serverURL=None,reportServerURL=None,default_retries=0):
         """
         Creates a new C{ReportClient} instance.
         @param token: User's authtoken or ( refresh token for OAUth).
@@ -72,6 +72,7 @@ class ReportClient:
         self.clientSecret = clientSecret
         self.refresh_or_access_token = token
         self.token_timestamp = time.time()  #this is a safe default
+        self.default_retries=default_retries
         if (clientId == None and clientSecret == None): #not using OAuth2
             self.__token = token
         else:
@@ -138,7 +139,9 @@ class ReportClient:
         else:
             raise RuntimeError("Unexpected httpMethod in getResp")
 
-    def __sendRequest(self, url, httpMethod, payLoad, action, callBackData,retry_countdown=0):
+    def __sendRequest(self, url, httpMethod, payLoad, action, callBackData,retry_countdown:int=None):
+        if not retry_countdown:
+            retry_countdown = self.default_retries
         while retry_countdown >= 0:
             retry_countdown -= 1
             respObj = self.getResp(url, httpMethod, payLoad)

@@ -50,10 +50,11 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
         return table_data
 
     def __init__(self, login_email_id: str, token: str, default_databasename: str = None, clientId=None,
-                 clientSecret=None,serverURL=None,reportServerURL=None):
+                 clientSecret=None,serverURL=None,reportServerURL=None,default_retries=None):
         self.login_email_id = login_email_id
         self.default_databasename = default_databasename
-        super().__init__(token=token, clientId=clientId, clientSecret=clientSecret,serverURL=serverURL,reportServerURL=reportServerURL)
+        super().__init__(token=token, clientId=clientId, clientSecret=clientSecret,serverURL=serverURL,
+                         reportServerURL=reportServerURL,default_retries=default_retries)
 
     def get_database_catalog(self, database_name: str = None) -> MutableMapping:
         db_uri = self.getDBURI(self.login_email_id, database_name or self.default_databasename)
