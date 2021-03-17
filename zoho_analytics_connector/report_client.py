@@ -72,7 +72,7 @@ class ReportClient:
         self.clientSecret = clientSecret
         self.refresh_or_access_token = token
         self.token_timestamp = time.time()  #this is a safe default
-        self.default_retries=default_retries
+        self.default_retries = default_retries
         if (clientId == None and clientSecret == None): #not using OAuth2
             self.__token = token
         else:
@@ -141,7 +141,7 @@ class ReportClient:
 
     def __sendRequest(self, url, httpMethod, payLoad, action, callBackData,retry_countdown:int=None):
         if not retry_countdown:
-            retry_countdown = self.default_retries
+            retry_countdown = self.default_retries or 0
         while retry_countdown >= 0:
             retry_countdown -= 1
             respObj = self.getResp(url, httpMethod, payLoad)
