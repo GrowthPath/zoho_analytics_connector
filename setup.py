@@ -18,7 +18,7 @@ setup(
     version=version,
     packages=['zoho_analytics_connector'],
     python_requires='>=3.6',
-    install_requires=['requests',],
+    install_requires=['requests','emoji'],
     setup_requires=['pytest-runner', 'wheel', 'sphinx'],
     tests_require=["pytest", ],
     classifiers=[

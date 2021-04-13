@@ -7,6 +7,7 @@ import logging
 from typing import MutableMapping, Optional
 import time
 import json
+import emoji
 
 import requests
 from . import report_client as report_client
@@ -94,10 +95,11 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
         """ data is a csv-style string, newline separated. Matching columns is a comma separated string"""
         retry_count = 0
         impResult = None
+        import_content_demojized = emoji.demojize(import_content)
         database_name = database_name or self.default_databasename
         uri = self.getURI(dbOwnerName=self.login_email_id, dbName=database_name, tableOrReportName=table_name)
         # import_modes = APPEND / TRUNCATEADD / UPDATEADD
-        impResult = self.importData_v2(uri, import_mode=import_mode, import_content=import_content,
+        impResult = self.importData_v2(uri, import_mode=import_mode, import_content=import_content_demojized,
                                        date_format=date_format,
                                        matching_columns=matching_columns, retry_countdown=retry_limit)
         logger.debug(
