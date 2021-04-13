@@ -103,41 +103,7 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
         logger.debug(
                 f"Table: {table_name}: Processed Rows: "
                 f"{impResult.totalRowCount} with {impResult.warningCount} warnings ")
-        # while True:
-        #     retry_count += 1
-        #     try:
-        #         impResult = self.importData_v2(uri, import_mode=import_mode, import_content=import_content,
-        #                                        date_format=date_format,
-        #                                        matching_columns=matching_columns,retry_countdown=retry_limit)
-        #         logger.debug(
-        #             f"Table: {table_name}: Processed Rows: "
-        #             f"{impResult.totalRowCount} with {impResult.warningCount} warnings ")
-        #         break
-        #     except report_client.RecoverableRateLimitError:
-        #         if retry_count <= retry_limit:
-        #             logger.error(f"Zoho API limit or some other recoverable error, will retry, next attempt: {retry_count}")
-        #             time.sleep(retry_count * 10)
-        #             continue
-        #             # raise RuntimeError("API limit exceeded")
-        #         else:
-        #             logger.info(f"Number of retry attempts exceeded")
-        #             raise RuntimeError("API Limit error: Number of retry attempts exceeded")
-        #     except report_client.UnrecoverableRateLimitError:
-        #         logger.error(f"Zoho API daily limit exceeded or row count exceeded, will not retry")
-        #         raise
-        #     except report_client.ParseError as e:
-        #         response_content_string = e.responseContent.decode('utf-8', errors='ignore')
-        #         response_content_string = response_content_string or 'No response content'
-        #         if 'Invalid NUMBER value' in response_content_string:
-        #             raise RuntimeError(
-        #                 f"Invalid data format in Zoho data upload, check table definitions: {response_content_string}")
-        #         if retry_count <= retry_limit:
-        #             logger.error(f"Retrying data_upload because of upload error: {response_content_string}")
-        #             time.sleep(1)
-        #             continue
-        #         else:
-        #             logger.info(f"Number of retry attempts exceeded")
-        #             raise (requests.exceptions.ConnectionError(response_content_string))
+
         return impResult
 
 

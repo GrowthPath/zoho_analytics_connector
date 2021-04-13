@@ -7,10 +7,6 @@ This is a version which is Python 3 ready, tested on Python 3.8 and 3.9.
 A more convenient wrapper class is in enhanced_report_client. This is based on Zoho's ReportClient but provides some more convenient features.
 I use it mostly for uploading data, and creating and modifying tables.
 
-AuthTokens are being deprecated, and in some Zoho domains they don't work any longer. 
-OAuth support works, see notes below.
-
-
 Authentication
 ==============
 AuthTokens are now retired, replaced with OAuth2.
@@ -21,7 +17,6 @@ The RefreshToken is the equivalent of the old AuthToken.
 
 To use AuthToken (retired authentication method), pass the AuthToken, and set ClientID and ClientSecret to none.
 The test cases give some hints.
-
 
 For OAuth2:
 ----------
@@ -136,14 +131,17 @@ The retry logic is in
 It attempts to differentiate between recoverable and non-recoverable errors. Recoverable errors so far are temporary rate limit errors, errors due to another update running on the same table, and token refresh errors.
 
 It should be enhanced to use smarter retry timing, but first I will see if this works under production loads.
+
 Change in v.1.2.0
+
 You can pass default_retries when creating the client, or you can set it on an existing client.
-This will be the retry count if none is specified. This means you can use retries with the report_client methods.
+This will be the retry count if none is specified. This means you can use retries with the 'low-level' report_client methods by setting a retry level at the EnhancedZohoAnalyticsClient level (actually, the attribute is added to ReportClient)
 
 e.g.
     zoho_enhanced_client.default_retries = 5
 
 and then 'low-level' methods such as add_column()  will get the benefit of the retry logic.
+Of course, you should be careful to test this.
 
 Do some stuff
 -------------

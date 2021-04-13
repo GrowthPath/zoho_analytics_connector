@@ -30,7 +30,7 @@ setup(
         'Topic :: Office/Business',
     ],
     url='https://github.com/timrichardson/zoho_analytics_connector',
-    license='MIT',
+    license='MPL-2.0',
     author='Tim Richardson',
     author_email='tim@growthpath.com.au',
     description='Zoho Analytics connector',

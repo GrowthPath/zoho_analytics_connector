@@ -140,6 +140,7 @@ class ReportClient:
             raise RuntimeError("Unexpected httpMethod in getResp")
 
     def __sendRequest(self, url, httpMethod, payLoad, action, callBackData,retry_countdown:int=None):
+        code = ""
         if not retry_countdown:
             retry_countdown = self.default_retries or 0
         while retry_countdown >= 0:
@@ -153,10 +154,10 @@ class ReportClient:
                     j = respObj.response.json()
                     code = j['response']['error']['code']
                     logger.debug(f"API returned a 400 result and an error code: {code}")
-                    if code in [6045]:
+                    if code in [6045,]:
                         logger.debug(f"Zoho API Recoverable rate limit encountered")
                         if retry_countdown < 0:
-                            raise RecoverableRateLimitError(urlResp=respObj)
+                            raise RecoverableRateLimitError(urlResp=respObj,zoho_error_code=code)
                         else:
                             time.sleep(min(10-retry_countdown,1)*10)
                             continue
@@ -167,25 +168,29 @@ class ReportClient:
                             pass
                         logger.debug(f"Zoho API Recoverable error encountered (invalid oauth token)")
                         if retry_countdown < 0:
-                            raise RecoverableRateLimitError(urlResp=respObj)
+                            raise RecoverableRateLimitError(urlResp=respObj,zoho_error_code=code)
                         else:
                             time.sleep(min(10 - retry_countdown, 1) * 10)
                             continue
+                    elif code in [8509, ]:  # parameter does not match accepted input pattern
+                        logger.debug(f"Error 8509 encountered, something is wrong with the data format")
+                        raise BadDataError(respObj,zoho_error_code=code)
                     elif code in [10001,]:  #10001 is "Another import is in progress, so we can try this again"
                         logger.debug(f"Zoho API Recoverable error encountered (Another import is in progress)")
                         if retry_countdown < 0:
-                            raise RecoverableRateLimitError(urlResp=respObj)
+                            raise RecoverableRateLimitError(urlResp=respObj,zoho_error_code=code)
                         else:
                             time.sleep(min(10 - retry_countdown, 1) * 10)
                             continue
                     else:
-                        raise ServerError(respObj)
+                        raise ServerError(respObj,zoho_error_code=code)
                 except (RecoverableRateLimitError,UnrecoverableRateLimitError):
                     raise
                 except Exception as e:
-                    raise ServerError(respObj)
+                    raise ServerError(respObj,zoho_error_code=code)
             else:
-                raise ServerError(respObj)
+                raise ServerError(respObj,zoho_error_code=code)
+
 
     def handle_response_v2(self, response: requests.Response, action: str, callBackData) -> Optional[
         Union[MutableMapping, 'ImportResult', 'ShareInfo', 'PlanInfo']]:
@@ -1818,7 +1823,9 @@ class RecoverableRateLimitError(Exception):
         self.uri = ""  #: The uri which threw this exception.
         self.action = ""  #:The action to be performed over the resource specified by the uri
         self.message = urlResp.content  #: Returns the message sent by the server.
+        self.zoho_error_code = ""
         self.extra = kwargs
+
 
 
     def __str__(self):
@@ -1840,6 +1847,7 @@ class UnrecoverableRateLimitError(Exception):
 
     def __str__(self):
         return repr(self.message)
+
 class ServerError(Exception):
     """
     ServerError is thrown if the report server has recieved the request but did not process the
@@ -1852,6 +1860,7 @@ class ServerError(Exception):
         self.uri = ""  #: The uri which threw this exception.
         self.action = ""  #:The action to be performed over the resource specified by the uri
         self.message = urlResp.content  #: Returns the message sent by the server.
+        self.zoho_error_code = ""
         self.extra = kwargs
 
         parseable = False
@@ -1879,6 +1888,9 @@ class ServerError(Exception):
 
     def __str__(self):
         return repr(self.message)
+
+class BadDataError(ServerError):
+    pass
 
 
 class ParseError(Exception):
