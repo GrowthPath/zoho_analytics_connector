@@ -1889,8 +1889,41 @@ class ServerError(Exception):
     def __str__(self):
         return repr(self.message)
 
-class BadDataError(ServerError):
-    pass
+class BadDataError(Exception):
+    def __init__(self, urlResp, **kwargs):
+        self.httpStatusCode = urlResp.status_code  #:The http status code for the request.
+        self.errorCode = self.httpStatusCode  # The error code sent by the server.
+        self.uri = ""  #: The uri which threw this exception.
+        self.action = ""  #:The action to be performed over the resource specified by the uri
+        self.message = urlResp.content  #: Returns the message sent by the server.
+        self.zoho_error_code = ""
+        self.extra = kwargs
+
+        parseable = False
+        if not urlResp:
+            logger.error(f"response object is None")
+        else:
+            try:
+                contHeader = urlResp.headers.get("Content-Type", None)
+                if (contHeader and contHeader.find("text/xml") > -1):
+                    self.__parseErrorResponse()
+            except AttributeError:
+                logger.error(f"response object is None")
+
+    def __parseErrorResponse(self):
+        try:
+            dom = xml.dom.minidom.parseString(self.message)
+            respEl = dom.getElementsByTagName("response")[0]
+            self.uri = respEl.getAttribute("uri")
+            self.action = respEl.getAttribute("action")
+            self.errorCode = int(ReportClientHelper.getInfo(dom, "code", self.message))
+            self.message = ReportClientHelper.getInfo(dom, "message", self.message)
+        except Exception as inst:
+            print(inst)
+            self.parseError = inst
+
+    def __str__(self):
+        return repr(self.message)
 
 
 class ParseError(Exception):
