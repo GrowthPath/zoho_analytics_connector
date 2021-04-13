@@ -184,7 +184,7 @@ class ReportClient:
                             continue
                     else:
                         raise ServerError(respObj,zoho_error_code=code)
-                except (RecoverableRateLimitError,UnrecoverableRateLimitError):
+                except (RecoverableRateLimitError,UnrecoverableRateLimitError,BadDataError):
                     raise
                 except Exception as e:
                     raise ServerError(respObj,zoho_error_code=code)
