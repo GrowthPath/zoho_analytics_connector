@@ -250,6 +250,9 @@ this is, the cache object needs to offer cache.set(...) and cache.get(...) as Dj
 
 Changes
 -------------
+1.2.1 Emoticons are unicode but Analytics raises an error on import. I am now using the emoji library in enhanced_report_client.data_upload to look for emojis and replace them.
+so 'Ok to leave at front door 🙂' becomes 'Ok to leave at front door :slightly_smiling_face:'
+
 1.2.0 Specify a default retry count when making report_client or enhanced_report_client
 1.1.2 fix issue #2 to fix criteria on export. Added test case.
 1.1.1 minor fixes
