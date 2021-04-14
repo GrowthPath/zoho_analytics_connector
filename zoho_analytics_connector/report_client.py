@@ -153,11 +153,13 @@ class ReportClient:
                 try:
                     j = respObj.response.json()
                     code = j['response']['error']['code']
-                    logger.debug(f"API returned a 400 result and an error code: {code}")
+                    logger.debug(f"API returned a 400 result and an error code: {code} ")
                     if code in [6045,]:
-                        logger.debug(f"Zoho API Recoverable rate limit encountered")
+                        logger.debug(f"Zoho API Recoverable rate limit (rate limit exceeded) encountered")
                         if retry_countdown < 0:
-                            raise RecoverableRateLimitError(urlResp=respObj,zoho_error_code=code)
+                            logger.debug(
+                                    f"Zoho API Recoverable error (rate limit exceeded) exhausted retries")
+                            raise UnrecoverableRateLimitError(urlResp=respObj,zoho_error_code=code)
                         else:
                             time.sleep(min(10-retry_countdown,1)*10)
                             continue
@@ -166,19 +168,23 @@ class ReportClient:
                             self.getOAuthToken()
                         except:
                             pass
-                        logger.debug(f"Zoho API Recoverable error encountered (invalid oauth token)")
+                        logger.debug(f"Zoho API Recoverable error encountered (invalid oauth token), will retry")
                         if retry_countdown < 0:
-                            raise RecoverableRateLimitError(urlResp=respObj,zoho_error_code=code)
+                            logger.debug(
+                                    f"Zoho API Recoverable error (invalid oauth token) exhausted retries")
+                            raise UnrecoverableRateLimitError(urlResp=respObj,zoho_error_code=code)
                         else:
                             time.sleep(min(10 - retry_countdown, 1) * 10)
                             continue
                     elif code in [8509, ]:  # parameter does not match accepted input pattern
-                        logger.debug(f"Error 8509 encountered, something is wrong with the data format")
+                        logger.debug(f"Error 8509 encountered, something is wrong with the data format, no retry")
                         raise BadDataError(respObj,zoho_error_code=code)
                     elif code in [10001,]:  #10001 is "Another import is in progress, so we can try this again"
-                        logger.debug(f"Zoho API Recoverable error encountered (Another import is in progress)")
+                        logger.debug(f"Zoho API Recoverable error encountered (Another import is in progress), will retry")
                         if retry_countdown < 0:
-                            raise RecoverableRateLimitError(urlResp=respObj,zoho_error_code=code)
+                            logger.debug(
+                            f"Zoho API Recoverable error (Another import is in progress) exhausted retries")
+                            raise UnrecoverableRateLimitError(urlResp=respObj,zoho_error_code=code)
                         else:
                             time.sleep(min(10 - retry_countdown, 1) * 10)
                             continue
@@ -186,7 +192,7 @@ class ReportClient:
                         raise ServerError(respObj,zoho_error_code=code)
                 except (RecoverableRateLimitError,UnrecoverableRateLimitError,BadDataError):
                     raise
-                except Exception as e:
+                except ServerError as e:
                     raise ServerError(respObj,zoho_error_code=code)
             else:
                 raise
