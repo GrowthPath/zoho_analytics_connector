@@ -195,7 +195,7 @@ class ReportClient:
                 except ServerError as e:
                     raise ServerError(respObj,zoho_error_code=code)
             else:
-                raise
+                raise ServerError(respObj,zoho_error_code=code)
 
 
     def handle_response_v2(self, response: requests.Response, action: str, callBackData) -> Optional[
