@@ -3,6 +3,7 @@ Functions which are modified and tested have PEP8 underscore names
 """
 import json
 import io
+import pprint
 import time
 import logging
 import urllib
@@ -155,6 +156,8 @@ class ReportClient:
                         j = respObj.response.json(strict=False)
                     except json.JSONDecodeError as e:
                         logger.error(f"API caused a JSONDecodeError for {respObj.response} ")
+                        pp = pprint.PrettyPrinter()
+                        logger.error(pp.pprint(respObj))
                         raise
 
                     code = j['response']['error']['code']
