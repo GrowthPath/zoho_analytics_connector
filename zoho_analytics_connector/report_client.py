@@ -151,7 +151,12 @@ class ReportClient:
             elif (respObj.status_code in [400,]):
                 #400 errors be an API limit error, which are handled by the result parsing
                 try:
-                    j = respObj.response.json()
+                    try:
+                        j = respObj.response.json(strict=False)
+                    except json.JSONDecodeError as e:
+                        logger.error(f"API caused a JSONDecodeError for {respObj.response} ")
+                        raise
+
                     code = j['response']['error']['code']
                     logger.debug(f"API returned a 400 result and an error code: {code} ")
                     if code in [6045,]:
