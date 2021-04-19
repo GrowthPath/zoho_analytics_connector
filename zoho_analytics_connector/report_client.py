@@ -155,7 +155,7 @@ class ReportClient:
                     try:
                         j = respObj.response.json(strict=False)
                     except json.JSONDecodeError as e:
-                        logger.error(f"API caused a JSONDecodeError for {respObj.response} ")
+                        logger.error(f"API caused a JSONDecodeError for {respObj.response.text} ")
                         pp = pprint.PrettyPrinter()
                         logger.error(pp.pprint(respObj))
                         raise
