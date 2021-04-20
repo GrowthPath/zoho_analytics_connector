@@ -3,7 +3,7 @@ Functions which are modified and tested have PEP8 underscore names
 """
 import json
 import io
-import pprint
+import re
 import time
 import logging
 import urllib
@@ -153,12 +153,21 @@ class ReportClient:
                 #400 errors be an API limit error, which are handled by the result parsing
                 try:
                     try:
-                        j = respObj.response.json(strict=False)
+                        #j = respObj.response.json(strict=False) #getting decode errors in this and they don't make sense
+                        j = json.loads(respObj.response.text,strict=False)
+                        code = j['response']['error']['code']
                     except json.JSONDecodeError as e:
                         logger.error(f"API caused a JSONDecodeError for {respObj.response.text} ")
-                        raise
+                        code = None
+                    if not code:
+                        m = re.search(r'"code":(\d+)',respObj.response.text)
+                        if m:
+                            code=int(m.group(1))
+                        else:
+                            code = -1
+                            logger.error(f"could not find error code in {respObj.response.text} ")
+                            raise RuntimeError(f"could not find error code in {respObj.response.text}")
 
-                    code = j['response']['error']['code']
                     logger.debug(f"API returned a 400 result and an error code: {code} ")
                     if code in [6045,]:
                         logger.debug(f"Zoho API Recoverable rate limit (rate limit exceeded) encountered")
