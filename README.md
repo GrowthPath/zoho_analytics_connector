@@ -250,7 +250,10 @@ this is, the cache object needs to offer cache.set(...) and cache.get(...) as Dj
 
 Changes
 -------------
+1.2.3 LICENSE file updated to include text relating to the licence
+
 1.2.2 Workaround for error code detection when json decoding fails. Fixed a bug around exception handling
+
 1.2.1 Emoticons are unicode but Analytics raises an error on import. I am now using the emoji library in enhanced_report_client.data_upload to look for emojis and replace them.
 so 'Ok to leave at front door 🙂' becomes 'Ok to leave at front door :slightly_smiling_face:'
 

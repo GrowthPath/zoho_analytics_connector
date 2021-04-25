@@ -1,5 +1,9 @@
 """ this is rewritten from some very old python 2 code from zoho, although I merged their more recent OAuth support.
 Functions which are modified and tested have PEP8 underscore names
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
 """
 import json
 import io
