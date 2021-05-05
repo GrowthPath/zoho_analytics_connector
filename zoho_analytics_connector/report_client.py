@@ -11,6 +11,7 @@ import re
 import time
 import logging
 import urllib
+import urllib.parse
 import xml.dom.minidom
 from typing import MutableMapping, Optional, Union
 
@@ -216,6 +217,20 @@ class ReportClient:
             else:
                 raise ServerError(respObj,zoho_error_code=code)
 
+    def invalidOAUTH(self, respObj):
+        """
+        Internal method to check whether accesstoken expires or not.
+        """
+        if (respObj.status_code != 200):
+            try:
+                dom = ReportClientHelper.getAsDOM(respObj.content)
+                err_code = dom.getElementsByTagName("code")
+                err_code = ReportClientHelper.getText(err_code[0].childNodes).strip()
+                return err_code == "8535"
+            except Exception:
+                return False
+
+        return False
 
     def handle_response_v2(self, response: requests.Response, action: str, callBackData) -> Optional[
         Union[MutableMapping, 'ImportResult', 'ShareInfo', 'PlanInfo']]:
@@ -410,7 +425,7 @@ class ReportClient:
         """
         payLoad = ReportClientHelper.getAsPayLoad([columnValues, config], criteria, None)
         url = ReportClientHelper.addQueryParams(tableURI, self.token, "UPDATE", "JSON")
-        self.__sendRequest(url, "POST", payLoad, "UPDATE", None)
+        return self.__sendRequest(url, "POST", payLoad, "UPDATE", None)
 
     def importData(self, tableURI, importType, importContent, autoIdentify="TRUE", onError="ABORT", importConfig=None):
         """
@@ -449,20 +464,20 @@ class ReportClient:
             importConfig["ZOHO_CREATE_TABLE"] = 'false'
 
         files = {"ZOHO_FILE": ("file", importContent, 'multipart/form-data')}
-        url = ReportClientHelper.addQueryParams(tableURI, self.authtoken, "IMPORT", "XML")
+        url = ReportClientHelper.addQueryParams(tableURI, self.token, "IMPORT", "XML")
 
         headers = {}
         # To set accessToken for the first time when an instance is created.
         if ReportClient.isOAuth:
             if self.accesstoken == None:
-                self.accesstoken = self.getOAuthToken(self.clientId, self.clientSecret, self.token)
+                self.accesstoken = self.getOAuthToken()
             headers = {"Authorization": "Zoho-oauthtoken " + self.accesstoken}
 
         respObj = requests.post(url, data=importConfig, files=files, headers=headers)
 
         # To generate new accesstoken once after it get expires.
         if self.invalidOAUTH(respObj):
-            self.accesstoken = self.getOAuthToken(self.clientId, self.clientSecret, self.token)
+            self.accesstoken = self.getOAuthToken()
             headers = {"Authorization": "Zoho-oauthtoken " + self.accesstoken}
             respObj = requests.post(url, data=importConfig, files=files, headers=headers)
 
@@ -550,13 +565,13 @@ class ReportClient:
         @raise ParseError: If the server has responded but client was not able to parse the response.
         """
         dict = {"ZOHO_AUTO_IDENTIFY": autoIdentify, "ZOHO_ON_IMPORT_ERROR": onError,
-                "ZOHO_IMPORT_TYPE": importType, "ZOHO_IMPORT_DATA": importContent};
+                "ZOHO_IMPORT_TYPE": importType, "ZOHO_IMPORT_DATA": importContent}
 
         if not ("ZOHO_CREATE_TABLE" in importConfig):
             importConfig["ZOHO_CREATE_TABLE"] = 'false'
 
-        payLoad = ReportClientHelper.getAsPayLoad([dict, importConfig], None, None);
-        url = ReportClientHelper.addQueryParams(tableURI, self.authtoken, "IMPORT", "XML")
+        payLoad = ReportClientHelper.getAsPayLoad([dict, importConfig], None, None)
+        url = ReportClientHelper.addQueryParams(tableURI, self.token, "IMPORT", "XML")
         return self.__sendRequest(url, "POST", payLoad, "IMPORT", None)
 
     def exportData(self, tableOrReportURI, format, exportToFileObj,
@@ -566,7 +581,7 @@ class ReportClient:
         @param tableOrReportURI: The URI of the table. See L{getURI<getURI>}.
         @type tableOrReportURI:string
         @param format: The format in which the data is to be exported.
-        See U{Supported Export Formats<http://zohoreportsapi.wiki.zoho.com/Export.html>} for
+        See U{Supported Export Formats<https://www.zoho.com/analytics/api/#export-data>} for
         the supported types.
         @type format:string
         @param exportToFileObj: File (or file like object) to which the exported data is to be written
@@ -604,7 +619,7 @@ class ReportClient:
         @raise ParseError: If the server has responded but client was not able to parse the response.
         """
         payLoad = ReportClientHelper.getAsPayLoad([config], None, sql)
-        url = ReportClientHelper.addQueryParams(tableOrReportURI, self.authtoken, "EXPORT", format)
+        url = ReportClientHelper.addQueryParams(tableOrReportURI, self.token, "EXPORT", format)
         return self.__sendRequest(url, "POST", payLoad, "EXPORT", exportToFileObj)
 
     def exportDataUsingSQL_v2(self, tableOrReportURI, format, sql, config=None,retry_countdown=0) -> io.BytesIO:
@@ -834,9 +849,9 @@ class ReportClient:
         @rtype: string
         """
         payLoad = ReportClientHelper.getAsPayLoad([config], None, None)
-        url = ReportClientHelper.addQueryParams(dbURI, self.authtoken, "SAVEAS", "JSON")
-        url += "&ZOHO_VIEWTOCOPY=" + urllib.quote(viewToCopy)
-        url += "&ZOHO_NEW_VIEWNAME=" + urllib.quote(newViewName)
+        url = ReportClientHelper.addQueryParams(dbURI, self.token, "SAVEAS", "JSON")
+        url += "&ZOHO_VIEWTOCOPY=" + urllib.parse.quote(viewToCopy)
+        url += "&ZOHO_NEW_VIEWNAME=" + urllib.parse.quote(newViewName)
         return self.__sendRequest(url, "POST", payLoad, "SAVEAS", None)
 
     def copyReports(self, dbURI, views, dbName, dbKey, config=None):
@@ -1050,10 +1065,10 @@ class ReportClient:
         @raise ParseError: If the server has responded but client was not able to parse the response.
         """
         payLoad = ReportClientHelper.getAsPayLoad([config], None, None)
-        url = ReportClientHelper.addQueryParams(userURI, self.authtoken, "CREATEBLANKDB", "JSON")
-        url += "&ZOHO_DATABASE_NAME=" + urllib.quote(dbName)
+        url = ReportClientHelper.addQueryParams(userURI, self.token, "CREATEBLANKDB", "JSON")
+        url += "&ZOHO_DATABASE_NAME=" + urllib.parse.quote(dbName)
         if (dbDesc != None):
-            url += "&ZOHO_DATABASE_DESC=" + urllib.quote(dbDesc)
+            url += "&ZOHO_DATABASE_DESC=" + urllib.parse.quote(dbDesc)
         self.__sendRequest(url, "POST", payLoad, "CREATEBLANKDB", None)
 
     def getDatabaseMetadata(self, requestURI, metadata, config=None) -> MutableMapping:
@@ -1113,8 +1128,8 @@ class ReportClient:
         @raise ParseError: If the server has responded but client was not able to parse the response.
         """
         payLoad = ReportClientHelper.getAsPayLoad([config], None, None)
-        url = ReportClientHelper.addQueryParams(userURI, self.authtoken, "GETDATABASEID", "XML")
-        url += "&ZOHO_DATABASE_NAME=" + urllib.quote(dbName)
+        url = ReportClientHelper.addQueryParams(userURI, self.token, "GETDATABASEID", "XML")
+        url += "&ZOHO_DATABASE_NAME=" + urllib.parse.quote(dbName)
         return self.__sendRequest(url, "POST", payLoad, "GETDATABASEID", None)
 
     def isDbExist(self, userURI, dbName, config=None):
@@ -1153,8 +1168,8 @@ class ReportClient:
         @raise ParseError: If the server has responded but client was not able to parse the response.
         """
         payLoad = ReportClientHelper.getAsPayLoad([config], None, None)
-        url = ReportClientHelper.addQueryParams(dbURI, self.authtoken, "ISVIEWEXIST", "JSON")
-        url += "&ZOHO_VIEW_NAME=" + urllib.quote(viewName)
+        url = ReportClientHelper.addQueryParams(dbURI, self.token, "ISVIEWEXIST", "JSON")
+        url += "&ZOHO_VIEW_NAME=" + urllib.parse.quote(viewName)
         return self.__sendRequest(url, "POST", payLoad, "ISVIEWEXIST", None)
 
     def isColumnExist(self, tableURI, columnName, config=None):
@@ -1173,8 +1188,8 @@ class ReportClient:
         @raise ParseError: If the server has responded but client was not able to parse the response.
         """
         payLoad = ReportClientHelper.getAsPayLoad([config], None, None)
-        url = ReportClientHelper.addQueryParams(tableURI, self.authtoken, "ISCOLUMNEXIST", "JSON")
-        url += "&ZOHO_COLUMN_NAME=" + urllib.quote(columnName)
+        url = ReportClientHelper.addQueryParams(tableURI, self.token, "ISCOLUMNEXIST", "JSON")
+        url += "&ZOHO_COLUMN_NAME=" + urllib.parse.quote(columnName)
         return self.__sendRequest(url, "POST", payLoad, "ISCOLUMNEXIST", None)
 
     def getCopyDBKey(self, dbURI, config=None):
@@ -1247,8 +1262,8 @@ class ReportClient:
         @rtype: dictionary
         """
         payLoad = ReportClientHelper.getAsPayLoad([config], None, None)
-        url = ReportClientHelper.addQueryParams(dbURI, self.authtoken, "GETVIEWINFO", "JSON")
-        url += "&ZOHO_VIEW_ID=" + urllib.quote(viewID)
+        url = ReportClientHelper.addQueryParams(dbURI, self.token, "GETVIEWINFO", "JSON")
+        url += "&ZOHO_VIEW_ID=" + urllib.parse.quote(viewID)
         return self.__sendRequest(url, "GET", payLoad, "GETVIEWINFO", None)
 
     def recentItems(self, userURI, config=None):
@@ -1265,7 +1280,7 @@ class ReportClient:
         @rtype:List
         """
         payLoad = ReportClientHelper.getAsPayLoad([config], None, None)
-        url = ReportClientHelper.addQueryParams(userURI, self.authtoken, "RECENTITEMS", "JSON")
+        url = ReportClientHelper.addQueryParams(userURI, self.token, "RECENTITEMS", "JSON")
         return self.__sendRequest(url, "GET", payLoad, "RECENTITEMS", None)
 
     def getDashboards(self, userURI, config=None):
@@ -1282,7 +1297,7 @@ class ReportClient:
         @rtype:List
         """
         payLoad = ReportClientHelper.getAsPayLoad([config], None, None)
-        url = ReportClientHelper.addQueryParams(userURI, self.authtoken, "GETDASHBOARDS", "JSON")
+        url = ReportClientHelper.addQueryParams(userURI, self.token, "GETDASHBOARDS", "JSON")
         return self.__sendRequest(url, "GET", payLoad, "GETDASHBOARDS", None)
 
     def myWorkspaceList(self, userURI, config=None):
@@ -1299,7 +1314,7 @@ class ReportClient:
         @rtype:List
         """
         payLoad = ReportClientHelper.getAsPayLoad([config], None, None)
-        url = ReportClientHelper.addQueryParams(userURI, self.authtoken, "MYWORKSPACELIST", "JSON")
+        url = ReportClientHelper.addQueryParams(userURI, self.token, "MYWORKSPACELIST", "JSON")
         return self.__sendRequest(url, "GET", payLoad, "MYWORKSPACELIST", None)
 
     def sharedWorkspaceList(self, userURI, config=None):
@@ -1316,7 +1331,7 @@ class ReportClient:
         @rtype:List
         """
         payLoad = ReportClientHelper.getAsPayLoad([config], None, None)
-        url = ReportClientHelper.addQueryParams(userURI, self.authtoken, "SHAREDWORKSPACELIST", "JSON")
+        url = ReportClientHelper.addQueryParams(userURI, self.token, "SHAREDWORKSPACELIST", "JSON")
         return self.__sendRequest(url, "GET", payLoad, "SHAREDWORKSPACELIST", None)
 
     def viewList(self, dbURI, config=None):
@@ -1333,7 +1348,7 @@ class ReportClient:
         @rtype:List
         """
         payLoad = ReportClientHelper.getAsPayLoad([config], None, None)
-        url = ReportClientHelper.addQueryParams(dbURI, self.authtoken, "VIEWLIST", "JSON")
+        url = ReportClientHelper.addQueryParams(dbURI, self.token, "VIEWLIST", "JSON")
         return self.__sendRequest(url, "GET", payLoad, "VIEWLIST", None)
 
     def folderList(self, dbURI, config=None):
@@ -1350,7 +1365,7 @@ class ReportClient:
         @rtype:List
         """
         payLoad = ReportClientHelper.getAsPayLoad([config], None, None)
-        url = ReportClientHelper.addQueryParams(dbURI, self.authtoken, "FOLDERLIST", "JSON")
+        url = ReportClientHelper.addQueryParams(dbURI, self.token, "FOLDERLIST", "JSON")
         return self.__sendRequest(url, "GET", payLoad, "FOLDERLIST", None)
 
     def shareView(self, dbURI, emailIds, views, criteria=None, config=None):
