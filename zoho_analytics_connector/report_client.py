@@ -139,7 +139,8 @@ class ReportClient:
                     raise requests.exceptions.RequestException("Invalid Client")
                 respObj = ResponseObj(resp)
             except requests.exceptions.RequestException as e:
-                respObj = ResponseObj(e)
+               logger.exception(f"{e=}")
+               raise e
             return respObj
         else:
             raise RuntimeError("Unexpected httpMethod in getResp")
@@ -214,7 +215,9 @@ class ReportClient:
                 except ServerError as e:
                     raise ServerError(respObj,zoho_error_code=code)
             else:
-                raise ServerError(respObj,zoho_error_code=code)
+                msg = f"Unexpected error in from __sendRequest. {respObj=}"
+                logger.exception(msg)
+                raise RuntimeError(msg)
 
 
     def handle_response_v2(self, response: requests.Response, action: str, callBackData) -> Optional[

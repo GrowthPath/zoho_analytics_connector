@@ -1,8 +1,8 @@
-Zoho Analytics Connector
+Zoho Analytics Connector for Python
 ========================
 
-Zoho's SDK for Zoho Reports is very old, however it is very complete.
-This is a version which is Python 3 ready, tested on Python 3.8 and 3.9.
+Zoho's Python SDK for Zoho Reports is old, however it is very complete.
+This is a version which is Python 3 ready, tested on Python 3.8 and 3.9 and in fairly substantial production use.
 
 A more convenient wrapper class is in enhanced_report_client. This is based on Zoho's ReportClient but provides some more convenient features.
 I use it mostly for uploading data, and creating and modifying tables.
