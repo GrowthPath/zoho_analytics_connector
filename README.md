@@ -21,39 +21,67 @@ The test cases give some hints.
 For OAuth2:
 ----------
 
-Visit https://www.zoho.com/analytics/api/#oauth and follow the steps ... in conjunction with the tips here.
+#### Note: Which user?
 
-Self Clients are an easy start. You choose Self Client when you 'register' (create) a new app. A Self Client means that you interactively get a Refresh Token.
-OAuth2 is mostly designed for flows where the user interactively approves: the Self Client approach is the equivalent of the old AuthToken, requiring no user action.
-However, you need to access the Zoho Analytics account as the admin user or user who owns the Workspace.
+Only the admin user, the owner, can make the Self Client. Other users, even organisational admins, won't work.
 
-In the UI, they have purple hexagonal icons. You ae limited to one self-client, so the scope may need to be shared with your other usages amongst Zoho APIs.
+### Choose the correct API Console site
 
-The self-client needs to have access rights to the Zoho Analytics accounts, so use as an account on the target organisation with admin rights.
+You need to be aware of the Zoho hosting domain, e.g. .com or .com.au etc.
 
 <b>Site to visit</b>
 
-https://api-console.zoho.com/  or .com.au ...
+https://api-console.zoho.com/  or 
 
-and create a Self Client (at least, to experiment)
+https://api-console.zoho.com.au
 
-Choose the correct domain matching the Zoho Analytics account, e.g. api-console.zoho.com.au 
-<p></p>
+or
+...
+
+
+Self Clients are an easy start to getting authenticated. They are suitable for server-based applications, because there is no user-interaction.
+
+You choose Self Client when you 'register' (create) a new app. A Self Client means that you interactively get a Refresh Token.
+OAuth2 is mostly designed for flows where the user interactively approves: the Self Client approach is the equivalent of the old AuthToken, requiring no user action.
+However, you need to access the Zoho Analytics account as the admin user.
+
+In the UI, they have purple hexagonal icons. You ae limited to one self-client, so the scope may need to be shared with your other usages amongst Zoho APIs.
+
+So, create a Self Client (at least, to experiment)
 
 
 <b>Tip: The scope for full access</b>
 
     ZohoReports.fullaccess.all
 
+Make the Tim Duration the maximum: 10 minutes.
+
+Now is  a good time to copy the correct curl template from below into a text editor.
+
+I paste this into the Scope Description as well.
+
+Choose "Create"
 
 Now with data gathered (client id, client secret, the code which expires in a few minutes, the scope, execute a POST to
 
-https://accounts.zoho.com/oauth/v2/token?code=
+    https://accounts.zoho.com/oauth/v2/token?code=
+
+or for Zoho Australia (.com.au)
+
+    https://accounts.zoho.com.au/oauth/v2/token?code=
+
+
+### Using curl for this ...
 
 You can do this from terminal with curl:
 
     curl -d "code=1000.dedaa...&client_id=1000.2TY...&client_secret=b74103c...&grant_type=authorization_code&scope=ZohoReports.fullaccess.all" \
     -X POST https://accounts.zoho.com/oauth/v2/token
+
+or for Australia
+
+    curl -d "code=1000.dedaa...&client_id=1000.2TY...&client_secret=b74103c...&grant_type=authorization_code&scope=ZohoReports.fullaccess.all" \
+     -X POST https://accounts.zoho.com.au/oauth/v2/token
 
 and you should get back JSON which looks like this:
 

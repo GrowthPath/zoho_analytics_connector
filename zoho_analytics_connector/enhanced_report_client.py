@@ -7,13 +7,13 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 """
 
 import csv
-import logging
-from typing import MutableMapping, Optional
-import time
 import json
+import logging
+import time
+from typing import MutableMapping, Optional
+
 import emoji
 
-import requests
 from . import report_client as report_client
 
 logger = logging.getLogger(__name__)
@@ -28,7 +28,7 @@ logger.addHandler(ch)
 class EnhancedZohoAnalyticsClient(report_client.ReportClient):
 
     @staticmethod
-    def process_table_meta_data(catalog,force_lowercase_column_names=False):
+    def process_table_meta_data(catalog, force_lowercase_column_names=False):
         """ catalog is a ZOHO_CATALOG_INFO dict. Call this from get_database_metadata for example
          Return a dict keyed by tablename, each item being a dict keyed by column name, with the item being the
          catalog info for the col
@@ -55,21 +55,22 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
         return table_data
 
     def __init__(self, login_email_id: str, token: str, default_databasename: str = None, clientId=None,
-                 clientSecret=None,serverURL=None,reportServerURL=None,default_retries=None):
+                 clientSecret=None, serverURL=None, reportServerURL=None, default_retries=None):
         self.login_email_id = login_email_id
         self.default_databasename = default_databasename
-        super().__init__(token=token, clientId=clientId, clientSecret=clientSecret,serverURL=serverURL,
-                         reportServerURL=reportServerURL,default_retries=default_retries)
+        super().__init__(token=token, clientId=clientId, clientSecret=clientSecret, serverURL=serverURL,
+                         reportServerURL=reportServerURL, default_retries=default_retries)
 
     def get_database_catalog(self, database_name: str = None) -> MutableMapping:
         db_uri = self.getDBURI(self.login_email_id, database_name or self.default_databasename)
         catalog_info = self.getDatabaseMetadata(requestURI=db_uri, metadata="ZOHO_CATALOG_INFO")
         return catalog_info
 
-    def get_table_metadata(self, database_name: str = None,force_lowercase_column_names=False) -> MutableMapping:
+    def get_table_metadata(self, database_name: str = None, force_lowercase_column_names=False) -> MutableMapping:
         database_name = database_name or self.default_databasename
         catalog_info = self.get_database_catalog(database_name=database_name)
-        table_metadata = self.process_table_meta_data(catalog_info,force_lowercase_column_names=force_lowercase_column_names)
+        table_metadata = self.process_table_meta_data(catalog_info,
+                                                      force_lowercase_column_names=force_lowercase_column_names)
         return table_metadata
 
     def create_table(self, table_design, database_name=None) -> MutableMapping:
@@ -107,13 +108,13 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
                                        date_format=date_format,
                                        matching_columns=matching_columns, retry_countdown=retry_limit)
         logger.debug(
-                f"Table: {table_name}: Processed Rows: "
-                f"{impResult.totalRowCount} with {impResult.warningCount} warnings ")
+            f"Table: {table_name}: Processed Rows: "
+            f"{impResult.totalRowCount} with {impResult.warningCount} warnings ")
 
         return impResult
 
-
-    def data_export_using_sql(self, sql, table_name, database_name: str = None, cache_object = None, cache_timeout_seconds=60, retry_countdown = 0) -> csv.DictReader:
+    def data_export_using_sql(self, sql, table_name, database_name: str = None, cache_object=None,
+                              cache_timeout_seconds=60, retry_countdown=0) -> csv.DictReader:
         """ returns a csv.DictReader after querying with the sql provided.
         The Zoho API insists on a table or report name, but it doesn't seem to restrict the query
         The cache object has a get and set function like the django cache does: https://docs.djangoproject.com/en/3.1/topics/cache/
@@ -127,18 +128,19 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
             database_name = database_name or self.default_databasename
             uri = self.getURI(dbOwnerName=self.login_email_id, dbName=database_name or self.default_databasename,
                               tableOrReportName=table_name)
-            callback_data = self.exportDataUsingSQL_v2(tableOrReportURI=uri, format='CSV', sql=sql,retry_countdown=retry_countdown)
+            callback_data = self.exportDataUsingSQL_v2(tableOrReportURI=uri, format='CSV', sql=sql,
+                                                       retry_countdown=retry_countdown)
             returned_data = callback_data.getvalue().decode('utf-8').splitlines()
             if cache_object:
-                cache_object.set(sql,returned_data,cache_timeout_seconds)
+                cache_object.set(sql, returned_data, cache_timeout_seconds)
 
         reader = csv.DictReader(returned_data)
         return reader
 
-    def delete_rows(self, table_name, sql, database_name: Optional[str] = None,retry_countdown=0):
+    def delete_rows(self, table_name, sql, database_name: Optional[str] = None, retry_countdown=0):
         """ criteria is SQL fragments such as 'a' in ColA """
         uri = self.getURI(dbOwnerName=self.login_email_id, dbName=database_name or self.default_databasename,
                           tableOrReportName=table_name)
 
-        r = self.deleteData(tableURI=uri, criteria=sql,retry_countdown=retry_countdown)
+        r = self.deleteData(tableURI=uri, criteria=sql, retry_countdown=retry_countdown)
         return r
