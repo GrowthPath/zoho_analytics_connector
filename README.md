@@ -280,6 +280,8 @@ this is, the cache object needs to offer cache.set(...) and cache.get(...) as Dj
 
 Changes
 -------------
+1.2.5 Merged PR with code clean ups, thanks gredondogc
+1.2.4 Readme changes
 1.2.3 LICENSE file updated to include text relating to the licence
 
 1.2.2 Workaround for error code detection when json decoding fails. Fixed a bug around exception handling
