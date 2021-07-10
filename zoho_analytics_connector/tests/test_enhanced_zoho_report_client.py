@@ -2,6 +2,7 @@ import os
 import io
 import json
 import pytest
+import requests.exceptions
 
 from zoho_analytics_connector.enhanced_report_client import EnhancedZohoAnalyticsClient
 from zoho_analytics_connector.report_client import ReportClient, ServerError
@@ -48,7 +49,7 @@ def enhanced_zoho_analytics_client(zoho_email=None) -> EnhancedZohoAnalyticsClie
     )
     return rc
 
-def get_enhanced_zoho_analytics_client(zoho_email=None) -> EnhancedZohoAnalyticsClient:
+def get_enhanced_zoho_analytics_client(zoho_email=None,retries=3) -> EnhancedZohoAnalyticsClient:
     assert (not TEST_OAUTH and Config.AUTHTOKEN) or (TEST_OAUTH and Config.REFRESHTOKEN)
     rc = EnhancedZohoAnalyticsClient(
         login_email_id=zoho_email or Config.LOGINEMAILID,
@@ -58,7 +59,7 @@ def get_enhanced_zoho_analytics_client(zoho_email=None) -> EnhancedZohoAnalytics
         default_databasename=Config.DATABASENAME,
         serverURL=Config.SERVER_URL,
         reportServerURL=Config.REPORT_SERVER_URL,
-        default_retries=3
+        default_retries=retries
     )
     return rc
 
@@ -220,6 +221,17 @@ def test_rate_limits_data_upload():
             print (f"Import {i} done")
         except Exception as e:
             print (e)
+
+def test_timeout():
+    #
+    enhanced_client = get_enhanced_zoho_analytics_client(retries=1)
+    enhanced_client.request_timeout = 0.001
+    animals_table_uri = enhanced_client.getURI(dbOwnerName=enhanced_client.login_email_id,
+                                               dbName=enhanced_client.default_databasename,
+                                               tableOrReportName='animals')
+    output = io.BytesIO()
+    with pytest.raises(requests.exceptions.ConnectTimeout):
+        r = enhanced_client.exportData(tableOrReportURI=animals_table_uri,format='JSON',exportToFileObj=output)
 
 
 def test_data_download(enhanced_zoho_analytics_client):

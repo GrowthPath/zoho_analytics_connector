@@ -52,6 +52,7 @@ class ReportClient:
      """
 
     isOAuth = False
+    request_timeout = 60
     # clientId = None
     # clientSecret = None
     # refresh_or_access_token = None
@@ -73,7 +74,7 @@ class ReportClient:
         """
         self.iamServerURL = serverURL or "https://accounts.zoho.com"
         self.reportServerURL = reportServerURL or "https://analyticsapi.zoho.com"
-        self.requests_session = requests_retry_session()
+        self.requests_session = requests_retry_session(retries=default_retries)
         self.clientId = clientId
         self.clientSecret = clientSecret
         self.refresh_or_access_token = token
@@ -84,6 +85,7 @@ class ReportClient:
         else:
             self.getOAuthToken()  #this sets the instance variable
             ReportClient.isOAuth = True
+        self.request_timeout = 60
 
     @property
     def token(self):
@@ -135,7 +137,7 @@ class ReportClient:
 
             headers['User-Agent'] = "ZohoAnalytics PythonLibrary"
             try:
-                resp = requests_session.post(url, data=payLoad, headers=headers, timeout=30)
+                resp = requests_session.post(url, data=payLoad, headers=headers, timeout=self.request_timeout)
                 if 'invalid client' in resp.text:
                     raise requests.exceptions.RequestException("Invalid Client")
                 respObj = ResponseObj(resp)
@@ -478,7 +480,7 @@ class ReportClient:
 
         respObj = requests.post(url, data=importConfig, files=files, headers=headers)
 
-        # To generate new accesstoken once after it get expires.
+        # To generate new accesstoken once after it expires.
         if self.invalidOAUTH(respObj):
             self.accesstoken = self.getOAuthToken()
             headers = {"Authorization": "Zoho-oauthtoken " + self.accesstoken}
@@ -654,8 +656,6 @@ class ReportClient:
         # addQueryParams adds: ZOHO_ERROR_FORMAT, ZOHO_OUTPUT_FORMAT
         url = ReportClientHelper.addQueryParams(tableOrReportURI, self.token, "EXPORT", format,
                                                 sql=sql)  # urlencoding is done in here
-        #requests_session = self.requests_session or requests_retry_session()
-        #r = requests_session.post(url=url, data=payload, timeout=30)
         callback_object = io.BytesIO()
         r = self.__sendRequest(url=url,httpMethod="POST",payLoad=payload,action="EXPORT",callBackData=callback_object,retry_countdown=retry_countdown)
         return callback_object
