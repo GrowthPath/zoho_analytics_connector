@@ -54,15 +54,16 @@ So, create a Self Client (at least, to experiment)
 
     ZohoReports.fullaccess.all
 
-Make the Tim Duration the maximum: 10 minutes.
-
-Now is  a good time to copy the correct curl template from below into a text editor.
-
 I paste this into the Scope Description as well.
+
+Make the 'Time Duration' the maximum: 10 minutes.
+
+Now is a good time to copy the correct curl template from below into a text editor.
+
 
 Choose "Create"
 
-Now with data gathered (client id, client secret, the code which expires in a few minutes, the scope, execute a POST to
+Now with data gathered (client id, client secret, the code which expires in a few minutes, the scope), execute a POST to
 
     https://accounts.zoho.com/oauth/v2/token?code=
 
@@ -70,8 +71,9 @@ or for Zoho Australia (.com.au)
 
     https://accounts.zoho.com.au/oauth/v2/token?code=
 
+or to the URL matching your Zoho data centre.
 
-### Using curl for this ...
+### Using curl to POST
 
 You can do this from terminal with curl:
 
