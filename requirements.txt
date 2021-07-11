@@ -4,3 +4,5 @@ pytest
 wheel
 twine
 emoji
+requests
+PySimpleGUI

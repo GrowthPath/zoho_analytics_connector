@@ -224,7 +224,7 @@ def test_rate_limits_data_upload():
 
 def test_timeout():
     #
-    enhanced_client = get_enhanced_zoho_analytics_client(retries=1)
+    enhanced_client = get_enhanced_zoho_analytics_client(retries=5)
     enhanced_client.request_timeout = 0.001
     animals_table_uri = enhanced_client.getURI(dbOwnerName=enhanced_client.login_email_id,
                                                dbName=enhanced_client.default_databasename,
