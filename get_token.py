@@ -33,4 +33,4 @@ def post_token_request(client_id, client_secret, code, data_centre):
 if __name__ == "__main__":
     button, client_id, client_secret, code, data_centre = get_form_entry()
     result = post_token_request(client_id, client_secret, code, data_centre)
-    print(result)
+    print(result["refresh_token"])
