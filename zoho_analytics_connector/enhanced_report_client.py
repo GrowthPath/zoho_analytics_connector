@@ -95,10 +95,11 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
     def data_upload(self, import_content: str, table_name: str, import_mode="TRUNCATEADD",
                     matching_columns: Optional[str] = None,
                     database_name: Optional[str] = None,
-                    retry_limit=9,
+                    retry_limit=None,
                     date_format=None) -> Optional[report_client.ImportResult]:
         """ data is a csv-style string, newline separated. Matching columns is a comma separated string"""
         retry_count = 0
+        retry_limit = retry_limit or self.default_retries
         impResult = None
         import_content_demojized = emoji.demojize(import_content)
         database_name = database_name or self.default_databasename

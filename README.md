@@ -286,6 +286,8 @@ this is, the cache object needs to offer cache.set(...) and cache.get(...) as Dj
 
 Changes
 -------------
+1.3.0 Retry on connection errors. First effort at a test case covering an exception. 
+      Simple little helper script to get the auth token from a self-client, get_token.py. This requires PySimpleGUI.
 1.2.5 Merged PR with code clean ups, thanks gredondogc
 1.2.4 Readme changes
 1.2.3 LICENSE file updated to include text relating to the licence

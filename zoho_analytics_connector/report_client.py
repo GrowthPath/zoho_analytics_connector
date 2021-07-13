@@ -26,7 +26,7 @@ logger.addHandler(ch)
 
 
 def requests_retry_session(
-        retries=10,
+        retries=5,
         backoff_factor=2,
         status_forcelist=(500, 502, 503, 504),
         session=None,
@@ -77,7 +77,7 @@ class ReportClient:
         self.requests_session = requests_retry_session(retries=default_retries)
         self.clientId = clientId
         self.clientSecret = clientSecret
-        self.refresh_or_access_token = token
+        self.accesstoken = token
         self.token_timestamp = time.time()  #this is a safe default
         self.default_retries = default_retries
         if (clientId == None and clientSecret == None): #not using OAuth2
@@ -109,7 +109,7 @@ class ReportClient:
         dict = {}
         dict["client_id"] = self.clientId
         dict["client_secret"] = self.clientSecret
-        dict["refresh_token"] = self.refresh_or_access_token
+        dict["refresh_token"] = self.accesstoken
         dict["grant_type"] = "refresh_token"
         #dict = urllib.parse.urlencode(dict)  we should pass a dict, not a string
         accUrl = self.iamServerURL + "/oauth/v2/token"
@@ -150,19 +150,22 @@ class ReportClient:
         code = ""
         if not retry_countdown:
             retry_countdown = self.default_retries or 0
-        while retry_countdown >= 0:
+        while retry_countdown > 0:
             retry_countdown -= 1
             try:
                 respObj = self.getResp(url, httpMethod, payLoad)
             except Exception as e:
-                logger.exception(str(e))
-                time.sleep(min(10 - retry_countdown, 1) * 10)
-                continue
+                logger.exception(str(e))  #connection error
+                if retry_countdown <= 0:
+                    raise e
+                else:
+                    time.sleep(min(10 - retry_countdown, 1) * 10)
+                    continue
 
             if (respObj.status_code in [200,]):
                 return self.handleResponse(respObj, action, callBackData)
             elif (respObj.status_code in [400,]):
-                #400 errors be an API limit error, which are handled by the result parsing
+                #400 errors may be an API limit error, which are handled by the result parsing
                 try:
                     try:
                         #j = respObj.response.json(strict=False) #getting decode errors in this and they don't make sense
@@ -182,10 +185,10 @@ class ReportClient:
 
                     logger.debug(f"API returned a 400 result and an error code: {code} ")
                     if code in [6045,]:
-                        logger.debug(f"Zoho API Recoverable rate limit (rate limit exceeded) encountered")
+                        logger.debug(f"Zoho API Recoverable rate limit (rate limit exceeded) ")
                         if retry_countdown < 0:
                             logger.debug(
-                                    f"Zoho API Recoverable error (rate limit exceeded) exhausted retries")
+                                    f"Zoho API Recoverable error (rate limit exceeded), but exhausted retries")
                             raise UnrecoverableRateLimitError(urlResp=respObj,zoho_error_code=code)
                         else:
                             time.sleep(min(10-retry_countdown,1)*10)
@@ -204,13 +207,13 @@ class ReportClient:
                             time.sleep(min(10 - retry_countdown, 1) * 10)
                             continue
                     elif code in [8509, ]:  # parameter does not match accepted input pattern
-                        logger.debug(f"Error 8509 encountered, something is wrong with the data format, no retry")
+                        logger.debug(f"Error 8509 encountered, something is wrong with the data format, no retry is attempted")
                         raise BadDataError(respObj,zoho_error_code=code)
                     elif code in [10001,]:  #10001 is "Another import is in progress, so we can try this again"
                         logger.debug(f"Zoho API Recoverable error encountered (Another import is in progress), will retry")
                         if retry_countdown < 0:
                             logger.debug(
-                            f"Zoho API Recoverable error (Another import is in progress) exhausted retries")
+                            f"Zoho API Recoverable error (Another import is in progress) but exhausted retries")
                             raise UnrecoverableRateLimitError(urlResp=respObj,zoho_error_code=code)
                         else:
                             time.sleep(min(10 - retry_countdown, 1) * 10)
@@ -225,6 +228,8 @@ class ReportClient:
                 msg = f"Unexpected error in from __sendRequest. {respObj=}"
                 logger.exception(msg)
                 raise RuntimeError(msg)
+        #fell off while loop
+        raise RuntimeError("No more retries left")
 
     def invalidOAUTH(self, respObj):
         """
@@ -476,7 +481,7 @@ class ReportClient:
         url = ReportClientHelper.addQueryParams(tableURI, self.token, "IMPORT", "XML")
 
         headers = {}
-        # To set accessToken for the first time when an instance is created.
+        # To set access token for the first time when an instance is created.
         if ReportClient.isOAuth:
             if self.accesstoken == None:
                 self.accesstoken = self.getOAuthToken()
@@ -484,7 +489,7 @@ class ReportClient:
 
         respObj = requests.post(url, data=importConfig, files=files, headers=headers)
 
-        # To generate new accesstoken once after it expires.
+        # To generate new access token once after it expires.
         if self.invalidOAUTH(respObj):
             self.accesstoken = self.getOAuthToken()
             headers = {"Authorization": "Zoho-oauthtoken " + self.accesstoken}

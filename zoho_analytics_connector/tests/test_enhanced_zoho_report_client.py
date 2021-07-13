@@ -88,7 +88,7 @@ animals_table = {
     ],
 }
 
-
+@pytest.mark.skip
 def test_create_tables(enhanced_zoho_analytics_client):
     # is the table already defined?
     try:
@@ -209,7 +209,6 @@ def test_deleteData(enhanced_zoho_analytics_client):
     row_count = enhanced_client.deleteData(tableURI=animals_table_uri, criteria=criteria)
     # assert (row_count == 1)
 
-
 @pytest.mark.skip
 def test_rate_limits_data_upload():
     enhanced_client = get_enhanced_zoho_analytics_client()
@@ -238,18 +237,23 @@ def test_rate_limits_data_upload():
 class MockResponse:
     # needs to have the sort of things that a Request ersult has
     text = "123"
-
+    response = {}
     @staticmethod
     def json():
         raise ConnectionError
 
 
 def test_connection_error_data_upload(monkeypatch):
+    allowed_retries = 2
+    count_retries = 0
+
     def mock_post(*args, **kwargs):
+        nonlocal count_retries
+        count_retries += 1
         raise ConnectionError
         # return MockResponse
 
-    enhanced_client = get_enhanced_zoho_analytics_client()
+    enhanced_client = get_enhanced_zoho_analytics_client(retries=allowed_retries)
     monkeypatch.setattr(enhanced_client.requests_session, "post", mock_post)
 
     try:
@@ -267,13 +271,17 @@ def test_connection_error_data_upload(monkeypatch):
         impResult = enhanced_client.data_upload(
             import_content=import_content, table_name="sales"
         )
-    except Exception as e:
+    except ConnectionError as e:
         print(e)
+        print (f"Retries: {count_retries}")
+        assert count_retries == allowed_retries
+    except Exception as e:
+        assert False
 
 
 def test_timeout():
     #
-    enhanced_client = get_enhanced_zoho_analytics_client(retries=5)
+    enhanced_client = get_enhanced_zoho_analytics_client(retries=2)
     enhanced_client.request_timeout = 0.001
     animals_table_uri = enhanced_client.getURI(dbOwnerName=enhanced_client.login_email_id,
                                                dbName=enhanced_client.default_databasename,
