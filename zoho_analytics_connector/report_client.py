@@ -32,14 +32,14 @@ def requests_retry_session(
         session=None,
 ) -> requests.Session:
     session = session or requests.Session()
-    retry = Retry(
+    retry_strategy = Retry(
         total=retries,
         read=retries,
         connect=retries,
         backoff_factor=backoff_factor,
         status_forcelist=status_forcelist,
     )
-    adapter = HTTPAdapter(max_retries=retry)
+    adapter = HTTPAdapter(max_retries=retry_strategy)
     session.mount('http://', adapter)
     session.mount('https://', adapter)
     return session
@@ -126,16 +126,14 @@ class ReportClient:
 
     def getResp(self, url: str, httpMethod: str, payLoad,add_token=True):
         """
-        Internal method.(For google app integ).
+        Internal method.
         """
         requests_session = self.requests_session or requests_retry_session()
-
         if httpMethod.upper() == 'POST':
             headers = {}
             if add_token and ReportClient.isOAuth and hasattr(self,'token'): #check for token because this can be called during __init__ and isOAuth could be true.
                 headers["Authorization"] = "Zoho-oauthtoken " + self.token
-
-            headers['User-Agent'] = "ZohoAnalytics PythonLibrary"
+            headers['User-Agent'] = "ZohoAnalytics Python GrowthPath Library"
             try:
                 resp = requests_session.post(url, data=payLoad, headers=headers, timeout=self.request_timeout)
                 if 'invalid client' in resp.text:
@@ -146,7 +144,7 @@ class ReportClient:
                raise e
             return respObj
         else:
-            raise RuntimeError("Unexpected httpMethod in getResp")
+            raise RuntimeError(f"Unexpected httpMethod in getResp, was expecting POST but got {httpMethod}")
 
     def __sendRequest(self, url, httpMethod, payLoad, action, callBackData,retry_countdown:int=None):
         code = ""
@@ -154,7 +152,13 @@ class ReportClient:
             retry_countdown = self.default_retries or 0
         while retry_countdown >= 0:
             retry_countdown -= 1
-            respObj = self.getResp(url, httpMethod, payLoad)
+            try:
+                respObj = self.getResp(url, httpMethod, payLoad)
+            except Exception as e:
+                logger.exception(str(e))
+                time.sleep(min(10 - retry_countdown, 1) * 10)
+                continue
+
             if (respObj.status_code in [200,]):
                 return self.handleResponse(respObj, action, callBackData)
             elif (respObj.status_code in [400,]):
