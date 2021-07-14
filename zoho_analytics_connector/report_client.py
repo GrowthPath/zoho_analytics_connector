@@ -150,12 +150,13 @@ class ReportClient:
         code = ""
         if not retry_countdown:
             retry_countdown = self.default_retries or 0
+        init_retry_countdown = retry_countdown
         while retry_countdown > 0:
             retry_countdown -= 1
             try:
                 respObj = self.getResp(url, httpMethod, payLoad)
             except Exception as e:
-                logger.exception(str(e))  #connection error
+                logger.exception(f" getResp exception in __sendRequest, {retry_countdown}, {e}")  #connection error
                 if retry_countdown <= 0:
                     raise e
                 else:
@@ -185,9 +186,9 @@ class ReportClient:
 
                     logger.debug(f"API returned a 400 result and an error code: {code} ")
                     if code in [6045,]:
-                        logger.debug(f"Zoho API Recoverable rate limit (rate limit exceeded) ")
+                        logger.error(f"Zoho API Recoverable rate limit (rate limit exceeded) ")
                         if retry_countdown < 0:
-                            logger.debug(
+                            logger.error(
                                     f"Zoho API Recoverable error (rate limit exceeded), but exhausted retries")
                             raise UnrecoverableRateLimitError(urlResp=respObj,zoho_error_code=code)
                         else:
@@ -198,38 +199,43 @@ class ReportClient:
                             self.getOAuthToken()
                         except:
                             pass
-                        logger.debug(f"Zoho API Recoverable error encountered (invalid oauth token), will retry")
+                        logger.error(f"Zoho API Recoverable error encountered (invalid oauth token), will retry")
                         if retry_countdown < 0:
-                            logger.debug(
+                            logger.error(
                                     f"Zoho API Recoverable error (invalid oauth token) exhausted retries")
                             raise UnrecoverableRateLimitError(urlResp=respObj,zoho_error_code=code)
                         else:
                             time.sleep(min(10 - retry_countdown, 1) * 10)
                             continue
                     elif code in [8509, ]:  # parameter does not match accepted input pattern
-                        logger.debug(f"Error 8509 encountered, something is wrong with the data format, no retry is attempted")
+                        logger.error(f"Error 8509 encountered, something is wrong with the data format, no retry is attempted")
                         raise BadDataError(respObj,zoho_error_code=code)
                     elif code in [10001,]:  #10001 is "Another import is in progress, so we can try this again"
-                        logger.debug(f"Zoho API Recoverable error encountered (Another import is in progress), will retry")
+                        logger.error(f"Zoho API Recoverable error encountered (Another import is in progress), will retry")
                         if retry_countdown < 0:
-                            logger.debug(
+                            logger.error(
                             f"Zoho API Recoverable error (Another import is in progress) but exhausted retries")
                             raise UnrecoverableRateLimitError(urlResp=respObj,zoho_error_code=code)
                         else:
                             time.sleep(min(10 - retry_countdown, 1) * 10)
                             continue
                     else:
-                        raise ServerError(respObj,zoho_error_code=code)
+                        #raise ServerError(respObj,zoho_error_code=code)
+                        msg = f"Unexpected status code {code=}, will attempt retry"
+                        logger.exception(msg)
+                        time.sleep(min(10 - retry_countdown, 1) * 10)
+                        continue
                 except (RecoverableRateLimitError,UnrecoverableRateLimitError,BadDataError):
                     raise
                 except ServerError as e:
                     raise ServerError(respObj,zoho_error_code=code)
             else:
-                msg = f"Unexpected error in from __sendRequest. {respObj=}"
+                msg = f"Unexpected status code in from __sendRequest. {respObj.status_code=} {respObj=}"
                 logger.exception(msg)
-                raise RuntimeError(msg)
+                time.sleep(min(10 - retry_countdown, 1) * 10)
+                continue
         #fell off while loop
-        raise RuntimeError("No more retries left")
+        raise RuntimeError(f"After starting with {init_retry_countdown}, there are now no more retries left in __sendRequest")
 
     def invalidOAUTH(self, respObj):
         """
