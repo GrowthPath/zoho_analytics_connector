@@ -182,7 +182,8 @@ class ReportClient:
                         else:
                             code = -1
                             logger.error(f"could not find error code in {respObj.response.text} ")
-                            raise RuntimeError(f"could not find error code in {respObj.response.text}")
+                            time.sleep(min(10 - retry_countdown, 1) * 10)
+                            continue
 
                     logger.debug(f"API returned a 400 result and an error code: {code} ")
                     if code in [6045,]:
@@ -194,6 +195,10 @@ class ReportClient:
                         else:
                             time.sleep(min(10-retry_countdown,1)*10)
                             continue
+                    if code in [7389, ]:
+                        logger.error(f"7389 Error from zoho ... what is this? {respObj.response.text}")
+                        time.sleep(min(10 - retry_countdown, 1) * 10)
+                        continue
                     elif code in [8535,]: #invalid oauth token
                         try:
                             self.getOAuthToken()
@@ -222,6 +227,10 @@ class ReportClient:
                     else:
                         #raise ServerError(respObj,zoho_error_code=code)
                         msg = f"Unexpected status code {code=}, will attempt retry"
+                        try:
+                            msg += respObj.response.text
+                        except Exception:
+                            pass
                         logger.exception(msg)
                         time.sleep(min(10 - retry_countdown, 1) * 10)
                         continue
@@ -235,7 +244,7 @@ class ReportClient:
                 time.sleep(min(10 - retry_countdown, 1) * 10)
                 continue
         #fell off while loop
-        raise RuntimeError(f"After starting with {init_retry_countdown}, there are now no more retries left in __sendRequest")
+        raise RuntimeError(f"After starting with {init_retry_countdown} retries allowed, there are now no more retries left in __sendRequest")
 
     def invalidOAUTH(self, respObj):
         """
