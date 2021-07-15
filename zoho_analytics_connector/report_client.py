@@ -201,7 +201,9 @@ class ReportClient:
                     elif code in [7389, ]:
                         logger.error(f"7389 Error from zoho Organisation doest not exist {respObj.response.text}")
                         raise ServerError(urlResp=respObj, zoho_error_code=code)
-
+                    elif code in [8540, ]:
+                        logger.error(f"8540 Error, token has incorrect scope {respObj.response.text}")
+                        raise ServerError(urlResp=respObj, zoho_error_code=code)
                     elif code in [8535,]: #invalid oauth token
                         try:
                             self.getOAuthToken()
