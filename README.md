@@ -52,7 +52,7 @@ So, create a Self Client (at least, to experiment)
 
 <b>Tip: The scope for full access</b>
 
-    ZohoReports.fullaccess.all
+    ZohoAnalytics.fullaccess.all
 
 I paste this into the Scope Description as well.
 
@@ -77,12 +77,12 @@ or to the URL matching your Zoho data centre.
 
 You can do this from terminal with curl:
 
-    curl -d "code=1000.dedaa...&client_id=1000.2TY...&client_secret=b74103c...&grant_type=authorization_code&scope=ZohoReports.fullaccess.all" \
+    curl -d "code=1000.dedaa...&client_id=1000.2TY...&client_secret=b74103c...&grant_type=authorization_code&scope=ZohoAnalytics.fullaccess.all" \
     -X POST https://accounts.zoho.com/oauth/v2/token
 
 or for Australia
 
-    curl -d "code=1000.dedaa...&client_id=1000.2TY...&client_secret=b74103c...&grant_type=authorization_code&scope=ZohoReports.fullaccess.all" \
+    curl -d "code=1000.dedaa...&client_id=1000.2TY...&client_secret=b74103c...&grant_type=authorization_code&scope=ZohoAnalytics.fullaccess.all" \
      -X POST https://accounts.zoho.com.au/oauth/v2/token
 
 and you should get back JSON which looks like this:
