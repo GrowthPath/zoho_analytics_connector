@@ -195,9 +195,13 @@ class ReportClient:
                         else:
                             time.sleep(min(10-retry_countdown,1)*10)
                             continue
-                    if code in [7389, ]:
+                    elif code in [7280, ]:
+                        logger.error(f"7280 error, relating to schema errors, return immediately {respObj.response.text}")
+                        raise ServerError(urlResp=respObj, zoho_error_code=code)
+                    elif code in [7389, ]:
                         logger.error(f"7389 Error from zoho Organisation doest not exist {respObj.response.text}")
                         raise ServerError(urlResp=respObj, zoho_error_code=code)
+
                     elif code in [8535,]: #invalid oauth token
                         try:
                             self.getOAuthToken()
