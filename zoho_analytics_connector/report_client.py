@@ -196,9 +196,8 @@ class ReportClient:
                             time.sleep(min(10-retry_countdown,1)*10)
                             continue
                     if code in [7389, ]:
-                        logger.error(f"7389 Error from zoho ... what is this? {respObj.response.text}")
-                        time.sleep(min(10 - retry_countdown, 1) * 10)
-                        continue
+                        logger.error(f"7389 Error from zoho Organisation doest not exist {respObj.response.text}")
+                        raise ServerError(urlResp=respObj, zoho_error_code=code)
                     elif code in [8535,]: #invalid oauth token
                         try:
                             self.getOAuthToken()
@@ -1917,7 +1916,7 @@ class UnrecoverableRateLimitError(Exception):
 
 class ServerError(Exception):
     """
-    ServerError is thrown if the report server has recieved the request but did not process the
+    ServerError is thrown if the report server has received the request but did not process the
     request due to some error. For example if authorization failure.
     """
 
