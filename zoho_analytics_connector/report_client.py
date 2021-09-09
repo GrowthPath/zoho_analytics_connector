@@ -195,6 +195,10 @@ class ReportClient:
                         else:
                             time.sleep(min(10-retry_countdown,1)*10)
                             continue
+                    elif code in [6001, ]:
+                        logger.error(
+                            f"6001 error, rows in Zoho plan exceeded {respObj.response.text}")
+                        raise UnrecoverableRateLimitError(urlResp=respObj, zoho_error_code=code)
                     elif code in [7103, ]:
                         logger.error(
                             f"7103 error, workspace not found (check authentication) {respObj.response.text}")
