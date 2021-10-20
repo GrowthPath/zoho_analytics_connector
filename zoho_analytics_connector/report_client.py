@@ -252,8 +252,7 @@ class ReportClient:
                 except ServerError as e:
                     raise ServerError(respObj,zoho_error_code=code)
             elif (respObj.status_code in [500,]):
-                j = json.loads(respObj.response.text,strict=False)
-                code = j['response']['error']['code']
+                code = respObj.response.status_code
                 if code in [7005,]:
                     logger.error(f"Error 7005 encountered ('unexpected error'), no retry is attempted. {respObj.response.text}")
                     raise BadDataError(respObj,zoho_error_code=code)
