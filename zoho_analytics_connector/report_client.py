@@ -199,10 +199,6 @@ class ReportClient:
                         logger.error(
                             f"6001 error, rows in Zoho plan exceeded {respObj.response.text}")
                         raise UnrecoverableRateLimitError(urlResp=respObj, zoho_error_code=code)
-                    elif code in [7005, ]:
-                        logger.error(
-                            f"7005 error,  Unexpected error with the Zoho API, check your account settings {respObj.response.text}")
-                        raise UnrecoverableRateLimitError(urlResp=respObj, zoho_error_code=code)
                     elif code in [7103, ]:
                         logger.error(
                             f"7103 error, workspace not found (check authentication) {respObj.response.text}")
@@ -255,6 +251,13 @@ class ReportClient:
                     raise
                 except ServerError as e:
                     raise ServerError(respObj,zoho_error_code=code)
+            elif (respObj.status_code in [500,]):
+                j = json.loads(respObj.response.text,strict=False)
+                code = j['response']['error']['code']
+                if code in [7005,]:
+                    logger.error(f"Error 7005 encountered ('unexpected error'), no retry is attempted. {respObj.response.text}")
+                    raise BadDataError(respObj,zoho_error_code=code)
+
             else:
                 msg = f"Unexpected status code in from __sendRequest. {respObj.status_code=} {respObj=}"
                 logger.exception(msg)
