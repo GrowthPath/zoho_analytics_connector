@@ -237,6 +237,7 @@ class ReportClient:
                         else:
                             time.sleep(min(10 - retry_countdown, 1) * 10)
                             continue
+
                     else:
                         #raise ServerError(respObj,zoho_error_code=code)
                         msg = f"Unexpected status code {code=}, will attempt retry"
@@ -253,12 +254,15 @@ class ReportClient:
                     raise ServerError(respObj,zoho_error_code=code)
             elif (respObj.status_code in [500,]):
                 code = respObj.response.status_code
-                if code in [7005,]:
+                if ":7005" in respObj.response.text:
                     logger.error(f"Error 7005 encountered ('unexpected error'), no retry is attempted. {respObj.response.text}")
                     raise BadDataError(respObj,zoho_error_code=code)
-
             else:
-                msg = f"Unexpected status code in from __sendRequest. {respObj.status_code=} {respObj=}"
+                try:
+                    response_text = respObj.response.text
+                except Exception as e:
+                    response_text = "unreadable response text"
+                msg = f"Unexpected status code in from __sendRequest. Server response code is {respObj.status_code=} {response_text=}. Retry attempts will be made..."
                 logger.exception(msg)
                 time.sleep(min(10 - retry_countdown, 1) * 10)
                 continue
