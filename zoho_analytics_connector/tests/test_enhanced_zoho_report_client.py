@@ -67,16 +67,20 @@ def get_enhanced_zoho_analytics_client(zoho_email=None, retries=3) -> EnhancedZo
         default_retries=retries
     )
     return rc
+#"Date","Region","Product Category","Product","Customer Name","Sales","Cost","Profit"
 
-
-zoho_sales_fact_table = {
-    "TABLENAME": "sales_fact",
+zoho_sales_table = {
+    "TABLENAME": "store_sales",
     "COLUMNS": [
-        {"COLUMNNAME": "inv_date", "DATATYPE": "DATE"},
-        {"COLUMNNAME": "customer", "DATATYPE": "PLAIN"},
-        {"COLUMNNAME": "sku", "DATATYPE": "PLAIN"},
-        {"COLUMNNAME": "qty_invoiced", "DATATYPE": "NUMBER"},
-        {"COLUMNNAME": "line_total_excluding_tax", "DATATYPE": "NUMBER"},
+        {"COLUMNNAME": "date", "DATATYPE": "DATE"},
+        {"COLUMNNAME": "region", "DATATYPE": "PLAIN"},
+        {"COLUMNNAME": "product_category", "DATATYPE": "PLAIN"},
+        {"COLUMNNAME": "product", "DATATYPE": "PLAIN"},
+        {"COLUMNNAME": "customer_name", "DATATYPE": "PLAIN"},
+
+        {"COLUMNNAME": "sales", "DATATYPE": "NUMBER"},
+        {"COLUMNNAME": "cost", "DATATYPE": "NUMBER"},
+        {"COLUMNNAME": "profit", "DATATYPE": "NUMBER"},
     ],
 }
 
@@ -88,7 +92,7 @@ animals_table = {
     ],
 }
 
-@pytest.mark.skip
+#@pytest.mark.skip
 def test_create_tables(enhanced_zoho_analytics_client):
     # is the table already defined?
     try:
@@ -100,8 +104,8 @@ def test_create_tables(enhanced_zoho_analytics_client):
             raise
     zoho_tables = set(zoho_table_metadata.keys())
 
-    if "sales_fact" not in zoho_tables:
-        enhanced_zoho_analytics_client.create_table(table_design=zoho_sales_fact_table)
+    if "sales" not in zoho_tables:
+        enhanced_zoho_analytics_client.create_table(table_design=zoho_sales_table)
     else:
         # get an error, but error handling is not working, the API returns a 400 with no content in the message
         print(f"\nThe table sales_fact exists already; delete it manually to test")
@@ -126,7 +130,7 @@ def test_data_upload():
         return
         # import_modes = APPEND / TRUNCATEADD / UPDATEADD
     impResult = enhanced_client.data_upload(
-        import_content=import_content, table_name="sales"
+        import_content=import_content, table_name="store_sales"
     )
     assert impResult
     assert impResult.successRowCount == impResult.totalRowCount
@@ -227,7 +231,7 @@ def test_rate_limits_data_upload():
         i += 1
         try:
             impResult = enhanced_client.data_upload(
-                import_content=import_content, table_name="sales"
+                import_content=import_content, table_name="store_sales"
             )
             print(f"Import {i} done")
         except Exception as e:
@@ -269,7 +273,7 @@ def test_connection_error_data_upload(monkeypatch):
 
     try:
         impResult = enhanced_client.data_upload(
-            import_content=import_content, table_name="sales"
+            import_content=import_content, table_name="store_sales"
         )
     except ConnectionError as e:
         print(e)
@@ -294,7 +298,7 @@ def test_timeout():
 def test_data_download(enhanced_zoho_analytics_client):
     sql = "select * from sales"
     result = enhanced_zoho_analytics_client.data_export_using_sql(
-        sql=sql, table_name="sales"
+        sql=sql, table_name="store_sales"
     )
     assert len(list(result)) > 0
 

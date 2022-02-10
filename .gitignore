@@ -170,3 +170,5 @@ venv.bak/
 /zoho_analytics_connector/private/
 /docs/
 /.idea/
+/.run/Python tests in test_enhanced_zoho_report_client.py.run.xml
+/.run/pytest in test_enhanced_zoho_report_client.py.run.xml

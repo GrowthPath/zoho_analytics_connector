@@ -149,7 +149,7 @@ class ReportClient:
     def __sendRequest(self, url, httpMethod, payLoad, action, callBackData,retry_countdown:int=None):
         code = ""
         if not retry_countdown:
-            retry_countdown = self.default_retries or 0
+            retry_countdown = self.default_retries or 1
         init_retry_countdown = retry_countdown
         while retry_countdown > 0:
             retry_countdown -= 1
@@ -252,6 +252,29 @@ class ReportClient:
                     raise
                 except ServerError as e:
                     raise ServerError(respObj,zoho_error_code=code)
+            elif (respObj.status_code in [401,]):
+                try:
+                    #j = respObj.response.json(strict=False) #getting decode errors in this and they don't make sense
+                    j = json.loads(respObj.response.text,strict=False)
+                    code = j['response']['error']['code']
+                except json.JSONDecodeError as e:
+                    logger.error(f"API caused a JSONDecodeError for {respObj.response.text} ")
+                    code = None
+                logger.debug(f"API returned a 401 result and an error code: {code} ")
+                if code in [8535,]: #invalid oauth token
+                    try:
+                        self.getOAuthToken()
+                    except:
+                        pass
+                    logger.error(f"Zoho API Recoverable error encountered (invalid oauth token), will retry")
+                    if retry_countdown < 0:
+                        logger.error(
+                            f"Zoho API Recoverable error (invalid oauth token) exhausted retries")
+                        raise UnrecoverableRateLimitError(urlResp=respObj,zoho_error_code=code)
+                    else:
+                        time.sleep(min(10 - retry_countdown, 1) * 10)
+                        continue
+
             elif (respObj.status_code in [500,]):
                 code = respObj.response.status_code
                 if ":7005" in respObj.response.text:
