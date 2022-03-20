@@ -199,6 +199,10 @@ class ReportClient:
                         logger.error(
                             f"6001 error, rows in Zoho plan exceeded {respObj.response.text}")
                         raise UnrecoverableRateLimitError(urlResp=respObj, zoho_error_code=code)
+                    elif code in [6043, ]:
+                        logger.error(
+                            f"6043 error, daily API limit in Zoho plan exceeded {respObj.response.text}")
+                        raise UnrecoverableRateLimitError(urlResp=respObj, zoho_error_code=code)
                     elif code in [7103, ]:
                         logger.error(
                             f"7103 error, workspace not found (check authentication) {respObj.response.text}")
