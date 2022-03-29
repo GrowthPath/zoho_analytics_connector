@@ -1,7 +1,8 @@
-update version number in setup.py
+#update version number in setup.py
 python3 setup.py sdist bdist_wheel
 python3 -m twine upload --skip-existing dist/*
 
 timatgca
 password is saved in password manager
 
+JQuRU4sXJr
