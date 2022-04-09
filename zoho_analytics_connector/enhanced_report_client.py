@@ -108,9 +108,9 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
         impResult = self.importData_v2(uri, import_mode=import_mode, import_content=import_content_demojized,
                                        date_format=date_format,
                                        matching_columns=matching_columns, retry_countdown=retry_limit)
-        logger.debug(
-            f"Table: {table_name}: Processed Rows: "
-            f"{impResult.totalRowCount} with {impResult.warningCount} warnings ")
+        # logger.debug(
+        #     f"Table: {table_name}: Processed Rows: "
+        #     f"{impResult.totalRowCount} with {impResult.warningCount} warnings ")
 
         return impResult
 

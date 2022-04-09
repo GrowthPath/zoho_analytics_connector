@@ -209,7 +209,7 @@ class ReportClient:
                         raise ServerError(urlResp=respObj, zoho_error_code=code)
                     elif code in [7232, ]:
                         logger.error(
-                            f"7232 error,unknown what this means (a data format problem?) {respObj.response.text=} ")
+                            f"7232 error,an invalid value has been provided according to the column's data type) {respObj.response.text=} ")
                         raise ServerError(urlResp=respObj, zoho_error_code=code)
                     elif code in [7280, ]:
                         logger.error(f"7280 error, relating to schema errors, return immediately {respObj.response.text}")
@@ -259,7 +259,10 @@ class ReportClient:
                 except (RecoverableRateLimitError,UnrecoverableRateLimitError,BadDataError):
                     raise
                 except ServerError as e:
-                    logger.error(f"ServerError raised on _sendRequest. {url=} {payLoad=} {action=} ")
+                    logger.error(f"ServerError raised on _sendRequest.  {url=} {payLoad=} {action=} ")
+                    import_data = payLoad.get("ZOHO_IMPORT_DATA")
+                    if import_data:
+                        logger.error(f"Import data, a csv file as a string. Row 1 is header, col 0 is first col (id): {import_data} ")
                     raise ServerError(respObj,zoho_error_code=code)
             elif (respObj.status_code in [401,]):
                 try:
