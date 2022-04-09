@@ -207,6 +207,10 @@ class ReportClient:
                         logger.error(
                             f"7103 error, workspace not found (check authentication) {respObj.response.text}")
                         raise ServerError(urlResp=respObj, zoho_error_code=code)
+                    elif code in [7232, ]:
+                        logger.error(
+                            f"7232 error,unknown what this means (a data format problem?) {respObj.response.text=} ")
+                        raise ServerError(urlResp=respObj, zoho_error_code=code)
                     elif code in [7280, ]:
                         logger.error(f"7280 error, relating to schema errors, return immediately {respObj.response.text}")
                         raise ServerError(urlResp=respObj, zoho_error_code=code)
@@ -255,6 +259,7 @@ class ReportClient:
                 except (RecoverableRateLimitError,UnrecoverableRateLimitError,BadDataError):
                     raise
                 except ServerError as e:
+                    logger.error(f"ServerError raised on _sendRequest. {url=} {payLoad=} {action=} ")
                     raise ServerError(respObj,zoho_error_code=code)
             elif (respObj.status_code in [401,]):
                 try:
