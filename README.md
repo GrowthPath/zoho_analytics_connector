@@ -286,6 +286,10 @@ this is, the cache object needs to offer cache.set(...) and cache.get(...) as Dj
 
 Changes
 -------------
+
+
+1.3.3 - 1.3.5 Handle some more Zoho exceptions
+
 1.3.2 Under heavy concurrent load, an oauth token error was not being caught. Fixed; new token is generated and a retry occurs.
 
 1.3.1 Some small improvements to Zoho error handling
