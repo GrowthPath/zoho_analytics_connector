@@ -105,13 +105,9 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
         database_name = database_name or self.default_databasename
         uri = self.getURI(dbOwnerName=self.login_email_id, dbName=database_name, tableOrReportName=table_name)
         # import_modes = APPEND / TRUNCATEADD / UPDATEADD
-        try:
-            impResult = self.importData_v2(uri, import_mode=import_mode, import_content=import_content_demojized,
-                                           date_format=date_format,
-                                           matching_columns=matching_columns, retry_countdown=retry_limit)
-        except Exception as e:
-            print (f"exception in Data Upload: column data: {matching_columns}")
-            raise e
+        impResult = self.importData_v2(uri, import_mode=import_mode, import_content=import_content_demojized,
+                                       date_format=date_format,
+                                       matching_columns=matching_columns, retry_countdown=retry_limit)
         # logger.debug(
         #     f"Table: {table_name}: Processed Rows: "
         #     f"{impResult.totalRowCount} with {impResult.warningCount} warnings ")
