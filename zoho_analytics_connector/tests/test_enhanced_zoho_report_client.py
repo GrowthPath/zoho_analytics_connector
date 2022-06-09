@@ -92,7 +92,7 @@ animals_table = {
     ],
 }
 
-#@pytest.mark.skip
+@pytest.mark.skip
 def test_create_tables(enhanced_zoho_analytics_client):
     # is the table already defined?
     try:

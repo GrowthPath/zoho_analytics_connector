@@ -137,8 +137,10 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
 
     def delete_rows(self, table_name, sql, database_name: Optional[str] = None, retry_countdown=5):
         """ criteria is SQL fragments such as 'a' in ColA """
+
+        if len(sql) > 5000:
+            raise RuntimeError("The SQL passed to delete_rows is too big and will cause Zoho 400 errors")
         uri = self.getURI(dbOwnerName=self.login_email_id, dbName=database_name or self.default_databasename,
                           tableOrReportName=table_name)
-
         r = self.deleteData(tableURI=uri, criteria=sql, retry_countdown=retry_countdown)
         return r
