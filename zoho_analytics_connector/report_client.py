@@ -474,8 +474,9 @@ class ReportClient:
         url = ReportClientHelper.addQueryParams(tableURI, self.token, "ADDROW", "XML")
         return self.__sendRequest(url, "POST", payLoad, "ADDROW", None)
 
-    def deleteData(self, tableURI, criteria=None, config=None,retry_countdown=0):
-        """  This has been refactored to use requests.post
+    def deleteData(self, tableURI, criteria=None, config=None,retry_countdown=0)->int:
+        """  This has been refactored to use requests.post.
+        Returns the number of rows deleted
         Delete the data in the  specified table identified by the URI.
         @param tableURI: The URI of the table. See L{getURI<getURI>}.
         @type tableURI:string
@@ -492,7 +493,7 @@ class ReportClient:
         payload = None  # can't put the SQL in the body of the post request, the library is wrong or out of date
         url = ReportClientHelper.addQueryParams(tableURI, self.token, "DELETE", "JSON", criteria=criteria)
         r = self.__sendRequest(url=url,httpMethod="POST",payLoad=payload,action="DELETE",callBackData=None,retry_countdown=retry_countdown)
-        return r
+        return int(r)
 
     def updateData(self, tableURI, columnValues, criteria, config=None):
         """
