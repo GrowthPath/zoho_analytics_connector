@@ -69,6 +69,7 @@ def get_enhanced_zoho_analytics_client(zoho_email=None, retries=3) -> EnhancedZo
     return rc
 #"Date","Region","Product Category","Product","Customer Name","Sales","Cost","Profit"
 
+# see
 zoho_sales_table = {
     "TABLENAME": "store_sales",
     "COLUMNS": [
@@ -78,9 +79,9 @@ zoho_sales_table = {
         {"COLUMNNAME": "product", "DATATYPE": "PLAIN"},
         {"COLUMNNAME": "customer_name", "DATATYPE": "PLAIN"},
 
-        {"COLUMNNAME": "sales", "DATATYPE": "NUMBER"},
-        {"COLUMNNAME": "cost", "DATATYPE": "NUMBER"},
-        {"COLUMNNAME": "profit", "DATATYPE": "NUMBER"},
+        {"COLUMNNAME": "sales", "DATATYPE": "DECIMAL_NUMBER"},
+        {"COLUMNNAME": "cost", "DATATYPE": "DECIMAL_NUMBER"},
+        {"COLUMNNAME": "profit", "DATATYPE": "DECIMAL_NUMBER"},
     ],
 }
 
@@ -92,7 +93,7 @@ animals_table = {
     ],
 }
 
-@pytest.mark.skip
+
 def test_create_tables(enhanced_zoho_analytics_client):
     # is the table already defined?
     try:
@@ -104,11 +105,11 @@ def test_create_tables(enhanced_zoho_analytics_client):
             raise
     zoho_tables = set(zoho_table_metadata.keys())
 
-    if "sales" not in zoho_tables:
+    if "store_sales" not in zoho_tables:
         enhanced_zoho_analytics_client.create_table(table_design=zoho_sales_table)
     else:
         # get an error, but error handling is not working, the API returns a 400 with no content in the message
-        print(f"\nThe table sales_fact exists already; delete it manually to test")
+        print(f"\nThe table store_sales exists already; delete it manually to test")
 
     if "animals" not in zoho_tables:
         enhanced_zoho_analytics_client.create_table(table_design=animals_table)
@@ -124,13 +125,15 @@ def test_data_upload():
             import_content = f.read()
     except Exception as e:
         print(
-            "Error Check if file StoreSales.csv exists in the current directory!! ",
+            "Error Check if file StoreSales.csv exists in the current directory; assumption is that the tests directory is the working directory. ",
             str(e),
         )
         return
         # import_modes = APPEND / TRUNCATEADD / UPDATEADD
     impResult = enhanced_client.data_upload(
-        import_content=import_content, table_name="store_sales"
+        import_content=import_content, table_name="store_sales",
+        import_mode="UPDATEADD",
+        matching_columns="date,region,product_category,product,customer_name"
     )
     assert impResult
     assert impResult.successRowCount == impResult.totalRowCount
@@ -149,7 +152,7 @@ def test_multiple_clients():
     table_meta_data = enhance_client1.get_table_metadata()
     assert table_meta_data
 
-
+@pytest.mark.skip
 def test_addRow():
     # test the standard Zoho ReportClient library function to add two rows
     enhanced_client = get_enhanced_zoho_analytics_client()
@@ -178,6 +181,12 @@ def test_exportData_csv_with_criteria():
     animals_table_uri = enhanced_client.getURI(dbOwnerName=enhanced_client.login_email_id,
                                                dbName=enhanced_client.default_databasename,
                                                tableOrReportName='animals')
+    criteria = """ "size" in ('small') """
+    row_count = enhanced_client.deleteData(tableURI=animals_table_uri, criteria=criteria)
+    new_row = {'common_name': 'Rabbit', 'size': 'small'}
+    enhanced_client.addRow(tableURI=animals_table_uri, columnValues=new_row)
+    new_row = {'common_name': 'Elephant', 'size': 'large'}
+    enhanced_client.addRow(tableURI=animals_table_uri, columnValues=new_row)
     output = io.BytesIO()
     r = enhanced_client.exportData(tableOrReportURI=animals_table_uri, format='CSV', exportToFileObj=output,
                                    criteria="size = 'small'")
@@ -198,20 +207,36 @@ def test_exportData_json():
     assert (json.loads(output.getvalue()))
 
 
-def test_deleteData(enhanced_zoho_analytics_client):
+def test_add_and_delete_data(enhanced_zoho_analytics_client):
     """ This tests the underlying ReportClient function.
     for criteria tips see https://www.zoho.com/analytics/api/?shell#applying-filter-criteria"""
     enhanced_client = get_enhanced_zoho_analytics_client()
     animals_table_uri = enhanced_client.getURI(dbOwnerName=enhanced_client.login_email_id,
                                                dbName=enhanced_client.default_databasename,
                                                tableOrReportName='animals')
+
+    animals_table_uri = enhanced_client.getURI(dbOwnerName=enhanced_client.login_email_id,
+                                               dbName=enhanced_client.default_databasename, tableOrReportName='animals')
+    new_row = {'common_name': 'Rabbit', 'size': 'small'}
+    enhanced_client.addRow(tableURI=animals_table_uri, columnValues=new_row)
+    new_row = {'common_name': 'Elephant', 'size': 'large'}
+    enhanced_client.addRow(tableURI=animals_table_uri, columnValues=new_row)
+    new_row = {'common_name': 'wolf', 'size': 'medium'}
+    enhanced_client.addRow(tableURI=animals_table_uri, columnValues=new_row)
+    new_row = {'common_name': 'leopard', 'size': 'medium'}
+    enhanced_client.addRow(tableURI=animals_table_uri, columnValues=new_row)
+
     criteria = """ 'Rabbit' in "common_name" """
     row_count = enhanced_client.deleteData(tableURI=animals_table_uri, criteria=criteria, retry_countdown=10)
-    # assert (row_count==1)
+    assert (int(row_count)>=1)
 
     criteria = """ "common_name" like '%phant' """
     row_count = enhanced_client.deleteData(tableURI=animals_table_uri, criteria=criteria)
-    # assert (row_count == 1)
+    assert (int(row_count) >= 1)
+
+    criteria = """ "common_name" in ('leopard', 'wolf') """
+    row_count = enhanced_client.deleteData(tableURI=animals_table_uri, criteria=criteria)
+    assert (int(row_count) >= 1)
 
 @pytest.mark.skip
 def test_rate_limits_data_upload():
@@ -296,7 +321,7 @@ def test_timeout():
 
 
 def test_data_download(enhanced_zoho_analytics_client):
-    sql = "select * from sales"
+    sql = "select * from store_sales"
     result = enhanced_zoho_analytics_client.data_export_using_sql(
         sql=sql, table_name="store_sales"
     )

@@ -74,6 +74,22 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
         return table_metadata
 
     def create_table(self, table_design, database_name=None) -> MutableMapping:
+        """
+        ZOHO_DATATYPE
+            (Supported data types are:
+            PLAIN
+            MULTI_LINE
+            EMAIL
+            NUMBER
+            POSITIVE_NUMBER
+            DECIMAL_NUMBER
+            CURRENCY
+            PERCENT
+            DATE
+            BOOLEAN
+            URL
+            AUTO_NUMBER
+        """
         db_uri = self.getDBURI(self.login_email_id, database_name or self.default_databasename)
         columns = table_design['COLUMNS']
         BIG_NUMBER_OF_COLUMNS = 10

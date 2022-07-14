@@ -7,6 +7,8 @@ This is a version which is Python 3 ready, tested on Python 3.8 and 3.9 and in f
 A more convenient wrapper class is in enhanced_report_client. This is based on Zoho's ReportClient but provides some more convenient features.
 I use it mostly for uploading data, and creating and modifying tables.
 
+This library uses the Analytics V1 API.
+
 Authentication
 ==============
 AuthTokens are now retired, replaced with OAuth2.
@@ -94,14 +96,6 @@ save this somewhere, it is confidential. The refresh token is permanent, it is b
 NOTE!!! For Australian-hosted Zoho accounts and other regional variations:
 
 The token URL is adapted for the server location. e.g. for Australia, post to https://accounts.zoho.com.au/oauth/v2/token
-
-### Using the helper script
-
-You can run 
-
-`python get_token.py` 
-
-which is a little helper script to fetch the self-client token. The script needs requests and PySimpleGUI
 
 Usage
 =====
@@ -287,6 +281,7 @@ this is, the cache object needs to offer cache.set(...) and cache.get(...) as Dj
 Changes
 -------------
 
+next_version Test updates
 
 1.3.3 - 1.3.5 Handle some more Zoho exceptions
 
