@@ -227,16 +227,23 @@ def test_add_and_delete_data(enhanced_zoho_analytics_client):
     enhanced_client.addRow(tableURI=animals_table_uri, columnValues=new_row)
 
     criteria = """ 'Rabbit' in "common_name" """
+    pre_delete_row_count = enhanced_client.pre_delete_rows(table_name="animals", sql=criteria, retry_countdown=10)
     row_count = enhanced_client.deleteData(tableURI=animals_table_uri, criteria=criteria, retry_countdown=10)
     assert (int(row_count)>=1)
+    assert row_count == pre_delete_row_count
 
     criteria = """ "common_name" like '%phant' """
+    pre_delete_row_count = enhanced_client.pre_delete_rows(table_name="animals", sql=criteria, retry_countdown=10)
     row_count = enhanced_client.deleteData(tableURI=animals_table_uri, criteria=criteria)
     assert (int(row_count) >= 1)
+    assert row_count == pre_delete_row_count
 
     criteria = """ "common_name" in ('leopard', 'wolf') """
+    pre_delete_row_count = enhanced_client.pre_delete_rows(table_name="animals", sql=criteria, retry_countdown=10)
     row_count = enhanced_client.deleteData(tableURI=animals_table_uri, criteria=criteria)
     assert (int(row_count) >= 1)
+    assert row_count == pre_delete_row_count
+
 
 @pytest.mark.skip
 def test_rate_limits_data_upload():

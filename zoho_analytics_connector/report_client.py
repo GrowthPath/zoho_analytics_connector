@@ -2225,7 +2225,7 @@ class ReportClientHelper:
         return url
 
     @staticmethod
-    def getAsPayLoad(separateDicts, criteria, sql,encode_payload=False):
+    def getAsPayLoad(separateDicts, criteria:Optional[str], sql:Optional[str],encode_payload=False):
         payload = {}
         for i in separateDicts:
             if (i != None):

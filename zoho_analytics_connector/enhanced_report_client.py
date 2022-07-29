@@ -151,12 +151,29 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
         reader = csv.DictReader(returned_data)
         return reader
 
-    def delete_rows(self, table_name, sql, database_name: Optional[str] = None, retry_countdown=5):
-        """ criteria is SQL fragments such as 'a' in ColA """
+    def delete_rows(self, table_name, sql, database_name: Optional[str] = None, retry_countdown=5)->int:
+        """ criteria is SQL fragments such as 'a' in ColA, for example,
+        sql = f"{id_column} IN ('ce76dc3a-bac0-47dd-841a-70e66613958e')
+        return the count of eows
+        """
 
         if len(sql) > 5000:
             raise RuntimeError("The SQL passed to delete_rows is too big and will cause Zoho 400 errors")
         uri = self.getURI(dbOwnerName=self.login_email_id, dbName=database_name or self.default_databasename,
                           tableOrReportName=table_name)
-        r = self.deleteData(tableURI=uri, criteria=sql, retry_countdown=retry_countdown)
-        return r
+        row_count = self.deleteData(tableURI=uri, criteria=sql, retry_countdown=retry_countdown)
+        return row_count
+
+    def pre_delete_rows(self, table_name, sql, database_name: Optional[str] = None, retry_countdown=5):
+        """ uses the same sql input as delete_rows and counts what is present in the table. This is to check the nbr of rows deleted is correct.
+        Zoho sometimes gets table corruption which means rows don't delete.
+        When the operation is critical, you can use this function to check the nbr of rows deleted is correct.
+        """
+
+        if len(sql) > 5000:
+            raise RuntimeError("The SQL passed to delete_rows is too big and will cause Zoho 400 errors")
+        sql = f"select count(*) from {table_name} where {sql}"
+        reader = self.data_export_using_sql(sql,table_name=table_name)
+        result = list(reader)[0]
+        row_count = int(result['count(*)'])
+        return row_count
