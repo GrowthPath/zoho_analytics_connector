@@ -113,7 +113,9 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
                     database_name: Optional[str] = None,
                     retry_limit=None,
                     date_format=None) -> Optional[report_client.ImportResult]:
-        """ data is a csv-style string, newline separated. Matching columns is a comma separated string"""
+        """ data is a csv-style string, newline separated. Matching columns is a comma separated string
+        import_mode is one of TRUNCATEADD, APPEND, UPDATEADD
+        """
         retry_count = 0
         retry_limit = retry_limit or self.default_retries
         impResult = None
