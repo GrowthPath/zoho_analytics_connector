@@ -283,6 +283,9 @@ Changes
 
 next_version Test updates
 
+1.3.6 Documentation updates, test updates. Added a 'pre-delete function' to calculate how many rows should be deleted.
+    deleteData returns an int not a string for the number of rows deleted.
+
 1.3.3 - 1.3.5 Handle some more Zoho exceptions
 
 1.3.2 Under heavy concurrent load, an oauth token error was not being caught. Fixed; new token is generated and a retry occurs.
