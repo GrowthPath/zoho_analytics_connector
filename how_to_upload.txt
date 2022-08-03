@@ -5,4 +5,3 @@ python3 -m twine upload --skip-existing dist/*
 timatgca
 password is saved in password manager
 
-JQuRU4sXJr
