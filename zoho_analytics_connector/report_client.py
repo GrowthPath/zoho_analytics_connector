@@ -187,7 +187,7 @@ class ReportClient:
 
                     logger.debug(f"API returned a 400 result and an error code: {code} ")
                     if code in [6045,]:
-                        logger.error(f"Zoho API Recoverable rate limit (rate limit exceeded) ")
+                        logger.error(f"Zoho API Recoverable rate limit (rate limit exceeded); there are {retry_countdown+1} retries left")
                         if retry_countdown < 0:
                             logger.error(
                                     f"Zoho API Recoverable error (rate limit exceeded), but exhausted retries")
