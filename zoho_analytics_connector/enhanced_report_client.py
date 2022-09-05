@@ -10,7 +10,7 @@ import csv
 import json
 import logging
 import time
-from typing import MutableMapping, Optional
+from typing import MutableMapping, Optional, List
 
 import emoji
 
@@ -55,9 +55,12 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
         return table_data
 
     def __init__(self, login_email_id: str, token: str, default_databasename: str = None, clientId=None,
-                 clientSecret=None, serverURL=None, reportServerURL=None, default_retries=None):
+                 clientSecret=None, serverURL=None, reportServerURL=None, default_retries=None,
+                 error_email_list: Optional[List[str]]=None):
+        """ error email list is not used by the client, but it is available for callers as a convenience"""
         self.login_email_id = login_email_id
         self.default_databasename = default_databasename
+        self.error_email_list = error_email_list or [login_email_id]
         super().__init__(token=token, clientId=clientId, clientSecret=clientSecret, serverURL=serverURL,
                          reportServerURL=reportServerURL, default_retries=default_retries)
 
@@ -153,7 +156,7 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
         reader = csv.DictReader(returned_data)
         return reader
 
-    def delete_rows(self, table_name, sql, database_name: Optional[str] = None, retry_countdown=5)->int:
+    def delete_rows(self, table_name, sql, database_name: Optional[str] = None, retry_countdown=5) -> int:
         """ criteria is SQL fragments such as 'a' in ColA, for example,
         sql = f"{id_column} IN ('ce76dc3a-bac0-47dd-841a-70e66613958e')
         return the count of eows
@@ -175,7 +178,7 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
         if len(sql) > 5000:
             raise RuntimeError("The SQL passed to delete_rows is too big and will cause Zoho 400 errors")
         sql = f"select count(*) from {table_name} where {sql}"
-        reader = self.data_export_using_sql(sql,table_name=table_name)
+        reader = self.data_export_using_sql(sql, table_name=table_name)
         result = list(reader)[0]
         row_count = int(result['count(*)'])
         return row_count
