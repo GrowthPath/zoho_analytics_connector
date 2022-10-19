@@ -287,7 +287,8 @@ class ReportClient:
                         time.sleep(min(10 - retry_countdown, 1) * 10)
                         continue
             elif (respObj.status_code in [414,]):
-                logger.error(f"HTTP response 414 was encountered (URI too large), no retry is attempted. {respObj.response.text} URL for {httpMethod=} {url=} {payLoad=}")
+                msg = f"HTTP response 414 was encountered (URI too large), no retry is attempted. {respObj.response.text} URL for {httpMethod=} {url=} {payLoad=}"
+                logger.error(msg)
                 raise BadDataError(respObj,zoho_error_code=None)
 
             elif (respObj.status_code in [500,]):
@@ -300,12 +301,12 @@ class ReportClient:
                     response_text = respObj.response.text
                 except Exception as e:
                     response_text = "unreadable response text"
-                msg = f"Unexpected status code in from __sendRequest. Server response code is {respObj.status_code=} {response_text=}. Retry attempts will be made..."
+                msg = f"Unexpected status code in from __sendRequest. Server response code is {respObj.status_code=} {response_text=}.  {url=}, {httpMethod=}, {payLoad=}, {action=} Retry attempts will be made..."
                 logger.exception(msg)
                 time.sleep(min(10 - retry_countdown, 1) * 10)
                 continue
         #fell off while loop
-        raise RuntimeError(f"After starting with {init_retry_countdown} retries allowed, there are now no more retries left in __sendRequest")
+        raise RuntimeError(f"After starting with {init_retry_countdown} retries allowed, there are now no more retries left in __sendRequest.  ")
 
     def invalidOAUTH(self, respObj):
         """
