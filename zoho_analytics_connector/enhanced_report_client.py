@@ -182,3 +182,11 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
         result = list(reader)[0]
         row_count = int(result['count(*)'])
         return row_count
+
+    def rename_column(self, table_name, old_column_name, new_column_name, database_name: Optional[str] = None,
+                      retry_countdown=5):
+        """ rename a column in a table """
+        uri = self.getURI(dbOwnerName=self.login_email_id, dbName=database_name or self.default_databasename,
+                          tableOrReportName=table_name)
+        self.renameColumn(tableURI=uri, oldColumnName=old_column_name, newColumnName=new_column_name,
+                          retry_countdown=retry_countdown)

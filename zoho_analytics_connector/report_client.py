@@ -286,6 +286,9 @@ class ReportClient:
                     else:
                         time.sleep(min(10 - retry_countdown, 1) * 10)
                         continue
+            elif (respObj.status_code in [414,]):
+                logger.error(f"HTTP response 414 was encountered (URI too large), no retry is attempted. {respObj.response.text} URL for {httpMethod=} {url=} {payLoad=}")
+                raise BadDataError(respObj,zoho_error_code=None)
 
             elif (respObj.status_code in [500,]):
                 code = respObj.response.status_code
