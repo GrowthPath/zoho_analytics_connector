@@ -207,6 +207,10 @@ class ReportClient:
                         logger.error(
                             f"7103 error, workspace not found (check authentication) {respObj.response.text}")
                         raise ServerError(urlResp=respObj, zoho_error_code=code)
+                    elif code in [7179, ]:
+                       logger.error(
+                           f"7179 error, workspace reports no view present. Initialise with a dummy table {respObj.response.text}")
+                       raise ServerError(urlResp=respObj, zoho_error_code=code)
                     elif code in [7232, ]:
                         logger.error(
                             f"7232 error,an invalid value has been provided according to the column's data type) {respObj.response.text=} ")
