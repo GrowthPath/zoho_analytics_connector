@@ -264,7 +264,7 @@ class ReportClient:
                     raise
                 except ServerError as e:
                     logger.error(f"ServerError raised on _sendRequest.  {url=} {payLoad=} {action=} ")
-                    import_data = payLoad.get("ZOHO_IMPORT_DATA")
+                    import_data = payLoad.get("ZOHO_IMPORT_DATA") if payLoad else None
                     if import_data:
                         logger.error(f"Import data, a csv file as a string. Row 1 is header, col 0 is first col (id): {import_data} ")
                     raise ServerError(respObj,zoho_error_code=code)
