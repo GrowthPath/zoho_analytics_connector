@@ -142,6 +142,44 @@ def test_data_upload():
 def test_get_database_metadata(enhanced_zoho_analytics_client: EnhancedZohoAnalyticsClient):
     table_meta_data = enhanced_zoho_analytics_client.get_table_metadata()
     assert table_meta_data
+def test_get_v2_metadata(enhanced_zoho_analytics_client: EnhancedZohoAnalyticsClient):
+    metadata = enhanced_zoho_analytics_client.get_orgs_metadata_api_v2()
+    assert metadata
+
+def test_workspace_details(enhanced_zoho_analytics_client:EnhancedZohoAnalyticsClient):
+    org_metadata = enhanced_zoho_analytics_client.get_orgs_metadata_api_v2()
+    origin_orgid = org_metadata["data"]["orgs"][0]["orgId"]
+    dest_orgid = origin_orgid
+    workspaces_metadata = enhanced_zoho_analytics_client.get_all_workspaces_metadata_api_v2()
+    source_workspace_name = "DearTest"
+    for workspace in workspaces_metadata["data"]["ownedWorkspaces"]:
+        if workspace["workspaceName"] == source_workspace_name:
+            workspace_id = workspace["workspaceId"]
+            break
+    else:
+        raise "workspace not found"
+    workspace_details = enhanced_zoho_analytics_client.get_workspace_details_api_v2(workspace_id=workspace_id)
+    assert workspace_details
+def test_copy_workspace(enhanced_zoho_analytics_client:EnhancedZohoAnalyticsClient):
+    org_metadata = enhanced_zoho_analytics_client.get_orgs_metadata_api_v2()
+    origin_orgid = org_metadata["data"]["orgs"][0]["orgId"]
+    dest_orgid = origin_orgid
+    workspaces_metadata = enhanced_zoho_analytics_client.get_all_workspaces_metadata_api_v2()
+    source_workspace_name = "DearTest"
+    for workspace in workspaces_metadata["data"]["ownedWorkspaces"]:
+        if workspace["workspaceName"] == source_workspace_name:
+            workspace_id = workspace["workspaceId"]
+            break
+    else:
+        raise "workspace not found"
+    workspace_secret_key_result = enhanced_zoho_analytics_client.get_workspace_secretkey_api_v2(workspace_id=workspace_id,org_id=origin_orgid)
+    workspace_secret_key = workspace_secret_key_result["data"]["workspaceKey"]
+    r = enhanced_zoho_analytics_client.copy_workspace_api_v2(new_workspace_name="NewWorkspace",
+                                                             workspace_id=workspace_id,
+                                                             copy_with_data=True,
+                                                             dest_org_id=dest_orgid,
+                                                             source_org_id=origin_orgid,
+                                                             workspace_key=workspace_secret_key)
 
 
 @pytest.mark.skip

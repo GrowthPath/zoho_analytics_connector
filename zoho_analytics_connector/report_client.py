@@ -124,9 +124,9 @@ class ReportClient:
             else:
                 raise ValueError("Error while getting OAuth token ", resp)
 
-    def getResp(self, url: str, httpMethod: str, payLoad,add_token=True):
+    def getResp(self, url: str, httpMethod: str, payLoad,add_token=True,extra_headers=None,**kwargs):
         """
-        Internal method.
+        Internal method. for GET, payLoad is params
         """
         requests_session = self.requests_session or requests_retry_session()
         if httpMethod.upper() == 'POST':
@@ -134,8 +134,10 @@ class ReportClient:
             if add_token and ReportClient.isOAuth and hasattr(self,'token'): #check for token because this can be called during __init__ and isOAuth could be true.
                 headers["Authorization"] = "Zoho-oauthtoken " + self.token
             headers['User-Agent'] = "ZohoAnalytics Python GrowthPath Library"
+            if extra_headers:
+                headers = {**headers, **extra_headers}
             try:
-                resp = requests_session.post(url, data=payLoad, headers=headers, timeout=self.request_timeout)
+                resp = requests_session.post(url, data=payLoad, headers=headers, timeout=self.request_timeout,**kwargs)
                 if 'invalid client' in resp.text:
                     raise requests.exceptions.RequestException("Invalid Client")
                 respObj = ResponseObj(resp)
@@ -143,10 +145,29 @@ class ReportClient:
                logger.exception(f"{e=}")
                raise e
             return respObj
-        else:
-            raise RuntimeError(f"Unexpected httpMethod in getResp, was expecting POST but got {httpMethod}")
+        elif httpMethod.upper() == 'GET':
+            headers = {}
+            if add_token and ReportClient.isOAuth and hasattr(self,
+                                                              'token'):  # check for token because this can be called during __init__ and isOAuth could be true.
+                headers["Authorization"] = "Zoho-oauthtoken " + self.token
+            headers['User-Agent'] = "ZohoAnalytics Python GrowthPath Library"
+            if extra_headers:
+                headers = {**headers, **extra_headers}
+            try:
+                resp = requests_session.get(url, params=payLoad, headers=headers, timeout=self.request_timeout,**kwargs)
+                if 'invalid client' in resp.text:
+                    raise requests.exceptions.RequestException("Invalid Client")
+                respObj = ResponseObj(resp)
+            except requests.exceptions.RequestException as e:
+                logger.exception(f"{e=}")
+                raise e
+            return respObj
 
-    def __sendRequest(self, url, httpMethod, payLoad, action, callBackData,retry_countdown:int=None):
+
+        else:
+            raise RuntimeError(f"Unexpected httpMethod in getResp, was expecting POST or GET but got {httpMethod}")
+
+    def __sendRequest(self, url, httpMethod, payLoad, action, callBackData=None,retry_countdown:int=None, extra_headers=None,**keywords):
         code = ""
         if not retry_countdown:
             retry_countdown = self.default_retries or 1
@@ -154,7 +175,7 @@ class ReportClient:
         while retry_countdown > 0:
             retry_countdown -= 1
             try:
-                respObj = self.getResp(url, httpMethod, payLoad)
+                respObj = self.getResp(url, httpMethod, payLoad, extra_headers=extra_headers,**keywords)
             except Exception as e:
                 logger.exception(f" getResp exception in __sendRequest, {retry_countdown}, {e}")  #connection error
                 if retry_countdown <= 0:
@@ -338,9 +359,14 @@ class ReportClient:
     def handleResponse(self, response, action, callBackData) -> Optional[
         Union[MutableMapping, 'ImportResult', 'ShareInfo', 'PlanInfo']]:
         """
-        Internal method. To be used by classes extending this.
+        Internal method. To be used by classes extending this. To phase in V2 api,
+        set action  to be None or "API_V2"
         """
-        if ("ADDROW" == action):
+        if not action or action == "API_V2":
+            resp = response.content
+            resp_json = json.loads(resp)
+            return resp_json
+        elif ("ADDROW" == action):
             resp = response.content
             dom = ReportClientHelper.getAsDOM(resp)
             try:
@@ -767,6 +793,44 @@ class ReportClient:
         payLoad = ReportClientHelper.getAsPayLoad([config], None, None)
         url = ReportClientHelper.addQueryParams(dbURI, self.token, "COPYDATABASE", "JSON")
         return self.__sendRequest(url, "POST", payLoad, "COPYDB", None)
+
+    def copy_workspace_api_v2(self, workspace_id, new_workspace_name, workspace_key, copy_with_data:bool,
+                      source_org_id,
+                      dest_org_id,
+                      copy_with_import_source:bool=False,
+
+                      ):
+        """
+       A v2 API functions
+        """
+        config_dict = {"newWorkspaceName":new_workspace_name,"newWorkspaceDesc":f"copy",
+                                                    "workspaceKey":workspace_key,
+                                                    "copyWithData":copy_with_data,
+                                                    "copyWithImportSource":copy_with_import_source}
+
+        config_data = "CONFIG=" + urllib.parse.quote_plus(json.dumps(config_dict))
+        url = self.getURI_v2() + f"workspaces/{workspace_id}"
+
+        extra_headers = {"ZANALYTICS-ORGID": source_org_id,"ZANALYTICS-DEST-ORGID": dest_org_id}
+        return self.__sendRequest(url, "POST",payLoad=None, params=config_data, action=None,extra_headers=extra_headers)
+
+    def get_orgs_metadata_api_v2(self):
+        url = self.getURI_v2() + f"orgs/"
+        return self.__sendRequest(url, "GET", payLoad=None, action=None)
+
+    def get_all_workspaces_metadata_api_v2(self):
+        url = self.getURI_v2() + f"workspaces/"
+        return self.__sendRequest(url, "GET", payLoad=None, action=None)
+
+    def get_workspace_secretkey_api_v2(self,workspace_id, org_id):
+        extra_headers = {"ZANALYTICS-ORGID": org_id, }
+        url = self.getURI_v2() + f"workspaces/{workspace_id}/secretkey"
+        return self.__sendRequest(url, "GET", payLoad=None, action=None, extra_headers=extra_headers)
+
+    def get_workspace_details_api_v2(self,workspace_id):
+        extra_headers = None
+        url = self.getURI_v2() + f"workspaces/{workspace_id}"
+        return self.__sendRequest(url, "GET", payLoad=None, action=None, extra_headers=extra_headers)
 
     def deleteDatabase(self, userURI, databaseName, config=None):
         """
@@ -1741,6 +1805,13 @@ class ReportClient:
 
         return url
 
+    def getURI_v2(self) -> str:
+        """
+        Returns the base URL for v2 api with trailing /
+        """
+        url = self.reportServerURL + "/restapi/v2/"
+
+        return url
     def splCharReplace(self, value):
         """
         Internal method for handling special charecters in tale or database name.

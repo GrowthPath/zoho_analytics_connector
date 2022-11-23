@@ -7,7 +7,7 @@ This is a version which is Python 3 ready, tested on Python 3.8 and 3.9 and in f
 A more convenient wrapper class is in enhanced_report_client. This is based on Zoho's ReportClient but provides some more convenient features.
 I use it mostly for uploading data, and creating and modifying tables.
 
-This library uses the Analytics V1 API.
+This library uses the Analytics V1 API and as of v.1.4 will phase in v2 API endpoints bit by bit
 
 Authentication
 ==============
@@ -100,12 +100,10 @@ The token URL is adapted for the server location. e.g. for Australia, post to ht
 Usage
 =====
 
-Zoho's full API is available through the ReportClient API. However, there are bugs in this code.
-Recent 2020 changes have fixed some of these bugs, but I have hardly any test cases; I only have test cases
-for a handful of the standard functions of ReportClient. So proceed carefully if you use them.
+Zoho's full API v1 is available through the ReportClient API. 
+Selectively, v2 API endpoints will be added to the ReportClient if they are useful. 
 
-They are probably worth looking at. For instance, ReportClient.exportData now actually does use the file object you pass.
-But perhaps due to its python2 heritage, it expects a binary file object.
+One example of this is get_metadata_api_v2()
 
 Note that for data import and export, my EnhancedReportClient has its own methods, and these are what I use in production so they are much better tested.
 
