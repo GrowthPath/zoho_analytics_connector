@@ -122,7 +122,8 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
         retry_count = 0
         retry_limit = retry_limit or self.default_retries
         impResult = None
-        import_content_demojized = emoji.demojize(import_content)
+        # import_content_demojized = emoji.demojize(import_content)
+        import_content_demojized = import_content #try without this, move data cleaning to the calling function
         database_name = database_name or self.default_databasename
         uri = self.getURI(dbOwnerName=self.login_email_id, dbName=database_name, tableOrReportName=table_name)
         # import_modes = APPEND / TRUNCATEADD / UPDATEADD
