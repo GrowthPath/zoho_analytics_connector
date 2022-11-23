@@ -9,9 +9,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 import csv
 import json
 import logging
-import sys
 import time
-import unicodedata
 from typing import MutableMapping, Optional, List
 
 import emoji
@@ -117,10 +115,7 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
                     matching_columns: Optional[str] = None,
                     database_name: Optional[str] = None,
                     retry_limit=None,
-                    date_format=None,
-                    nonprintable=(ord(c) for c in (chr(i) for i in range(sys.maxunicode)) if
-                                  unicodedata.category(c) == 'Cc')
-                    ) -> Optional[report_client.ImportResult]:
+                    date_format=None) -> Optional[report_client.ImportResult]:
         """ data is a csv-style string, newline separated. Matching columns is a comma separated string
         import_mode is one of TRUNCATEADD, APPEND, UPDATEADD
         """
@@ -128,12 +123,10 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
         retry_limit = retry_limit or self.default_retries
         impResult = None
         import_content_demojized = emoji.demojize(import_content)
-        import_content_cleansed = import_content_demojized.translate({character:None for character in nonprintable})
-
         database_name = database_name or self.default_databasename
         uri = self.getURI(dbOwnerName=self.login_email_id, dbName=database_name, tableOrReportName=table_name)
         # import_modes = APPEND / TRUNCATEADD / UPDATEADD
-        impResult = self.importData_v2(uri, import_mode=import_mode, import_content=import_content_cleansed,
+        impResult = self.importData_v2(uri, import_mode=import_mode, import_content=import_content_demojized,
                                        date_format=date_format,
                                        matching_columns=matching_columns, retry_countdown=retry_limit)
 
