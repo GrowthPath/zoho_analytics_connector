@@ -266,7 +266,7 @@ class ReportClient:
                         if retry_countdown < 0:
                             logger.error(
                             f"Zoho API Recoverable error (Another import is in progress) but exhausted retries")
-                            raise UnrecoverableRateLimitError(urlResp=respObj,zoho_error_code=code)
+                            raise UnrecoverableRateLimitError(urlResp=respObj,zoho_error_code=code, message="Zoho error: Another import is in progress")
                         else:
                             time.sleep(min(10 - retry_countdown, 1) * 10)
                             continue
