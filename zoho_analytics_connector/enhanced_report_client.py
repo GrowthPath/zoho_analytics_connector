@@ -150,7 +150,7 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
                               tableOrReportName=table_name)
             callback_data = self.exportDataUsingSQL_v2(tableOrReportURI=uri, format='CSV', sql=sql,
                                                        retry_countdown=retry_countdown)
-            returned_data = callback_data.getvalue().decode('utf-8').splitlines()
+            returned_data = callback_data.getvalue().decode('utf-8-sig').splitlines()
             if cache_object:
                 cache_object.set(sql, returned_data, cache_timeout_seconds)
 
