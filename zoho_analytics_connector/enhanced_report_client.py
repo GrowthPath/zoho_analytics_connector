@@ -151,6 +151,7 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
             callback_data = self.exportDataUsingSQL_v2(tableOrReportURI=uri, format='CSV', sql=sql,
                                                        retry_countdown=retry_countdown)
             returned_data = callback_data.getvalue().decode('utf-8-sig').splitlines()
+            print(f"debug: data_export_using_sql: {returned_data}")
             if cache_object:
                 cache_object.set(sql, returned_data, cache_timeout_seconds)
 
@@ -181,7 +182,10 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
         sql = f"select count(*) from {table_name} where {sql}"
         reader = self.data_export_using_sql(sql, table_name=table_name)
         result = list(reader)[0]
-        row_count = int(result['count(*)'])
+        try:
+            row_count = int(result['count(*)'])
+        except KeyError:
+            raise RuntimeError(f"Zoho returned unexpected data, did not found (count(8)) in the result: {result}")
         return row_count
 
     def rename_column(self, table_name, old_column_name, new_column_name, database_name: Optional[str] = None,
