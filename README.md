@@ -281,6 +281,9 @@ Changes
 
 next_version Test updates
 
+1.4.1 Something seems to changed with the UTF encoding returned by the export endpoint. Change decoding to use utf-8-sig 
+1.4.0 some adaptation towards new API from Zoho
+
 1.3.6 Documentation updates, test updates. Added a 'pre-delete function' to calculate how many rows should be deleted.
     deleteData returns an int not a string for the number of rows deleted.
 
