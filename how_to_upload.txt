@@ -5,3 +5,11 @@ python3 -m twine upload --skip-existing dist/*
 timatgca
 password is saved in password manager
 
+or with tokens:
+username is:
+__token__
+
+token include the pypi- prefix
+
+
+
