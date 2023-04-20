@@ -281,6 +281,7 @@ Changes
 
 next_version Test updates
 
+1.4.2 Added reporting_currency to enhanced_reporting_client
 1.4.1 Something seems to changed with the UTF encoding returned by the export endpoint. Change decoding to use utf-8-sig 
 1.4.0 some adaptation towards new API from Zoho
 
