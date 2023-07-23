@@ -26,7 +26,6 @@ logger.addHandler(ch)
 
 
 class EnhancedZohoAnalyticsClient(report_client.ReportClient):
-
     @staticmethod
     def process_table_meta_data(catalog, force_lowercase_column_names=False):
         """ catalog is a ZOHO_CATALOG_INFO dict. Call this from get_database_metadata for example
@@ -56,8 +55,8 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
 
     def __init__(self, login_email_id: str, token: str, default_databasename: str = None, clientId=None,
                  clientSecret=None, serverURL=None, reportServerURL=None, default_retries=None,
-                 reporting_currency:str=None,
-                 error_email_list: Optional[List[str]]=None):
+                 reporting_currency: str = None,
+                 error_email_list: Optional[List[str]] = None):
         """ error email list is not used by the client, but it is available for callers as a convenience"""
         self.login_email_id = login_email_id
         self.default_databasename = default_databasename
@@ -125,7 +124,7 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
         retry_limit = retry_limit or self.default_retries
         impResult = None
         # import_content_demojized = emoji.demojize(import_content)
-        import_content_demojized = import_content #try without this, move data cleaning to the calling function
+        import_content_demojized = import_content  # try without this, move data cleaning to the calling function
         database_name = database_name or self.default_databasename
         uri = self.getURI(dbOwnerName=self.login_email_id, dbName=database_name, tableOrReportName=table_name)
         # import_modes = APPEND / TRUNCATEADD / UPDATEADD
@@ -138,6 +137,7 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
     def data_export_using_sql(self, sql, table_name, database_name: str = None, cache_object=None,
                               cache_timeout_seconds=60, retry_countdown=5) -> csv.DictReader:
         """ returns a csv.DictReader after querying with the sql provided.
+        retry_countdown is the number of retries
         The Zoho API insists on a table or report name, but it doesn't seem to restrict the query
         The cache object has a get and set function like the django cache does: https://docs.djangoproject.com/en/3.1/topics/cache/
         The cache key is the sql query"""
