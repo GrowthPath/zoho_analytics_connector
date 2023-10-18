@@ -9,7 +9,7 @@ or with tokens:
 username is:
 __token__
 
-token include the pypi- prefix
+token includes the pypi- prefix
 
 
 
