@@ -211,8 +211,9 @@ class ReportClient:
                         else:
                             code = -1
                             logger.error(f"could not find error code in {respObj.response.text} ")
-                            time.sleep(min(10 - retry_countdown, 1) * 10)
-                            continue
+                            raise ServerError(urlResp=respObj, zoho_error_code=code)
+                            # time.sleep(min(10 - retry_countdown, 1) * 10)
+                            # continue
 
                     logger.debug(f"API returned a 400 result and an error code: {code} ")
                     if code in [6045, ]:
