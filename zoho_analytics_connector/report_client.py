@@ -242,6 +242,17 @@ class ReportClient:
                         logger.error(
                             f"7179 error, workspace reports no view present. Initialise with a dummy table {respObj.response.text}")
                         raise ServerError(urlResp=respObj, zoho_error_code=code)
+                    elif code in [7198, ]:
+                        logger.error(
+                            f"7198 error, table design changes still in progress {respObj.response.text}  there are {retry_countdown + 1} retries left")
+
+                        if retry_countdown < 0:
+                            logger.error(
+                                f"Zoho API Recoverable error (table maintenance ongoing), but exhausted retries")
+                            raise UnrecoverableRateLimitError(urlResp=respObj, zoho_error_code=code)
+                        else:
+                            time.sleep(min(10 - retry_countdown, 1) * 10)
+                            continue
                     elif code in [7232, ]:
                         logger.error(
                             f"7232 error,an invalid value has been provided according to the column's data type) {respObj.response.text=} ")
