@@ -12,9 +12,12 @@ import logging
 import time
 from typing import MutableMapping, Optional, List
 
+
 import emoji
 
 from . import report_client as report_client
+
+from .typed_dicts import SchemaMetadata
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -70,7 +73,7 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
         catalog_info = self.getDatabaseMetadata(requestURI=db_uri, metadata="ZOHO_CATALOG_INFO")
         return catalog_info
 
-    def get_table_metadata(self, database_name: str = None, force_lowercase_column_names=False) -> MutableMapping:
+    def get_table_metadata(self, database_name: str = None, force_lowercase_column_names=False) -> SchemaMetadata:
         database_name = database_name or self.default_databasename
         catalog_info = self.get_database_catalog(database_name=database_name)
         table_metadata = self.process_table_meta_data(catalog_info,
@@ -172,7 +175,7 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
         row_count = self.deleteData(tableURI=uri, criteria=sql, retry_countdown=retry_countdown)
         return row_count
 
-    def pre_delete_rows(self, table_name, sql, database_name: Optional[str] = None, retry_countdown=5):
+    def pre_delete_rows(self, table_name, sql, database_name: Optional[str] = None, retry_countdown=5)->int:
         """ uses the same sql input as delete_rows and counts what is present in the table. This is to check the nbr of rows deleted is correct.
         Zoho sometimes gets table corruption which means rows don't delete.
         When the operation is critical, you can use this function to check the nbr of rows deleted is correct.
