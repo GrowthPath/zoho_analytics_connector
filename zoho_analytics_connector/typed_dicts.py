@@ -17,19 +17,7 @@ class ColumnMetadata(TypedDict):
     remarks: str
     typeName: str
 
-
-class TableMetadata(TypedDict):
-    """
-    A TypedDict representing the metadata of a database table.
-
-    The keys are the column names and the values are the column's metadata.
-    """
-
-    # The [str, ColumnMetadata] indicates a dictionary with string keys, and columnMetadata values.
-    # This matches the way TypedDicts are used and ensures type checking during access.
-    # we use a dictionary to map column names to metadata.
-    __root__: dict[str, ColumnMetadata]
-
-
-class SchemaMetadata(TypedDict):
-    __root__: dict[str, TableMetadata]
+ColumnName = str
+TableName = str
+ZohoTableModel = dict[ColumnName, ColumnMetadata]
+ZohoSchemaModel =  dict[TableName, ZohoTableModel]

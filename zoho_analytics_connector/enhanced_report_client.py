@@ -17,7 +17,7 @@ import emoji
 
 from . import report_client as report_client
 
-from .typed_dicts import SchemaMetadata
+from .typed_dicts import ZohoSchemaModel
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -73,7 +73,7 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
         catalog_info = self.getDatabaseMetadata(requestURI=db_uri, metadata="ZOHO_CATALOG_INFO")
         return catalog_info
 
-    def get_table_metadata(self, database_name: str = None, force_lowercase_column_names=False) -> SchemaMetadata:
+    def get_table_metadata(self, database_name: str = None, force_lowercase_column_names=False) -> ZohoSchemaModel:
         database_name = database_name or self.default_databasename
         catalog_info = self.get_database_catalog(database_name=database_name)
         table_metadata = self.process_table_meta_data(catalog_info,
