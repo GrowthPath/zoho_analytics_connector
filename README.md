@@ -278,6 +278,8 @@ this is, the cache object needs to offer cache.set(...) and cache.get(...) as Dj
 
 Changes
 -------------
+1.4.8 Fixed up mistakes with typing, added a couple of new Zoho error codes to the error handling
+
 1.4.7 Added some type hints in enhanced_report_client
 
 1.4.3 Exponential backoff with jitter used for retry
