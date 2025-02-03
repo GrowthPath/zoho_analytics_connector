@@ -279,9 +279,13 @@ this is, the cache object needs to offer cache.set(...) and cache.get(...) as Dj
 Changes
 -------------
 1.4.7 Added some type hings in enhanced_report_client
+
 1.4.3 Exponential backoff with jitter used for retry
+
 1.4.2 Added reporting_currency to enhanced_reporting_client
-1.4.1 Something seems to changed with the UTF encoding returned by the export endpoint. Change decoding to use utf-8-sig 
+
+1.4.1 Something seems to changed with the UTF encoding returned by the export endpoint. Change decoding to use utf-8-sig
+
 1.4.0 some adaptation towards new API from Zoho
 
 1.3.6 Documentation updates, test updates. Added a 'pre-delete function' to calculate how many rows should be deleted.
