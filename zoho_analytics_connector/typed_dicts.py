@@ -11,10 +11,12 @@ DataTypeName = Literal[
     "Currency",
     "Percentage",
     "Date",
-    "Decision Box",
+    "Yes/No Decision",
     "URL",
     "Auto Number"
 ]
+
+
 
 # these are the values when adding a column
 DataTypeAddColumn = Literal[
@@ -31,7 +33,6 @@ DataTypeAddColumn = Literal[
     "URL",
     "AUTO_NUMBER"
 ]
-
 
 class ColumnMetadata(TypedDict):
     """
