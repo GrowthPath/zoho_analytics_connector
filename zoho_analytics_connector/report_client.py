@@ -19,7 +19,7 @@ from typing import MutableMapping, Optional, Union
 import requests
 from requests.adapters import HTTPAdapter, Retry
 
-from zoho_analytics_connector.typed_dicts import Catalog
+from zoho_analytics_connector.typed_dicts import Catalog, DataTypeAddColumn
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -1114,7 +1114,7 @@ class ReportClient:
         url += "&ZOHO_COPY_DB_KEY=" + urllib.parse.quote(dbKey)
         return self.__sendRequest(url, "POST", payLoad, "COPYREPORTS", None)
 
-    def addColumn(self, tableURI, columnName, dataType, config=None):
+    def addColumn(self, tableURI, columnName, dataType:DataTypeAddColumn, config=None):
         """
         Adds a column into Zoho Reports Table.
         @param tableURI: The URI of the table. See L{getURI<getURI>}.

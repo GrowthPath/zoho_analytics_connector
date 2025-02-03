@@ -16,6 +16,23 @@ DataTypeName = Literal[
     "Auto Number"
 ]
 
+# these are the values when adding a column
+DataTypeAddColumn = Literal[
+    "PLAIN",
+    "MULTI_LINE",
+    "EMAIL",
+    "NUMBER",
+    "POSITIVE_NUMBER",
+    "DECIMAL_NUMBER",
+    "CURRENCY",
+    "PERCENT",
+    "DATE",
+    "BOOLEAN",
+    "URL",
+    "AUTO_NUMBER"
+]
+
+
 class ColumnMetadata(TypedDict):
     """
     A TypedDict representing the metadata of a database column.
