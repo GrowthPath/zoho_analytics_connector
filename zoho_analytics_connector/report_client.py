@@ -248,6 +248,10 @@ class ReportClient:
                         logger.error(
                             f"7179 error, workspace reports no view present. Initialise with a dummy table {respObj.response.text}")
                         raise ServerError(urlResp=respObj, zoho_error_code=code)
+                    elif code in [7184, ]:
+                        logger.error(
+                            f"7184 error, cyclic lookup detected {respObj.response.text}")
+                        raise ServerError(urlResp=respObj, zoho_error_code=code)
                     elif code in [7198, ]:
                         logger.error(
                             f"7198 error, table design changes still in progress {respObj.response.text}  there are {retry_countdown + 1} retries left")
