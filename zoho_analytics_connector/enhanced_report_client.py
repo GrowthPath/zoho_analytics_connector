@@ -30,12 +30,12 @@ logger.addHandler(ch)
 
 class EnhancedZohoAnalyticsClient(report_client.ReportClient):
     @staticmethod
-    def process_table_meta_data(catalog, force_lowercase_column_names=False):
+    def process_table_meta_data(catalog, force_lowercase_column_names=False)->ZohoSchemaModel:
         """ catalog is a ZOHO_CATALOG_INFO dict. Call this from get_database_metadata for example
          Return a dict keyed by tablename, each item being a dict keyed by column name, with the item being the
          catalog info for the col
          So all the table names can be found as table_data.keys()
-         for for a given table name, the column names are table_data['table1'].keys()
+         for a given table name, the column names are table_data['table1'].keys()
          and to find the column meta data such as dataType:
          data['table1']['col1']['typeName']
          Zoho gives each type an integer coding ['dataType'], a descriptive datatype name ['typeName'],
@@ -74,6 +74,7 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
         return catalog_info
 
     def get_table_metadata(self, database_name: str = None, force_lowercase_column_names=False) -> ZohoSchemaModel:
+        """ a badly named function, which returns the metadata for all tables, not just one"""
         database_name = database_name or self.default_databasename
         catalog_info = self.get_database_catalog(database_name=database_name)
         table_metadata = self.process_table_meta_data(catalog_info,

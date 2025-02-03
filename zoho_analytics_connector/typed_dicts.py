@@ -1,4 +1,19 @@
-from typing import TypedDict, Optional
+from typing import TypedDict, Optional, Literal
+
+DataType = Literal[
+    "PLAIN",
+    "MULTI_LINE",
+    "EMAIL",
+    "NUMBER",
+    "POSITIVE_NUMBER",
+    "DECIMAL_NUMBER",
+    "CURRENCY",
+    "PERCENT",
+    "DATE",
+    "BOOLEAN",
+    "URL",
+    "AUTO_NUMBER"
+]
 
 class ColumnMetadata(TypedDict):
     """
@@ -7,7 +22,7 @@ class ColumnMetadata(TypedDict):
     columnFormula: Optional[str]
     columnName: str
     columnSize: int
-    dataType: str
+    dataType: DataType
     dateFormat: Optional[str]
     decimalDigits: int
     nullable: bool
