@@ -17,7 +17,7 @@ import emoji
 
 from . import report_client as report_client
 
-from .typed_dicts import ZohoSchemaModel
+from .typed_dicts import ZohoSchemaModel, TableView, Catalog
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -68,7 +68,7 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
         super().__init__(token=token, clientId=clientId, clientSecret=clientSecret, serverURL=serverURL,
                          reportServerURL=reportServerURL, default_retries=default_retries)
 
-    def get_database_catalog(self, database_name: str = None) -> MutableMapping:
+    def get_database_catalog(self, database_name: str = None) -> Catalog:
         db_uri = self.getDBURI(self.login_email_id, database_name or self.default_databasename)
         catalog_info = self.getDatabaseMetadata(requestURI=db_uri, metadata="ZOHO_CATALOG_INFO")
         return catalog_info

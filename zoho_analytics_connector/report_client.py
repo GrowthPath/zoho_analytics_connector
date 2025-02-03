@@ -19,6 +19,8 @@ from typing import MutableMapping, Optional, Union
 import requests
 from requests.adapters import HTTPAdapter, Retry
 
+from zoho_analytics_connector.typed_dicts import Catalog
+
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 ch = logging.StreamHandler()
@@ -237,6 +239,10 @@ class ReportClient:
                     elif code in [7103, ]:
                         logger.error(
                             f"7103 error, workspace not found (check authentication) {respObj.response.text}")
+                        raise ServerError(urlResp=respObj, zoho_error_code=code)
+                    elif code in [7107, ]:
+                        logger.error(
+                            f"7107 error, column does not exist:  {respObj.response.text}")
                         raise ServerError(urlResp=respObj, zoho_error_code=code)
                     elif code in [7179, ]:
                         logger.error(
@@ -1277,7 +1283,7 @@ class ReportClient:
             url += "&ZOHO_DATABASE_DESC=" + urllib.parse.quote(dbDesc)
         self.__sendRequest(url, "POST", payLoad, "CREATEBLANKDB", None)
 
-    def getDatabaseMetadata(self, requestURI, metadata, config=None) -> MutableMapping:
+    def getDatabaseMetadata(self, requestURI, metadata, config=None) -> Catalog:
         """
         This method is used to get the meta information about the reports.
         @param requestURI: The URI of the database or table.

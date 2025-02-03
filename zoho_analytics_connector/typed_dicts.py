@@ -1,18 +1,19 @@
 from typing import TypedDict, Optional, Literal
 
-DataType = Literal[
-    "PLAIN",
-    "MULTI_LINE",
-    "EMAIL",
-    "NUMBER",
-    "POSITIVE_NUMBER",
-    "DECIMAL_NUMBER",
-    "CURRENCY",
-    "PERCENT",
-    "DATE",
-    "BOOLEAN",
+DataTypeCode = str
+DataTypeName = Literal[
+    "Plain Text",
+    "Multi Line Text",
+    "E-mail",
+    "Number",
+    "Positive Number",
+    "Decimal Number",
+    "Currency",
+    "Percentage",
+    "Date",
+    "Decision Box",
     "URL",
-    "AUTO_NUMBER"
+    "Auto Number"
 ]
 
 class ColumnMetadata(TypedDict):
@@ -22,7 +23,7 @@ class ColumnMetadata(TypedDict):
     columnFormula: Optional[str]
     columnName: str
     columnSize: int
-    dataType: DataType
+    dataType: DataTypeCode
     dateFormat: Optional[str]
     decimalDigits: int
     nullable: bool
@@ -30,7 +31,18 @@ class ColumnMetadata(TypedDict):
     pkcolumnName: Optional[str]
     pktableName: Optional[str]
     remarks: str
-    typeName: str
+    typeName: DataTypeName
+
+class TableView(TypedDict):
+    columns: list[ColumnMetadata]
+    isfav: bool
+    remarks: Optional[str]
+    tableName: str
+    tableType: str
+
+class Catalog(TypedDict):
+    tableCat: str
+    views: list[TableView]
 
 ColumnName = str
 TableName = str
