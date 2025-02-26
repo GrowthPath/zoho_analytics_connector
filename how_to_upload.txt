@@ -11,7 +11,7 @@ username is:
 __token__
 
 token includes the pypi- prefix
-It is very long and ends in 7Q
+It is very long and ends in vt7Q
 
 
 

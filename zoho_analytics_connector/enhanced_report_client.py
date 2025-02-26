@@ -56,7 +56,7 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
 
         return table_data
 
-    def __init__(self, login_email_id: str, token: str, default_databasename: str = None, clientId=None,
+    def __init__(self, login_email_id: str, refresh_token: str, default_databasename: str = None, clientId=None,
                  clientSecret=None, serverURL=None, reportServerURL=None, default_retries=None,
                  reporting_currency: str = None,
                  error_email_list: Optional[List[str]] = None):
@@ -65,7 +65,7 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
         self.default_databasename = default_databasename
         self.error_email_list = error_email_list or [login_email_id]
         self.reporting_currency = reporting_currency
-        super().__init__(token=token, clientId=clientId, clientSecret=clientSecret, serverURL=serverURL,
+        super().__init__(refresh_token=refresh_token, clientId=clientId, clientSecret=clientSecret, serverURL=serverURL,
                          reportServerURL=reportServerURL, default_retries=default_retries)
 
     def get_database_catalog(self, database_name: str = None) -> Catalog:

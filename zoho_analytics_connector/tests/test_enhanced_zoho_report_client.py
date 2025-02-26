@@ -8,14 +8,18 @@ import requests.exceptions
 from zoho_analytics_connector.enhanced_report_client import EnhancedZohoAnalyticsClient
 from zoho_analytics_connector.report_client import ReportClient, ServerError
 
+try:
+    from zoho_analytics_connector.private import config_growthpath_test
+except ModuleNotFoundError:
+    from zoho_analytics_connector.private import config_example
 
 class Config:
     LOGINEMAILID = os.getenv("ZOHOANALYTICS_LOGINEMAIL")
     REFRESHTOKEN = os.getenv("ZOHOANALYTICS_REFRESHTOKEN")
-    AUTHTOKEN = os.getenv("ZOHOANALYTICS_AUTHTOKEN")
     CLIENTID = os.getenv("ZOHOANALYTICS_CLIENTID")
     CLIENTSECRET = os.getenv("ZOHOANALYTICS_CLIENTSECRET")
     DATABASENAME = os.getenv("ZOHOANALYTICS_DATABASENAME")
+    # these below are not in private module
     SERVER_URL = os.getenv("ZOHO_SERVER_URL")
     REPORT_SERVER_URL = os.getenv("ZOHO_REPORTS_SERVER_URL")
     TABLENAME = "Sales"
@@ -29,7 +33,7 @@ def get_report_client() -> ReportClient:
     if Config.REFRESHTOKEN == "":
         raise RuntimeError(Exception, "Please configure REFRESHTOKEN in Config class")
     rc = ReportClient(
-        token=Config.REFRESHTOKEN,
+        refresh_token=Config.REFRESHTOKEN,
         clientId=Config.CLIENTID,
         clientSecret=Config.CLIENTSECRET,
     )
@@ -44,7 +48,7 @@ def enhanced_zoho_analytics_client(zoho_email=None) -> EnhancedZohoAnalyticsClie
     assert (not TEST_OAUTH and Config.AUTHTOKEN) or (TEST_OAUTH and Config.REFRESHTOKEN)
     rc = EnhancedZohoAnalyticsClient(
         login_email_id=zoho_email or Config.LOGINEMAILID,
-        token=Config.REFRESHTOKEN if TEST_OAUTH else Config.AUTHTOKEN,
+        refresh_token=Config.REFRESHTOKEN if TEST_OAUTH else Config.AUTHTOKEN,
         clientSecret=Config.CLIENTSECRET if TEST_OAUTH else None,
         clientId=Config.CLIENTID if TEST_OAUTH else None,
         default_databasename=Config.DATABASENAME,
@@ -58,7 +62,7 @@ def get_enhanced_zoho_analytics_client(zoho_email=None, retries=3) -> EnhancedZo
     assert (not TEST_OAUTH and Config.AUTHTOKEN) or (TEST_OAUTH and Config.REFRESHTOKEN)
     rc = EnhancedZohoAnalyticsClient(
         login_email_id=zoho_email or Config.LOGINEMAILID,
-        token=Config.REFRESHTOKEN if TEST_OAUTH else Config.AUTHTOKEN,
+        refresh_token=Config.REFRESHTOKEN if TEST_OAUTH else Config.AUTHTOKEN,
         clientSecret=Config.CLIENTSECRET if TEST_OAUTH else None,
         clientId=Config.CLIENTID if TEST_OAUTH else None,
         default_databasename=Config.DATABASENAME,
