@@ -176,14 +176,23 @@ def test_copy_workspace(enhanced_zoho_analytics_client:EnhancedZohoAnalyticsClie
             break
     else:
         raise "workspace not found"
+
+    # delete the new destination workspace in case it already exists
+    new_workspace_name = "NewWorkspace"
+    new_workspace = next((w for w in workspaces_metadata["data"]["ownedWorkspaces"] if w["workspaceName"] == new_workspace_name), None)
+    if new_workspace:
+        r = enhanced_zoho_analytics_client.delete_workspace_api_v2(workspace_id=new_workspace["workspaceId"],org_id=origin_orgid)
+
     workspace_secret_key_result = enhanced_zoho_analytics_client.get_workspace_secretkey_api_v2(workspace_id=workspace_id,org_id=origin_orgid)
     workspace_secret_key = workspace_secret_key_result["data"]["workspaceKey"]
-    r = enhanced_zoho_analytics_client.copy_workspace_api_v2(new_workspace_name="NewWorkspace",
+    r = enhanced_zoho_analytics_client.copy_workspace_api_v2(new_workspace_name=new_workspace_name,
                                                              workspace_id=workspace_id,
-                                                             copy_with_data=True,
+                                                             copy_with_data=False,   # to make it faster
                                                              dest_org_id=dest_orgid,
                                                              source_org_id=origin_orgid,
                                                              workspace_key=workspace_secret_key)
+
+
 
 
 @pytest.mark.skip

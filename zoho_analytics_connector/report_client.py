@@ -5,12 +5,13 @@ This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at https://mozilla.org/MPL/2.0/.
 """
-import json
 import io
+import json
+import logging
+import os
 import random
 import re
 import time
-import logging
 import urllib
 import urllib.parse
 import xml.dom.minidom
@@ -22,10 +23,6 @@ from requests.adapters import HTTPAdapter, Retry
 from zoho_analytics_connector.typed_dicts import Catalog, DataTypeAddColumn
 
 logger = logging.getLogger(__name__)
-# logger.setLevel(logging.DEBUG)
-# ch = logging.StreamHandler()
-# ch.setLevel(logging.DEBUG)
-# logger.addHandler(ch)
 
 
 def requests_retry_session(
@@ -54,28 +51,16 @@ class ReportClient:
      @note: Authentication via authtoken is deprecated, use OAuth. kindly send parameter as ReportClient(token,clientId,clientSecret).
      """
 
+    # Define a default file name for token persistence.
+    token_file = "access_token.json"
+
     isOAuth = False
     request_timeout = 60
 
-    # clientId = None
-    # clientSecret = None
-    # refresh_or_access_token = None
-    # token_timestamp = time.time()
-
-    def __init__(self, refresh_token, clientId=None, clientSecret=None, serverURL=None, reportServerURL=None,
-                 default_retries=0):
+    def __init__(self, refresh_token, clientId=None, clientSecret=None,
+                 serverURL=None, reportServerURL=None, default_retries=0):
         """
-        Creates a new C{ReportClient} instance.
-        @param token: User's authtoken or ( refresh token for OAUth).
-        @type token:string
-        @param clientId: User client id for OAUth
-        @type clientId:string
-        @param clientSecret: User client secret for OAuth
-        @type clientSecret:string
-        @param serverURL: Zoho server URL if .com default needs to be replaced
-        @type serverURL:string
-        @param reportServerURL:Zoho Analytics server URL if .com default needs to be replaced
-        @type reportServerURL:string
+        Initializes a ReportClient instance.
         """
         self.iamServerURL = serverURL or "https://accounts.zoho.com"
         self.reportServerURL = reportServerURL or "https://analyticsapi.zoho.com"
@@ -83,65 +68,118 @@ class ReportClient:
         self.clientId = clientId
         self.clientSecret = clientSecret
         self.refresh_token = refresh_token
-
-        self.token_timestamp = time.time()  # this is a safe default
+        self.token_timestamp = time.time()  # use current time as a safe default
         self.default_retries = default_retries
-        if (clientId == None and clientSecret == None):  # not using OAuth2
+
+        if clientId is None and clientSecret is None:
+            # not using OAuth2, so use the refresh_token as the access token
             self.__access_token = refresh_token
         else:
-            self.getOAuthToken()  # this sets the instance variable
+            # Try to load an existing persisted token
+            self.__access_token = self.load_token()
             ReportClient.isOAuth = True
-        self.request_timeout = 60
 
     @property
     def access_token(self):
-        if ReportClient.isOAuth and time.time() - self.token_timestamp > 50 * 60:
-            logger.debug("Refreshing zoho analytics oauth token")
-            access_token = self.getOAuthToken()
-            self.__access_token = access_token
+        """
+        Returns a valid access token. If the current token is expired or None, it will refresh it.
+        """
+        # Consider token expired if more than 50 minutes old or never set.
+        if ReportClient.isOAuth and (time.time() - self.token_timestamp > 50 * 60 or self.__access_token is None):
+            logger.debug("Refreshing Zoho Analytics OAuth token")
+            new_token = self.getOAuthToken()
+            self.__access_token = new_token
             self.token_timestamp = time.time()
+            # Persist the new token using the default (or overridden) implementation.
+            self.persist_token(new_token)
         return self.__access_token
 
     @access_token.setter
     def access_token(self, token):
         self.__access_token = token
         self.token_timestamp = time.time()
+        # Persist the token whenever it is updated.
+        self.persist_token(token)
 
-    def getOAuthToken(self)->str:
+    def persist_token(self, token: str):
         """
-        Internal method for getting OAuth token. returns access token
+        Default implementation of token persistence.
+        Saves the access token and token timestamp as JSON to a local file.
+        Subclasses may override this method to provide a different persistence mechanism.
         """
-        dict = {}
-        dict["client_id"] = self.clientId
-        dict["client_secret"] = self.clientSecret
-        dict["refresh_token"] = self.refresh_token
-        dict["grant_type"] = "refresh_token"
-        # dict = urllib.parse.urlencode(dict)  we should pass a dict, not a string
+        data = {
+            "access_token": token,
+            "token_timestamp": self.token_timestamp
+        }
+        try:
+            with open(self.token_file, "w") as out_file:
+                json.dump(data, out_file)
+            logger.debug("Access token persisted to %s", self.token_file)
+        except Exception as e:
+            logger.error("Error persisting the token: %s", e)
+
+    def load_token(self) -> str:
+        """
+        Default implementation of token loading.
+        Loads the access token and token timestamp from a local JSON file.
+        Subclasses may override this method to provide a different persistence mechanism.
+        Returns:
+            The access token if found; otherwise, returns None.
+        """
+        if os.path.exists(self.token_file):
+            try:
+                with open(self.token_file, "r") as in_file:
+                    data = json.load(in_file)
+                    self.token_timestamp = data.get("token_timestamp", time.time())
+                    logger.debug("Access token loaded from %s", self.token_file)
+                    return data.get("access_token")
+            except Exception as e:
+                logger.error("Error loading the token: %s", e)
+        return None
+
+    def getOAuthToken(self) -> str:
+        """
+        Internal method for fetching a new OAuth token.
+        Should only be invoked when needed.
+        Returns:
+            The new access token as a string.
+        Raises:
+            ServerError: If the request to refresh the token fails.
+            ValueError: If the access token cannot be extracted from the response.
+        """
+        auth_dict = {
+            "client_id": self.clientId,
+            "client_secret": self.clientSecret,
+            "refresh_token": self.refresh_token,
+            "grant_type": "refresh_token"
+        }
         accUrl = self.iamServerURL + "/oauth/v2/token"
-        respObj = self.getResp(accUrl, "POST", dict, add_token=False)
-        if (respObj.status_code != 200):
+        respObj = self.getResp(accUrl, "POST", auth_dict, add_token=False)
+        if respObj.status_code != 200:
             raise ServerError(respObj)
-        else:
-            resp = respObj.response.json()
-            if ("access_token" in resp):
-                self.__access_token = resp['access_token']
-                return resp["access_token"]
-            else:
-                raise ValueError("Error while getting OAuth access token ", resp)
+        resp = respObj.response.json()  # assuming respObj.response supports .json()
+        if "access_token" in resp:
+            self.__access_token = resp["access_token"]
+            return resp["access_token"]
+        raise ValueError("Error while getting OAuth access token", resp)
 
     def getResp(self, url: str, httpMethod: str, payLoad, add_token=True, extra_headers=None, **kwargs):
         """
-        Internal method. for GET, payLoad is params
+        Internal method. For GET, payLoad is params; for POST, it's data; for DELETE, it may be data or params.
         """
         requests_session = self.requests_session or requests_retry_session()
+
+        # Build common headers
+        headers = {}
+        if add_token and ReportClient.isOAuth and hasattr(self, 'access_token'):
+            headers["Authorization"] = "Zoho-oauthtoken " + self.access_token
+        headers['User-Agent'] = "ZohoAnalytics Python GrowthPath Library"
+
+        if extra_headers:
+            headers = {**headers, **extra_headers}
+
+        # Process based on HTTP method
         if httpMethod.upper() == 'POST':
-            headers = {}
-            if add_token and ReportClient.isOAuth and hasattr(self,
-                                                              'access_token'):  # check for token because this can be called during __init__ and isOAuth could be true.
-                headers["Authorization"] = "Zoho-oauthtoken " + self.access_token
-            headers['User-Agent'] = "ZohoAnalytics Python GrowthPath Library"
-            if extra_headers:
-                headers = {**headers, **extra_headers}
             try:
                 resp = requests_session.post(url, data=payLoad, headers=headers, timeout=self.request_timeout, **kwargs)
                 if 'invalid client' in resp.text:
@@ -151,14 +189,8 @@ class ReportClient:
                 logger.exception(f"{e=}")
                 raise e
             return respObj
+
         elif httpMethod.upper() == 'GET':
-            headers = {}
-            if add_token and ReportClient.isOAuth and hasattr(self,
-                                                              'access_token'):  # check for token because this can be called during __init__ and isOAuth could be true.
-                headers["Authorization"] = "Zoho-oauthtoken " + self.access_token
-            headers['User-Agent'] = "ZohoAnalytics Python GrowthPath Library"
-            if extra_headers:
-                headers = {**headers, **extra_headers}
             try:
                 resp = requests_session.get(url, params=payLoad, headers=headers, timeout=self.request_timeout,
                                             **kwargs)
@@ -170,9 +202,22 @@ class ReportClient:
                 raise e
             return respObj
 
+        elif httpMethod.upper() == 'DELETE':
+            try:
+                # Depending on the API, a DELETE request might accept data or params.
+                # Here we assume payLoad can be sent as either 'data' or 'params'. Adjust as required.
+                resp = requests_session.delete(url, data=payLoad, headers=headers, timeout=self.request_timeout,
+                                               **kwargs)
+                if 'invalid client' in resp.text:
+                    raise requests.exceptions.RequestException("Invalid Client")
+                respObj = ResponseObj(resp)
+            except requests.exceptions.RequestException as e:
+                logger.exception(f"{e=}")
+                raise e
+            return respObj
 
         else:
-            raise RuntimeError(f"Unexpected httpMethod in getResp, was expecting POST or GET but got {httpMethod}")
+            raise RuntimeError(f"Unexpected httpMethod in getResp, expected POST, GET, or DELETE but got {httpMethod}")
 
     def __sendRequest(self, url, httpMethod, payLoad, action, callBackData=None, retry_countdown: int = None,
                       extra_headers=None, **keywords):
@@ -196,6 +241,8 @@ class ReportClient:
                     continue
 
             if (respObj.status_code in [200, ]):
+                return self.handleResponse(respObj, action, callBackData)
+            elif (respObj.status_code in [204, ]):  # successful but nothing to return
                 return self.handleResponse(respObj, action, callBackData)
             elif (respObj.status_code in [400, ]):
                 # 400 errors may be an API limit error, which are handled by the result parsing
@@ -409,7 +456,7 @@ class ReportClient:
         """
         if not action or action == "API_V2":
             resp = response.content
-            resp_json = json.loads(resp)
+            resp_json = json.loads(resp) if resp else {}  # 204 responses are empty
             return resp_json
         elif ("ADDROW" == action):
             resp = response.content
@@ -891,8 +938,14 @@ class ReportClient:
         url = self.getURI_v2() + f"workspaces/{workspace_id}"
         return self.__sendRequest(url, "GET", payLoad=None, action=None, extra_headers=extra_headers)
 
+    def delete_workspace_api_v2(self, workspace_id:str, org_id:str):
+        extra_headers = {"ZANALYTICS-ORGID": org_id }
+        url = self.getURI_v2() + f"workspaces/{workspace_id}"
+        return self.__sendRequest(url, "DELETE", payLoad=None, action=None, extra_headers=extra_headers)
+
     def deleteDatabase(self, userURI, databaseName, config=None):
         """
+        delete_workspace_api_v2 makes this redundant
         Delete the specified database.
         @param userURI: The URI of the user. See L{getUserURI<getUserURI>}.
         @type userURI:string
@@ -1119,7 +1172,7 @@ class ReportClient:
         url += "&ZOHO_COPY_DB_KEY=" + urllib.parse.quote(dbKey)
         return self.__sendRequest(url, "POST", payLoad, "COPYREPORTS", None)
 
-    def addColumn(self, tableURI, columnName, dataType:DataTypeAddColumn, config=None):
+    def addColumn(self, tableURI, columnName, dataType: DataTypeAddColumn, config=None):
         """
         Adds a column into Zoho Reports Table.
         @param tableURI: The URI of the table. See L{getURI<getURI>}.
