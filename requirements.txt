@@ -1,5 +1,4 @@
 #source ~/Envs/dear_xero_import/bin/activate
-sphinx
 pytest
 wheel
 twine

@@ -1,10 +1,7 @@
 from setuptools import setup
-from sphinx.setup_command import BuildDoc
 from os import path
-cmdclass = {'build_sphinx': BuildDoc}
 
 # https://pypi.org/classifiers/
-
 name = 'zoho_analytics_connector'
 keywords = 'zoho analytics'
 version = '1.5.0'
@@ -18,9 +15,9 @@ setup(
     version=version,
     packages=['zoho_analytics_connector'],
     python_requires='>=3.9',
-    install_requires=['requests','emoji'],
-    setup_requires=['pytest-runner', 'wheel', 'sphinx'],
-    tests_require=["pytest", ],
+    install_requires=['requests', 'emoji'],
+    setup_requires=['pytest-runner', 'wheel'],  # Removed sphinx from setup_requires
+    tests_require=["pytest"],
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'License :: OSI Approved :: MIT License',
@@ -37,13 +34,4 @@ setup(
     description='Zoho Analytics connector',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    cmdclass=cmdclass,
-    # these are optional and override conf.py settings
-    command_options={
-        'build_sphinx': {
-            'project': ('setup.py', name),
-            'version': ('setup.py', version),
-            'release': ('setup.py', version),
-            'source_dir': ('setup.py', 'docs')}},
-
 )

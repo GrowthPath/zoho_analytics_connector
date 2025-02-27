@@ -278,6 +278,8 @@ this is, the cache object needs to offer cache.set(...) and cache.get(...) as Dj
 
 Changes
 -------------
+1.5.1 setup.py fixes
+
 1.5.0 Variable name refactoring to make token use more clear. Also moved testing set-up into a module for more convenience. Reduced amount of access token refreshes.
 Adds a default implementation of access token persistence to ReportClass; it saves as json to a text file, these methods are designed to be replaced in a subclass. It saves the access token and timestamp.
 Added the v2 API endpoint delete workspace.
