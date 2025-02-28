@@ -423,7 +423,7 @@ class ReportClient:
                 continue
         # fell off while loop
         raise RuntimeError(
-            f"After starting with {init_retry_countdown} retries allowed, there are now no more retries left in __sendRequest.  ")
+            f"After starting with {init_retry_countdown} retries allowed, there are now no more retries left in __sendRequest. {url=}, {httpMethod=}, {payLoad=}, {action=} ")
 
     def invalidOAUTH(self, respObj):
         """
