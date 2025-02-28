@@ -244,7 +244,7 @@ class ReportClient:
                 return self.handleResponse(respObj, action, callBackData)
             elif (respObj.status_code in [204, ]):  # successful but nothing to return
                 return self.handleResponse(respObj, action, callBackData)
-            elif (respObj.status_code in [400, ]):
+            elif (respObj.status_code in [400,403 ]):
                 # 400 errors may be an API limit error, which are handled by the result parsing
                 try:
                     try:
@@ -318,6 +318,10 @@ class ReportClient:
                     elif code in [7280, ]:
                         logger.error(
                             f"7280 error, relating to schema errors, return immediately {respObj.response.text}")
+                        raise ServerError(urlResp=respObj, zoho_error_code=code)
+                    elif code in [7301, ]:
+                        logger.error(
+                            f"7301 error, relating to permission errors, return immediately {respObj.response.text}")
                         raise ServerError(urlResp=respObj, zoho_error_code=code)
                     elif code in [7389, ]:
                         logger.error(f"7389 Error from zoho Organisation does not exist {respObj.response.text}")
