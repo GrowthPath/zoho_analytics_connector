@@ -17,7 +17,6 @@ import urllib.parse
 import xml.dom.minidom
 from typing import MutableMapping, Optional, Union, TypedDict
 
-
 import requests
 from requests.adapters import HTTPAdapter, Retry
 
@@ -46,8 +45,6 @@ def requests_retry_session(
     return session
 
 
-
-
 # Represents a single workspace entry (owned or shared)
 class ZohoWorkspace(TypedDict):
     """TypedDict representing a single Zoho workspace's metadata."""
@@ -73,8 +70,6 @@ class ZohoWorkspacesResponse(TypedDict):
     data: ZohoWorkspaceData
     status: str  # Status indicator (e.g., "success")
     summary: str  # Summary message (e.g., "Get all workspaces")
-
-
 
 
 class ReportClient:
@@ -276,7 +271,7 @@ class ReportClient:
                 return self.handleResponse(respObj, action, callBackData)
             elif (respObj.status_code in [204, ]):  # successful but nothing to return
                 return self.handleResponse(respObj, action, callBackData)
-            elif (respObj.status_code in [400,403 ]):
+            elif (respObj.status_code in [400, 403]):
                 # 400 errors may be an API limit error, which are handled by the result parsing
                 try:
                     try:
@@ -960,15 +955,50 @@ class ReportClient:
         url = self.getURI_v2() + f"orgs/"
         return self.__sendRequest(url, "GET", payLoad=None, action=None)
 
-    def get_all_workspaces_metadata_api_v2(self)->ZohoWorkspacesResponse:
+    def get_all_workspaces_metadata_api_v2(self) -> ZohoWorkspacesResponse:
         url = self.getURI_v2() + f"workspaces/"
         return self.__sendRequest(url, "GET", payLoad=None, action=None)
 
-    def get_views_api_v2(self)->ZohoWorkspacesResponse:
-        url = self.getURI_v2() + f"views/"
+    def get_views_api_v2(self, org_id: str, workspace_id: str, view_types: list[int] = None) -> ZohoWorkspacesResponse:
+        """ViewType:
+        0 - Table
+        1 - Tabular View
+        2 - AnalysisView / Chart
+        3 - Pivot
+        4 - SummaryView
+        6 - QueryTable
+        7 - Dashboard"""
+        url = self.getURI_v2() + f"workspaces/{workspace_id}/views/"
+        if view_types:
+            url += f"?viewTypes={','.join(map(str, view_types))}"
+        return self.__sendRequest(url, "GET", payLoad=None, action=None, extra_headers={"ZANALYTICS-ORGID": org_id})
+
+    def get_view_details_api_v2(self,view_id):
+        url = self.getURI_v2() + f"views/{view_id}"
+        config_dict = {"withInvolvedMetaInfo":True}
+        json_config = json.dumps(config_dict)
+        # URL-encode the JSON string
+        # quote_plus is generally preferred for query parameters as it encodes spaces as '+'
+        encoded_config = urllib.parse.quote_plus(json_config)
+        url += f"?CONFIG={encoded_config}"
+
         return self.__sendRequest(url, "GET", payLoad=None, action=None)
 
-    def get_workspace_secretkey_api_v2(self, workspace_id, org_id):
+
+    def get_meta_details_view_api_v2(self,org_id:str,workspace_name:str,view_name:str):
+        url = self.getURI_v2() + f"metadetails"
+        config_dict = {"workspaceName": workspace_name, "viewName": view_name}
+        # Convert the dictionary to a JSON string
+        json_config = json.dumps(config_dict)
+        # URL-encode the JSON string
+        # quote_plus is generally preferred for query parameters as it encodes spaces as '+'
+        encoded_config = urllib.parse.quote_plus(json_config)
+        url += f"?CONFIG={encoded_config}"
+        extra_headers = {"ZANALYTICS-ORGID": org_id, }
+        return self.__sendRequest(url, "GET", payLoad=None, action=None,extra_headers=extra_headers)
+
+
+    def get_workspace_secretkey_api_v2(self, workspace_id:str, org_id:str):
         extra_headers = {"ZANALYTICS-ORGID": org_id, }
         url = self.getURI_v2() + f"workspaces/{workspace_id}/secretkey"
         return self.__sendRequest(url, "GET", payLoad=None, action=None, extra_headers=extra_headers)
@@ -978,8 +1008,8 @@ class ReportClient:
         url = self.getURI_v2() + f"workspaces/{workspace_id}"
         return self.__sendRequest(url, "GET", payLoad=None, action=None, extra_headers=extra_headers)
 
-    def delete_workspace_api_v2(self, workspace_id:str, org_id:str):
-        extra_headers = {"ZANALYTICS-ORGID": org_id }
+    def delete_workspace_api_v2(self, workspace_id: str, org_id: str):
+        extra_headers = {"ZANALYTICS-ORGID": org_id}
         url = self.getURI_v2() + f"workspaces/{workspace_id}"
         return self.__sendRequest(url, "DELETE", payLoad=None, action=None, extra_headers=extra_headers)
 
@@ -1381,7 +1411,7 @@ class ReportClient:
             url += "&ZOHO_DATABASE_DESC=" + urllib.parse.quote(dbDesc)
         self.__sendRequest(url, "POST", payLoad, "CREATEBLANKDB", None)
 
-    def getDatabaseMetadata(self, requestURI, metadata, config=None) -> Catalog:
+    def getDatabaseMetadata(self, requestURI, metadata, config=None):
         """
         This method is used to get the meta information about the reports.
         @param requestURI: The URI of the database or table.

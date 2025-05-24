@@ -17,7 +17,7 @@ import emoji
 
 from . import report_client as report_client
 
-from .typed_dicts import ZohoSchemaModel, TableView, Catalog
+from .typed_dicts import ZohoSchemaModel, TableView, Catalog, ZohoSchemaModel_v2, TableView_v2
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -30,7 +30,7 @@ logger.addHandler(ch)
 
 class EnhancedZohoAnalyticsClient(report_client.ReportClient):
     @staticmethod
-    def process_table_meta_data(catalog, force_lowercase_column_names=False)->ZohoSchemaModel:
+    def process_table_meta_data(catalog:Catalog, force_lowercase_column_names=False)->ZohoSchemaModel:
         """ catalog is a ZOHO_CATALOG_INFO dict. Call this from get_database_metadata for example
          Return a dict keyed by tablename, each item being a dict keyed by column name, with the item being the
          catalog info for the col
@@ -56,6 +56,28 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
 
         return table_data
 
+    @staticmethod
+    def process_table_meta_data_v2(catalog:dict[str,TableView_v2], force_lowercase_column_names=False)->ZohoSchemaModel_v2:
+        """ catalog is a ZOHO_CATALOG_INFO dict. Call this from get_database_metadata for example
+         Return a dict keyed by tablename, each item being a dict keyed by column name, with the item being the
+         catalog info for the col
+         So all the table names can be found as table_data.keys()
+         for a given table name, the column names are table_data['table1'].keys()
+         and to find the column meta data such as dataType:
+         data['table1']['col1']['typeName']
+         Zoho gives each type an integer coding ['dataType'], a descriptive datatype name ['typeName'],
+         and some other meta data.
+
+         """
+        table_data_zoho_schema:ZohoSchemaModel_v2 = {}
+        for table_name,table in catalog.items():
+            if table['tableType'] == 'Table':
+                zoho_schema_model = {d["columnName"]:d for d in table['columns']}
+                table_data_zoho_schema[table_name] = zoho_schema_model
+
+        return table_data_zoho_schema
+
+
     def __init__(self, login_email_id: str, refresh_token: str, default_databasename: str = None, clientId=None,
                  clientSecret=None, serverURL=None, reportServerURL=None, default_retries=None,
                  reporting_currency: str = None,
@@ -80,6 +102,36 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
         table_metadata = self.process_table_meta_data(catalog_info,
                                                       force_lowercase_column_names=force_lowercase_column_names)
         return table_metadata
+
+    def get_table_metadata_v2(self, database_name: str = None, force_lowercase_column_names=False) -> ZohoSchemaModel_v2:
+        """ Use the v2 API to get table metadata but return it in a similar data structure as the v1 function"""
+        database_name = database_name or self.default_databasename
+        workspaces_metadata = self.get_all_workspaces_metadata_api_v2()
+
+        for workspace in workspaces_metadata["data"]["ownedWorkspaces"] + workspaces_metadata["data"][
+            "sharedWorkspaces"]:
+            if workspace["workspaceName"] == database_name:
+                workspace_id = workspace["workspaceId"]
+                org_id = workspace["orgId"]
+                break
+        else:
+            raise "workspace not found"
+
+        tables_data = self.get_views_api_v2(org_id=org_id, workspace_id=workspace_id,
+                                                                      view_types=[0])
+        table_catalog:dict[str,TableView_v2] = {}
+        table_views = []
+        for table in tables_data["data"]["views"]:
+            view_id = table["viewId"]
+            table_details = self.get_view_details_api_v2(view_id=view_id)
+            table = table_details["data"]["views"]
+            table_catalog[table["viewName"]] = TableView_v2(columns=table["columns"], tableName=table["viewName"],
+                                                            tableType=table["viewType"], viewID=table["viewId"])
+
+        table_metadata = self.process_table_meta_data_v2(catalog=table_catalog,
+                                                      force_lowercase_column_names=force_lowercase_column_names)
+        return table_metadata
+
 
     def create_table(self, table_design, database_name=None) -> MutableMapping:
         """

@@ -7,9 +7,10 @@ import requests.exceptions
 
 from zoho_analytics_connector.enhanced_report_client import EnhancedZohoAnalyticsClient
 from zoho_analytics_connector.report_client import ReportClient, ServerError
+from zoho_analytics_connector.typed_dicts import TableView, TableView_v2
 
 try:
-    from zoho_analytics_connector.private import config_growthpath_test
+    from zoho_analytics_connector.private import config
 except ModuleNotFoundError:
     from zoho_analytics_connector.private import config_example
 
@@ -21,7 +22,7 @@ class Config:
     DATABASENAME = os.getenv("ZOHOANALYTICS_DATABASENAME")
     # these below are not in private module
     SERVER_URL = os.getenv("ZOHO_SERVER_URL")
-    REPORT_SERVER_URL = os.getenv("ZOHO_REPORTS_SERVER_URL")
+    REPORT_SERVER_URL = os.getenv("ZOHO_REPORT_SERVER_URL")
     TABLENAME = "Sales"
 
 
@@ -144,11 +145,40 @@ def test_data_upload():
 
 
 def test_get_database_metadata(enhanced_zoho_analytics_client: EnhancedZohoAnalyticsClient):
+    """ this is the way of getting table metadata with the V1 API"""
     table_meta_data = enhanced_zoho_analytics_client.get_table_metadata()
     assert table_meta_data
+
+
+def test_get_database_metadata_v2(enhanced_zoho_analytics_client: EnhancedZohoAnalyticsClient):
+    """ this is the way of getting table metadata with the V1 API"""
+    table_meta_data_v2 = enhanced_zoho_analytics_client.get_table_metadata_v2()
+    assert table_meta_data_v2
+
 def test_get_v2_metadata(enhanced_zoho_analytics_client: EnhancedZohoAnalyticsClient):
     metadata = enhanced_zoho_analytics_client.get_orgs_metadata_api_v2()
     assert metadata
+
+def test_get_v2_table_model_data(enhanced_zoho_analytics_client: EnhancedZohoAnalyticsClient):
+    workspaces_metadata = enhanced_zoho_analytics_client.get_all_workspaces_metadata_api_v2()
+    source_workspace_name = "Cin7Omni"
+    for workspace in workspaces_metadata["data"]["ownedWorkspaces"]+ workspaces_metadata["data"]["sharedWorkspaces"]:
+        if workspace["workspaceName"] == source_workspace_name:
+            workspace_id = workspace["workspaceId"]
+            org_id = workspace["orgId"]
+            break
+    else:
+        raise "workspace not found"
+    table_catalog = {}
+    tables_data = enhanced_zoho_analytics_client.get_views_api_v2(org_id=org_id,workspace_id=workspace_id,view_types=[0])
+    for table in tables_data["data"]["views"]:
+        view_id = table["viewId"]
+        table_details = enhanced_zoho_analytics_client.get_view_details_api_v2(view_id=view_id)
+        table = table_details["data"]["views"]
+
+        table_catalog[table["viewName"]] = TableView_v2(columns=table["columns"],tableName=table["viewName"],tableType=table["viewType"],viewID=table["viewId"])
+    assert table_catalog
+
 
 def test_workspace_details(enhanced_zoho_analytics_client:EnhancedZohoAnalyticsClient):
     org_metadata = enhanced_zoho_analytics_client.get_orgs_metadata_api_v2()
@@ -164,6 +194,22 @@ def test_workspace_details(enhanced_zoho_analytics_client:EnhancedZohoAnalyticsC
         raise "workspace not found"
     workspace_details = enhanced_zoho_analytics_client.get_workspace_details_api_v2(workspace_id=workspace_id)
     assert workspace_details
+
+def test_meta_details_v2(enhanced_zoho_analytics_client:EnhancedZohoAnalyticsClient):
+
+    workspaces_metadata = enhanced_zoho_analytics_client.get_all_workspaces_metadata_api_v2()
+    target_workspace_name = "Cin7Omni"
+    for workspace in workspaces_metadata["data"]["sharedWorkspaces"]:
+        if workspace["workspaceName"] == target_workspace_name:
+            workspace_id = workspace["workspaceId"]
+            org_id = workspace["orgId"]
+            break
+    else:
+        raise "workspace not found"
+    meta_detail = enhanced_zoho_analytics_client.get_meta_details_view_api_v2(org_id=org_id,workspace_name="Cin7Omni", view_name="Test")
+    assert meta_detail
+
+
 def test_copy_workspace(enhanced_zoho_analytics_client:EnhancedZohoAnalyticsClient):
     org_metadata = enhanced_zoho_analytics_client.get_orgs_metadata_api_v2()
     origin_orgid = org_metadata["data"]["orgs"][0]["orgId"]
