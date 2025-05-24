@@ -15,7 +15,8 @@ import time
 import urllib
 import urllib.parse
 import xml.dom.minidom
-from typing import MutableMapping, Optional, Union
+from typing import MutableMapping, Optional, Union, TypedDict
+
 
 import requests
 from requests.adapters import HTTPAdapter, Retry
@@ -43,6 +44,37 @@ def requests_retry_session(
     session.mount('http://', adapter)
     session.mount('https://', adapter)
     return session
+
+
+
+
+# Represents a single workspace entry (owned or shared)
+class ZohoWorkspace(TypedDict):
+    """TypedDict representing a single Zoho workspace's metadata."""
+    createdBy: str  # Email address of the creator
+    createdTime: str  # Timestamp string (e.g., "1740617804006") - Note: It's a string in the JSON
+    isDefault: bool  # Whether this is the default workspace
+    orgId: str  # Organization ID string (e.g., "629101756")
+    workspaceDesc: str  # Workspace description (can be an empty string)
+    workspaceId: str  # Workspace ID string (e.g., "1252003000007995001")
+    workspaceName: str  # Name of the workspace (e.g., "NewWorkspace")
+
+
+# Represents the 'data' part of the response, containing lists of workspaces
+class ZohoWorkspaceData(TypedDict):
+    """TypedDict representing the 'data' section of the workspace response."""
+    ownedWorkspaces: list[ZohoWorkspace]
+    sharedWorkspaces: list[ZohoWorkspace]
+
+
+# Represents the overall structure of the API response
+class ZohoWorkspacesResponse(TypedDict):
+    """TypedDict representing the full response structure for getting all workspaces."""
+    data: ZohoWorkspaceData
+    status: str  # Status indicator (e.g., "success")
+    summary: str  # Summary message (e.g., "Get all workspaces")
+
+
 
 
 class ReportClient:
@@ -928,8 +960,12 @@ class ReportClient:
         url = self.getURI_v2() + f"orgs/"
         return self.__sendRequest(url, "GET", payLoad=None, action=None)
 
-    def get_all_workspaces_metadata_api_v2(self):
+    def get_all_workspaces_metadata_api_v2(self)->ZohoWorkspacesResponse:
         url = self.getURI_v2() + f"workspaces/"
+        return self.__sendRequest(url, "GET", payLoad=None, action=None)
+
+    def get_views_api_v2(self)->ZohoWorkspacesResponse:
+        url = self.getURI_v2() + f"views/"
         return self.__sendRequest(url, "GET", payLoad=None, action=None)
 
     def get_workspace_secretkey_api_v2(self, workspace_id, org_id):
