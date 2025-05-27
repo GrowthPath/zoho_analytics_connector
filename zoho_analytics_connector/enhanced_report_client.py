@@ -15,6 +15,7 @@ from typing import MutableMapping, Optional, List
 
 import emoji
 
+from dear_zoho_analytics.generic_backend.model_helpers import AnalyticsTableZohoDef, AnalyticsTableZohoDef_v2
 from . import report_client as report_client
 
 from .typed_dicts import ZohoSchemaModel, TableView, Catalog, ZohoSchemaModel_v2, TableView_v2
@@ -172,7 +173,7 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
 
         return result
 
-    def create_table_v2(self, table_design:ZohoSchemaModel_v2, database_name:str=None) -> MutableMapping:
+    def create_table_v2(self, table_design:AnalyticsTableZohoDef_v2, database_name:str=None) -> MutableMapping:
         """
         ZOHO_DATATYPE
             (Supported data types are:
@@ -189,10 +190,20 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
             URL
             AUTO_NUMBER
         """
-        db_uri = self.getDBURI(self.login_email_id, database_name or self.default_databasename)
         org_id, workspace_id = self.get_org_and_workspace_id(database_name=database_name)
         columns = table_design['COLUMNS']
-        result = super().createTable_v2(dbURI=db_uri, org_id=org_id,workspace_id=workspace_id,tableDesign=table_design)
+        BIG_NUMBER_OF_COLUMNS = 10
+        if len(columns) < BIG_NUMBER_OF_COLUMNS:
+            result = super().createTable_v2(org_id=org_id,workspace_id=workspace_id,tableDesign=table_design)
+        else:
+            columns_initial, columns_residual = columns[:BIG_NUMBER_OF_COLUMNS], columns[BIG_NUMBER_OF_COLUMNS:]
+            table_design['COLUMNS'] = columns_initial
+            result = super().createTable_v2(org_id=org_id, workspace_id=workspace_id, tableDesign=table_design)
+            new_table_id = result["data"]["viewId"]
+            time.sleep(1)
+
+            for col in columns_residual:
+                self.addColumn_v2(org_id=org_id,workspace_id=workspace_id,view_id=new_table_id,column_def=col)
 
         return result
 
