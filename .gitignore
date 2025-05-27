@@ -174,3 +174,4 @@ venv.bak/
 /.run/Python tests in test_enhanced_zoho_report_client.py.run.xml
 /.run/pytest in test_enhanced_zoho_report_client.py.run.xml
 /zoho_analytics_connector/tests/access_token.json
+.aider*

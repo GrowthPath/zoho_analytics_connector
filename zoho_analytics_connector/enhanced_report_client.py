@@ -103,8 +103,7 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
                                                       force_lowercase_column_names=force_lowercase_column_names)
         return table_metadata
 
-    def get_table_metadata_v2(self, database_name: str = None, force_lowercase_column_names=False) -> ZohoSchemaModel_v2:
-        """ Use the v2 API to get table metadata but return it in a similar data structure as the v1 function"""
+    def get_org_and_workspace_id(self,database_name:str=None)->tuple[str,str]:
         database_name = database_name or self.default_databasename
         workspaces_metadata = self.get_all_workspaces_metadata_api_v2()
 
@@ -113,9 +112,14 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
             if workspace["workspaceName"] == database_name:
                 workspace_id = workspace["workspaceId"]
                 org_id = workspace["orgId"]
-                break
+                return org_id,workspace_id
         else:
             raise "workspace not found"
+
+    def get_table_metadata_v2(self, database_name: str = None, force_lowercase_column_names=False) -> ZohoSchemaModel_v2:
+        """ Use the v2 API to get table metadata but return it in a similar data structure as the v1 function"""
+
+        org_id, workspace_id = self.get_org_and_workspace_id(database_name=database_name)
 
         tables_data = self.get_views_api_v2(org_id=org_id, workspace_id=workspace_id,
                                                                       view_types=[0])
@@ -154,17 +158,41 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
         columns = table_design['COLUMNS']
         BIG_NUMBER_OF_COLUMNS = 10
         if len(columns) < BIG_NUMBER_OF_COLUMNS:  # too many columns and zoho rejects the very long URL
-            result = self.createTable(dbURI=db_uri, tableDesign=json.dumps(table_design))
+            result = super().createTable(dbURI=db_uri, tableDesign=json.dumps(table_design))
         else:
             columns_initial, columns_residual = columns[:BIG_NUMBER_OF_COLUMNS], columns[BIG_NUMBER_OF_COLUMNS:]
             table_design['COLUMNS'] = columns_initial
             table_name = table_design['TABLENAME']
-            result = self.createTable(dbURI=db_uri, tableDesign=json.dumps(table_design))
+            result = super().createTable(dbURI=db_uri, tableDesign=json.dumps(table_design))
             time.sleep(1)
             uri_addcol = self.getURI(self.login_email_id, database_name or self.default_databasename,
                                      tableOrReportName=table_name)
             for col in columns_residual:
                 self.addColumn(tableURI=uri_addcol, columnName=col['COLUMNNAME'], dataType=col['DATATYPE'])
+
+        return result
+
+    def create_table_v2(self, table_design:ZohoSchemaModel_v2, database_name:str=None) -> MutableMapping:
+        """
+        ZOHO_DATATYPE
+            (Supported data types are:
+            PLAIN
+            MULTI_LINE
+            EMAIL
+            NUMBER
+            POSITIVE_NUMBER
+            DECIMAL_NUMBER
+            CURRENCY
+            PERCENT
+            DATE
+            BOOLEAN
+            URL
+            AUTO_NUMBER
+        """
+        db_uri = self.getDBURI(self.login_email_id, database_name or self.default_databasename)
+        org_id, workspace_id = self.get_org_and_workspace_id(database_name=database_name)
+        columns = table_design['COLUMNS']
+        result = super().createTable_v2(dbURI=db_uri, org_id=org_id,workspace_id=workspace_id,tableDesign=table_design)
 
         return result
 

@@ -20,7 +20,7 @@ from typing import MutableMapping, Optional, Union, TypedDict
 import requests
 from requests.adapters import HTTPAdapter, Retry
 
-from zoho_analytics_connector.typed_dicts import Catalog, DataTypeAddColumn
+from zoho_analytics_connector.typed_dicts import Catalog, DataTypeAddColumn, ZohoSchemaModel_v2
 
 logger = logging.getLogger(__name__)
 
@@ -1098,6 +1098,29 @@ class ReportClient:
 
         return self.__sendRequest(url, "POST", payLoad, "CREATETABLE", None)
 
+    def createTable_v2(self, dbURI, workspace_id, org_id,tableDesign:ZohoSchemaModel_v2, config=None):
+        """
+        Create a table in the specified database.
+        @param dbURI: The URI of the database. See L{getDBURI<getDBURI>}.
+        @type dbURI:string
+        @param tableDesign: Table structure in JSON format (includes table name, description, folder name, column and lookup details, is system table).
+        @type tableDesign:string
+        @param config: Contains any additional control parameters. Can be C{None}.
+        @type config:dictionary
+        @raise ServerError: If the server has recieved the request but did not process the request
+        due to some error.
+        @raise ParseError: If the server has responded but client was not able to parse the response.
+        """
+        url = self.getURI_v2() + f"workspaces/{workspace_id}/tables"
+        json_config=json.dumps({"tableDesign":tableDesign})
+        encoded_config = urllib.parse.quote_plus(json_config)
+        url += f"?CONFIG={encoded_config}"
+        extra_headers = {"ZANALYTICS-ORGID": org_id, }
+        return self.__sendRequest(url, "GET", payLoad=None, action=None,extra_headers=extra_headers)
+
+
+
+
     def autoGenReports(self, tableURI, source, config=None):
         """
         Generate reports for the particular table.
@@ -1262,6 +1285,28 @@ class ReportClient:
         url += "&ZOHO_COLUMNNAME=" + urllib.parse.quote(columnName)
         url += "&ZOHO_DATATYPE=" + urllib.parse.quote(dataType)
         return self.__sendRequest(url, "POST", payLoad, "ADDCOLUMN", None)
+
+    def addColumn_v2(self, org_id:str, workspace_id:str,view_id:str, columnName:str, dataType: DataTypeAddColumn, config=None):
+        """
+        Adds a column into Zoho Reports Table.
+        @param tableURI: The URI of the table. See L{getURI<getURI>}.
+        @type tableURI:string
+        @param columnName: The column name to be added into Zoho Reports Table.
+        @type columnName:string
+        @param dataType: The data type of the column to be added into Zoho Reports Table.
+        @type dataType:string
+        @param config: Contains any additional control parameters.
+        @type config:dictionary
+        @raise ServerError: If the server has recieved the request but did not process the request
+        due to some error.
+        @raise ParseError: If the server has responded but client was not able to parse the response.
+        """
+        url = self.getURI_v2() + f"workspaces/{workspace_id}/views/{view_id}/columns"
+        json_config=json.dumps({"columnName":columnName,"dataType":dataType})
+        encoded_config = urllib.parse.quote_plus(json_config)
+        url += f"?CONFIG={encoded_config}"
+        extra_headers = {"ZANALYTICS-ORGID": org_id, }
+        return self.__sendRequest(url, "GET", payLoad=None, action=None,extra_headers=extra_headers)
 
     def deleteColumn(self, tableURI, columnName, config=None):
         """
