@@ -20,9 +20,8 @@ from typing import MutableMapping, Optional, Union, TypedDict
 import requests
 from requests.adapters import HTTPAdapter, Retry
 
-from dear_zoho_analytics.generic_backend.model_helpers import AnalyticsTableZohoDef, AnalyticsTableZohoDef_v2, \
-    ColumnDef_v2
-from zoho_analytics_connector.typed_dicts import Catalog, DataTypeAddColumn, ZohoSchemaModel_v2
+from zoho_analytics_connector.zoho_analytics_connector.model_helpers import AnalyticsTableZohoDef_v2, ColumnDef_v2
+from zoho_analytics_connector.zoho_analytics_connector.typed_dicts import DataTypeAddColumn
 
 logger = logging.getLogger(__name__)
 

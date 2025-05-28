@@ -12,11 +12,8 @@ import logging
 import time
 from typing import MutableMapping, Optional, List
 
-
-import emoji
-
-from dear_zoho_analytics.generic_backend.model_helpers import AnalyticsTableZohoDef, AnalyticsTableZohoDef_v2
-from . import report_client as report_client
+from . import report_client
+from .model_helpers import AnalyticsTableZohoDef_v2
 
 from .typed_dicts import ZohoSchemaModel, TableView, Catalog, ZohoSchemaModel_v2, TableView_v2
 

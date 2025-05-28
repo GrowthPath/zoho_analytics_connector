@@ -1,5 +1,4 @@
 # $Id$
-from io import StringIO
 import urllib
 import json
 import requests
