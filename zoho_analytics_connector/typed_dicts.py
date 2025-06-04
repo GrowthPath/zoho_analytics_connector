@@ -105,3 +105,27 @@ ZohoTableModel = dict[ColumnName, ColumnMetadata]
 ZohoSchemaModel = dict[TableName, ZohoTableModel]
 ZohoTableModel_v2 = dict[ColumnName, ColumnMetadata_v2]
 ZohoSchemaModel_v2 = dict[TableName, ZohoTableModel_v2]
+
+
+class ZohoWorkspace(TypedDict):
+    """TypedDict representing a single Zoho workspace's metadata."""
+    createdBy: str  # Email address of the creator
+    createdTime: str  # Timestamp string (e.g., "1740617804006") - Note: It's a string in the JSON
+    isDefault: bool  # Whether this is the default workspace
+    orgId: str  # Organization ID string (e.g., "629101756")
+    workspaceDesc: str  # Workspace description (can be an empty string)
+    workspaceId: str  # Workspace ID string (e.g., "1252003000007995001")
+    workspaceName: str  # Name of the workspace (e.g., "NewWorkspace")
+
+
+class ZohoWorkspaceData(TypedDict):
+    """TypedDict representing the 'data' section of the workspace response."""
+    ownedWorkspaces: list[ZohoWorkspace]
+    sharedWorkspaces: list[ZohoWorkspace]
+
+
+class ZohoWorkspacesResponse(TypedDict):
+    """TypedDict representing the full response structure for getting all workspaces."""
+    data: ZohoWorkspaceData
+    status: str  # Status indicator (e.g., "success")
+    summary: str  # Summary message (e.g., "Get all workspaces")
