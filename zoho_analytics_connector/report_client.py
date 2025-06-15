@@ -715,12 +715,12 @@ class ReportClient:
         else:
             return ImportResult(respObj.content)
 
-    def importData_v2(self, tableURI: str, import_mode: str,
-                      import_content: str,
-                      matching_columns: str = None,
-                      date_format=None,
-                      import_config=None,
-                      retry_countdown=0) -> 'ImportResult':
+    def importData_v1a(self, tableURI: str, import_mode: str,
+                       import_content: str,
+                       matching_columns: str = None,
+                       date_format=None,
+                       import_config=None,
+                       retry_countdown=0) -> 'ImportResult':
         """ Send data to zoho using a string formatted in CSV style.
         This has been refactored to use requests.post.
         Bulk import data into the table identified by the URI. import_content is a string in csv format (\n separated)

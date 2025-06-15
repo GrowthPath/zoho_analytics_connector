@@ -220,9 +220,9 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
         database_name = database_name or self.default_databasename
         uri = self.getURI(dbOwnerName=self.login_email_id, dbName=database_name, tableOrReportName=table_name)
         # import_modes = APPEND / TRUNCATEADD / UPDATEADD
-        impResult = self.importData_v2(uri, import_mode=import_mode, import_content=import_content_demojized,
-                                       date_format=date_format,
-                                       matching_columns=matching_columns, retry_countdown=retry_limit)
+        impResult = self.importData_v1a(uri, import_mode=import_mode, import_content=import_content_demojized,
+                                        date_format=date_format,
+                                        matching_columns=matching_columns, retry_countdown=retry_limit)
 
         return impResult
 
