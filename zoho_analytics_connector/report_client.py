@@ -302,10 +302,17 @@ class ReportClient:
                         logger.error(
                             f"7107 error, column does not exist:  {respObj.response.text}")
                         raise ServerError(urlResp=respObj, zoho_error_code=code)
+                    elif code in [7111, ]:
+                        logger.error(
+                            f"71111 error, table already exists:  {respObj.response.text}")
+                        raise ServerError(urlResp=respObj, zoho_error_code=code)
                     elif code in [7179, ]:
                         logger.error(
                             f"7179 error, workspace reports no view present. Initialise with a dummy table {respObj.response.text}")
                         raise ServerError(urlResp=respObj, zoho_error_code=code)
+                    elif code in [7183, ]:
+                        logger.error(
+                            f"7183 error, lookup column types don't match {respObj.response.text}")
                     elif code in [7184, ]:
                         logger.error(
                             f"7184 error, cyclic lookup detected {respObj.response.text}")

@@ -167,6 +167,7 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
                                      tableOrReportName=table_name)
             for col in columns_residual:
                 self.addColumn(tableURI=uri_addcol, columnName=col['COLUMNNAME'], dataType=col['DATATYPE'])
+                time.sleep(1)
 
         return result
 
