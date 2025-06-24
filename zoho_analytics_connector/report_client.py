@@ -340,6 +340,9 @@ class ReportClient:
                         logger.error(
                             f"7301 error, relating to permission errors, return immediately {respObj.response.text}")
                         raise ServerError(urlResp=respObj, zoho_error_code=code)
+                    elif code in [7378, ]:
+                        logger.error(f"7378 Possible attempt to remove a lookup when no such lookup exists {respObj.response.text}")
+                        raise ServerError(urlResp=respObj, zoho_error_code=code)
                     elif code in [7389, ]:
                         logger.error(f"7389 Error from zoho Organisation does not exist {respObj.response.text}")
                         raise ServerError(urlResp=respObj, zoho_error_code=code)
@@ -348,6 +351,9 @@ class ReportClient:
                         raise ServerError(urlResp=respObj, zoho_error_code=code)
                     elif code in [7407, ]:
                         logger.error(f"7403 SQL Unknown column {respObj.response.text}")
+                        raise ServerError(urlResp=respObj, zoho_error_code=code)
+                    elif code in [8504, ]:
+                        logger.error(f"8594 Teh ZOHO_REFERREDTABLE argument when calling ADDLOOKUP was wrong {respObj.response.text}")
                         raise ServerError(urlResp=respObj, zoho_error_code=code)
                     elif code in [8540, ]:
                         logger.error(f"8540 Error, token has incorrect scope {respObj.response.text}")
@@ -1415,7 +1421,7 @@ class ReportClient:
         @type columnName:string
         @param config: Contains any additional control parameters. Can be C{None}.
         @type config:dictionary
-        @raise ServerError: If the server has recieved the request but did not process the request
+        @raise ServerError: If the server has received the request but did not process the request
         due to some error.
         @raise ParseError: If the server has responded but client was not able to parse the response.
         """
