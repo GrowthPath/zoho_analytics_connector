@@ -68,7 +68,7 @@ class ReportClient:
     request_timeout = 60
 
     def __init__(self, refresh_token, clientId=None, clientSecret=None,
-                 serverURL=None, reportServerURL=None, default_retries=0):
+                 serverURL=None, reportServerURL=None, default_retries=0, access_token=None):
         """
         Initializes a ReportClient instance.
         """
@@ -85,8 +85,9 @@ class ReportClient:
             # not using OAuth2, so use the refresh_token as the access token
             self.__access_token = refresh_token
         else:
-            # Try to load an existing persisted token
-            self.__access_token = self.load_token()
+            # If an access token is provided directly, use it.
+            # Otherwise, try to load an existing persisted token.
+            self.__access_token = access_token or self.load_token()
             ReportClient.isOAuth = True
 
     @property
@@ -97,11 +98,7 @@ class ReportClient:
         # Consider token expired if more than 50 minutes old or never set.
         if ReportClient.isOAuth and (time.time() - self.token_timestamp > 50 * 60 or self.__access_token is None):
             logger.debug("Refreshing Zoho Analytics OAuth token")
-            new_token = self.getOAuthToken()
-            self.__access_token = new_token
-            self.token_timestamp = time.time()
-            # Persist the new token using the default (or overridden) implementation.
-            self.persist_token(new_token)
+            self.getOAuthToken()
         return self.__access_token
 
     @access_token.setter
@@ -150,7 +147,8 @@ class ReportClient:
     def getOAuthToken(self) -> str:
         """
         Internal method for fetching a new OAuth token.
-        Should only be invoked when needed.
+        Should only be invoked when needed. After a successful fetch, it updates
+        the instance's token, timestamp, and calls the persistence mechanism.
         Returns:
             The new access token as a string.
         Raises:
@@ -169,8 +167,11 @@ class ReportClient:
             raise ServerError(respObj)
         resp = respObj.response.json()  # assuming respObj.response supports .json()
         if "access_token" in resp:
-            self.__access_token = resp["access_token"]
-            return resp["access_token"]
+            new_token = resp["access_token"]
+            self.__access_token = new_token
+            self.token_timestamp = time.time()
+            self.persist_token(new_token)
+            return new_token
         raise ValueError("Error while getting OAuth access token", resp)
 
     def getResp(self, url: str, httpMethod: str, payLoad, add_token=True, extra_headers=None, **kwargs):

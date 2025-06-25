@@ -10,7 +10,7 @@ import csv
 import json
 import logging
 import time
-from typing import MutableMapping, Optional, List
+from typing import MutableMapping, Optional, List, Callable
 
 from . import report_client
 from .model_helpers import AnalyticsTableZohoDef_v2
@@ -76,17 +76,23 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
         return table_data_zoho_schema
 
 
-    def __init__(self, login_email_id: str, refresh_token: str, default_databasename: str = None, clientId=None,
+    def __init__(self, login_email_id: str, refresh_token: str, default_databasename: str = None, access_token: str = None, clientId=None,
                  clientSecret=None, serverURL=None, reportServerURL=None, default_retries=None,
                  reporting_currency: str = None,
-                 error_email_list: Optional[List[str]] = None):
+                 error_email_list: Optional[List[str]] = None,
+                 token_persistence_callback: Optional[Callable[[str], None]] = None):
         """ error email list is not used by the client, but it is available for callers as a convenience"""
         self.login_email_id = login_email_id
         self.default_databasename = default_databasename
         self.error_email_list = error_email_list or [login_email_id]
         self.reporting_currency = reporting_currency
+        self.token_persistence_callback = token_persistence_callback
         super().__init__(refresh_token=refresh_token, clientId=clientId, clientSecret=clientSecret, serverURL=serverURL,
-                         reportServerURL=reportServerURL, default_retries=default_retries)
+                         reportServerURL=reportServerURL, default_retries=default_retries, access_token=access_token)
+
+    def persist_token(self, token: str):
+        if self.token_persistence_callback:
+            self.token_persistence_callback(token)
 
     def get_database_catalog(self, database_name: str = None) -> Catalog:
         db_uri = self.getDBURI(self.login_email_id, database_name or self.default_databasename)
