@@ -2250,16 +2250,17 @@ class RecoverableRateLimitError(Exception):
     """
 
     def __init__(self, urlResp, **kwargs):
-        self.httpStatusCode = urlResp.status_code  #:The http status code for the request.
+        self.httpStatusCode = urlResp.status_code  # :The http status code for the request.
         self.errorCode = self.httpStatusCode  # The error code sent by the server.
-        self.uri = ""  #: The uri which threw this exception.
-        self.action = ""  #:The action to be performed over the resource specified by the uri
-        self.message = urlResp.content  #: Returns the message sent by the server.
-        self.zoho_error_code = ""
+        self.uri = ""  # : The uri which threw this exception.
+        self.action = ""  # :The action to be performed over the resource specified by the uri
+        if hasattr(urlResp, 'response') and urlResp.response is not None:
+            self.message = urlResp.response.text
+        else:
+            self.message = urlResp.content  # : Returns the message sent by the server.
+        self.zoho_error_code = kwargs.get("zoho_error_code")
         self.extra = kwargs
-
-    def __str__(self):
-        return repr(self.message)
+        super().__init__(self.message)
 
 
 class UnrecoverableRateLimitError(Exception):
@@ -2268,15 +2269,17 @@ class UnrecoverableRateLimitError(Exception):
     """
 
     def __init__(self, urlResp, **kwargs):
-        self.httpStatusCode = urlResp.status_code  #:The http status code for the request.
+        self.httpStatusCode = urlResp.status_code  # :The http status code for the request.
         self.errorCode = self.httpStatusCode  # The error code sent by the server.
-        self.uri = ""  #: The uri which threw this exception.
-        self.action = ""  #:The action to be performed over the resource specified by the uri
-        self.message = urlResp.content  #: Returns the message sent by the server.
+        self.uri = ""  # : The uri which threw this exception.
+        self.action = ""  # :The action to be performed over the resource specified by the uri
+        if hasattr(urlResp, 'response') and urlResp.response is not None:
+            self.message = urlResp.response.text
+        else:
+            self.message = urlResp.content  # : Returns the message sent by the server.
+        self.zoho_error_code = kwargs.get("zoho_error_code")
         self.extra = kwargs
-
-    def __str__(self):
-        return repr(self.message)
+        super().__init__(self.message)
 
 
 class ServerError(Exception):
@@ -2291,7 +2294,7 @@ class ServerError(Exception):
         self.uri = ""  #: The uri which threw this exception.
         self.action = ""  #:The action to be performed over the resource specified by the uri
         self.message = urlResp.content  #: Returns the message sent by the server.
-        self.zoho_error_code = ""
+        self.zoho_error_code = kwargs.get("zoho_error_code")
         self.extra = kwargs
 
         parseable = False
@@ -2304,21 +2307,7 @@ class ServerError(Exception):
                     self.__parseErrorResponse()
             except AttributeError:
                 logger.error(f"response object is None")
-
-    def __parseErrorResponse(self):
-        try:
-            dom = xml.dom.minidom.parseString(self.message)
-            respEl = dom.getElementsByTagName("response")[0]
-            self.uri = respEl.getAttribute("uri")
-            self.action = respEl.getAttribute("action")
-            self.errorCode = int(ReportClientHelper.getInfo(dom, "code", self.message))
-            self.message = ReportClientHelper.getInfo(dom, "message", self.message)
-        except Exception as inst:
-            print(inst)
-            self.parseError = inst
-
-    def __str__(self):
-        return repr(self.message)
+        super().__init__(self.message)
 
 
 class BadDataError(Exception):
@@ -2328,7 +2317,7 @@ class BadDataError(Exception):
         self.uri = ""  #: The uri which threw this exception.
         self.action = ""  #:The action to be performed over the resource specified by the uri
         self.message = urlResp.content  #: Returns the message sent by the server.
-        self.zoho_error_code = ""
+        self.zoho_error_code = kwargs.get("zoho_error_code")
         self.extra = kwargs
 
         parseable = False
@@ -2341,21 +2330,7 @@ class BadDataError(Exception):
                     self.__parseErrorResponse()
             except AttributeError:
                 logger.error(f"response object is None")
-
-    def __parseErrorResponse(self):
-        try:
-            dom = xml.dom.minidom.parseString(self.message)
-            respEl = dom.getElementsByTagName("response")[0]
-            self.uri = respEl.getAttribute("uri")
-            self.action = respEl.getAttribute("action")
-            self.errorCode = int(ReportClientHelper.getInfo(dom, "code", self.message))
-            self.message = ReportClientHelper.getInfo(dom, "message", self.message)
-        except Exception as inst:
-            print(inst)
-            self.parseError = inst
-
-    def __str__(self):
-        return repr(self.message)
+        super().__init__(self.message)
 
 
 class ParseError(Exception):
@@ -2365,12 +2340,10 @@ class ParseError(Exception):
     """
 
     def __init__(self, responseContent, message, origExcep):
+        super().__init__(message)
         self.responseContent = responseContent  #: The complete response content as sent by the server.
         self.message = message  #: The message describing the error.
-        self.origExcep = origExcep  #: The original exception that occurred during parsing(Can be C{None}).
-
-    def __str__(self):
-        return repr(self.message)
+        self.origExcep = repr(origExcep)  #: The original exception that occurred during parsing(Can be C{None}).
 
 
 class ImportResult:
