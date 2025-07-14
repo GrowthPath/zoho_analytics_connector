@@ -236,11 +236,17 @@ class ReportClient:
         if not retry_countdown:
             retry_countdown = self.default_retries or 1
         init_retry_countdown = retry_countdown
+        last_exception = None
+        last_respObj = None
         while retry_countdown > 0:
             retry_countdown -= 1
             try:
                 respObj = self.getResp(url, httpMethod, payLoad, extra_headers=extra_headers, **keywords)
+                last_respObj = respObj
+                last_exception = None
             except Exception as e:
+                last_exception = e
+                last_respObj = None
                 logger.exception(f" getResp exception in __sendRequest, {retry_countdown}, {e}")  # connection error
                 if retry_countdown <= 0:
                     raise e
@@ -450,8 +456,28 @@ class ReportClient:
                 time.sleep(min(10 - retry_countdown, 1) * 10)
                 continue
         # fell off while loop
+        error_details = ""
+        if last_exception:
+            error_details = f"Last error was an exception: {last_exception!r}"
+        elif last_respObj:
+            response_text = ""
+            try:
+                response_text = last_respObj.response.text
+            except Exception:
+                response_text = "could not get response text."
+            error_details = f"Last error response status: {last_respObj.status_code}, text: {response_text}"
+
+        display_payload = payLoad
+        if isinstance(payLoad, dict) and 'ZOHO_IMPORT_DATA' in payLoad:
+            display_payload = payLoad.copy()
+            data = display_payload.get('ZOHO_IMPORT_DATA', "")
+            if isinstance(data, str) and len(data) > 500:
+                display_payload['ZOHO_IMPORT_DATA'] = data[:500] + '... (truncated)'
+
         raise RuntimeError(
-            f"After starting with {init_retry_countdown} retries allowed, there are now no more retries left in __sendRequest. {url=}, {httpMethod=}, {payLoad=}, {action=} ")
+            f"After starting with {init_retry_countdown} retries allowed, there are now no more retries left in __sendRequest. "
+            f"{error_details}. {url=}, {httpMethod=}, payLoad={display_payload}, {action=}"
+        )
 
     def invalidOAUTH(self, respObj):
         """
