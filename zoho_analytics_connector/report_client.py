@@ -283,16 +283,18 @@ class ReportClient:
                             # continue
 
                     logger.debug(f"API returned a 400 result and an error code: {code} ")
-                    if code in [6045, ]:
+                    if code == 6045:          # rate-limit exceeded
                         logger.error(
-                            f"Zoho API Recoverable rate limit (rate limit exceeded); there are {retry_countdown + 1} retries left")
-                        if retry_countdown < 0:
-                            logger.error(
-                                f"Zoho API Recoverable error (rate limit exceeded), but exhausted retries")
-                            raise UnrecoverableRateLimitError(urlResp=respObj, zoho_error_code=code)
-                        else:
-                            time.sleep(min(10 - retry_countdown, 1) * 10)
-                            continue
+                            f"Zoho API recoverable rate-limit error; {retry_countdown} retries left")
+                        # exhausted all retries?
+                        if retry_countdown <= 0:
+                            logger.error("Rate-limit retries exhausted – raising temporary exception")
+                            raise RecoverableRateLimitError(urlResp=respObj, zoho_error_code=code)
+                        # exponential back-off (cap at 60 s, add jitter)
+                        attempts_made = init_retry_countdown - retry_countdown
+                        backoff_seconds = min(2 ** attempts_made, 60) + random.random()
+                        time.sleep(backoff_seconds)
+                        continue
                     elif code in [6001, ]:
                         logger.error(
                             f"6001 error, rows in Zoho plan exceeded {respObj.response.text}")
@@ -328,7 +330,7 @@ class ReportClient:
                         logger.error(
                             f"7198 error, table design changes still in progress {respObj.response.text}  there are {retry_countdown + 1} retries left")
 
-                        if retry_countdown < 0:
+                        if retry_countdown <= 0:
                             logger.error(
                                 f"Zoho API Recoverable error (table maintenance ongoing), but exhausted retries")
                             raise UnrecoverableRateLimitError(urlResp=respObj, zoho_error_code=code)
@@ -371,7 +373,7 @@ class ReportClient:
                         except:
                             pass
                         logger.error(f"Zoho API Recoverable error encountered (invalid oauth token), will retry")
-                        if retry_countdown < 0:
+                        if retry_countdown <= 0:
                             logger.error(
                                 f"Zoho API Recoverable error (invalid oauth token) exhausted retries")
                             raise UnrecoverableRateLimitError(urlResp=respObj, zoho_error_code=code)
@@ -428,7 +430,7 @@ class ReportClient:
                     except:
                         pass
                     logger.error(f"Zoho API Recoverable error encountered (invalid oauth token), will retry")
-                    if retry_countdown < 0:
+                    if retry_countdown <= 0:
                         logger.error(
                             f"Zoho API Recoverable error (invalid oauth token) exhausted retries")
                         raise UnrecoverableRateLimitError(urlResp=respObj, zoho_error_code=code)
