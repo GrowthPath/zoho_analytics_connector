@@ -68,7 +68,7 @@ class ReportClient:
     request_timeout = 60
 
     def __init__(self, refresh_token, clientId=None, clientSecret=None,
-                 serverURL=None, reportServerURL=None, default_retries=0, access_token=None):
+                 serverURL=None, reportServerURL=None, default_retries=6, access_token=None):
         """
         Initializes a ReportClient instance.
         """
@@ -233,9 +233,14 @@ class ReportClient:
     def __sendRequest(self, url, httpMethod, payLoad, action, callBackData=None, retry_countdown: int = None,
                       extra_headers=None, **keywords):
         code = ""
-        if not retry_countdown:
-            retry_countdown = self.default_retries or 1
+        # If retry_countdown is not set, use self.default_retries.
+        # If still falsy (0/None), treat as *zero* retries (one attempt, no retries).
+        if retry_countdown is None:
+            retry_countdown = self.default_retries
         init_retry_countdown = retry_countdown
+        logger.info(
+            "Retry countdown initialised: %s", retry_countdown
+        )
         last_exception = None
         last_respObj = None
         while retry_countdown > 0:

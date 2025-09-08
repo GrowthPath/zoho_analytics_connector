@@ -77,7 +77,7 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
 
 
     def __init__(self, login_email_id: str, refresh_token: str, default_databasename: str = None, access_token: str = None, clientId=None,
-                 clientSecret=None, serverURL=None, reportServerURL=None, default_retries=None,
+                 clientSecret=None, serverURL=None, reportServerURL=None, default_retries=6,
                  reporting_currency: str = None,
                  error_email_list: Optional[List[str]] = None,
                  token_persistence_callback: Optional[Callable[[str], None]] = None):
@@ -221,6 +221,7 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
         """
         retry_count = 0
         retry_limit = retry_limit or self.default_retries
+        logger.info("Retry limit for data_upload: %s", retry_limit)
         impResult = None
         # import_content_demojized = emoji.demojize(import_content)
         import_content_demojized = import_content  # try without this, move data cleaning to the calling function
