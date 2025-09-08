@@ -259,7 +259,7 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
         reader = csv.DictReader(returned_data)
         return reader
 
-    def delete_rows(self, table_name, sql, database_name: Optional[str] = None, retry_countdown=5) -> int:
+    def delete_rows(self, table_name, sql, database_name: Optional[str] = None, retry_countdown: int = 5) -> int:
         """ criteria is SQL fragments such as 'a' in ColA, for example,
         sql = f"{id_column} IN ('ce76dc3a-bac0-47dd-841a-70e66613958e')
         return the count of eows
@@ -269,8 +269,28 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
             raise RuntimeError("The SQL passed to delete_rows is too big and will cause Zoho 400 errors")
         uri = self.getURI(dbOwnerName=self.login_email_id, dbName=database_name or self.default_databasename,
                           tableOrReportName=table_name)
-        row_count = self.deleteData(tableURI=uri, criteria=sql, retry_countdown=retry_countdown)
-        return row_count
+        attempts_left = retry_countdown
+        while True:
+            try:
+                row_count = self.deleteData(
+                    tableURI=uri,
+                    criteria=sql,
+                    retry_countdown=attempts_left
+                )
+                return row_count
+            except report_client.BadDataError as ex:          # noqa: F821
+                zoho_code = str(getattr(ex, "zoho_error_code",
+                                         getattr(ex, "errorCode", "")))
+                if zoho_code == "6045" and attempts_left > 0:
+                    logger.warning(
+                        "Zoho error 6045 on delete_rows. "
+                        "Retrying (%s attempt(s) remaining)…",
+                        attempts_left
+                    )
+                    attempts_left -= 1
+                    time.sleep(2 ** (retry_countdown - attempts_left))  # simple back-off
+                    continue
+                raise
 
     def pre_delete_rows(self, table_name, sql, database_name: Optional[str] = None, retry_countdown=5)->int:
         """ uses the same sql input as delete_rows and counts what is present in the table. This is to check the nbr of rows deleted is correct.
