@@ -262,6 +262,38 @@ class ReportClient:
                     time.sleep(sleep_time)
                     continue
 
+            # ----------------------------------------------------------
+            # Zoho occasionally returns an “error” object (incl. 6045)
+            # while still using HTTP-200.  Detect that here and make it
+            # follow the same retry path as the 400/403 handler above.
+            # ----------------------------------------------------------
+            if respObj.status_code == 200:
+                try:
+                    json_body = json.loads(respObj.response.text)
+                    err_obj   = json_body.get("response", {}).get("error")
+                    if err_obj:
+                        code = int(err_obj.get("code", -1))
+                        if code == 6045:          # rate-limit exceeded
+                            logger.error(
+                                "Zoho API rate-limit error (6045) "
+                                "arrived with HTTP 200 – will retry "
+                                "(%s retries left)", retry_countdown
+                            )
+                            if retry_countdown <= 0:
+                                raise RecoverableRateLimitError(
+                                    urlResp=respObj,
+                                    zoho_error_code=code
+                                )
+                            # same exponential back-off used elsewhere
+                            attempts_made = init_retry_countdown - retry_countdown
+                            backoff_seconds = min(2 ** attempts_made, 60) + random.random()
+                            time.sleep(backoff_seconds)
+                            continue
+                except (ValueError, json.JSONDecodeError, AttributeError):
+                    # If we cannot parse the body, fall through and
+                    # treat it as a normal success path.
+                    pass
+
             if (respObj.status_code in [200, ]):
                 return self.handleResponse(respObj, action, callBackData)
             elif (respObj.status_code in [204, ]):  # successful but nothing to return
