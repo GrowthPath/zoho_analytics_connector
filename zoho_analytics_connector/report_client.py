@@ -273,7 +273,7 @@ class ReportClient:
                     err_obj   = json_body.get("response", {}).get("error")
                     if err_obj:
                         code = int(err_obj.get("code", -1))
-                        if code == 6045:          # rate-limit exceeded
+                        if code in (6045, 10001):     # 6045 = rate-limit, 10001 = import in progress
                             logger.error(
                                 "Zoho API rate-limit error (6045) "
                                 "arrived with HTTP 200 – will retry "
@@ -424,7 +424,7 @@ class ReportClient:
                     elif code in [10001, ]:  # 10001 is "Another import is in progress, so we can try this again"
                         logger.error(
                             f"Zoho API Recoverable error encountered (Another import is in progress), will retry")
-                        if retry_countdown < 0:
+                        if retry_countdown <= 0:
                             logger.error(
                                 f"Zoho API Recoverable error (Another import is in progress) but exhausted retries")
                             raise UnrecoverableRateLimitError(urlResp=respObj, zoho_error_code=code,
