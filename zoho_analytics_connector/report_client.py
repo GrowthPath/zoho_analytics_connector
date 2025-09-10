@@ -29,7 +29,7 @@ logger = logging.getLogger(__name__)
 def requests_retry_session(
         retries=5,
         backoff_factor=2,
-        status_forcelist=(500, 502, 503, 504),
+        status_forcelist=(500, 502, 503, 504, 429),
         session=None,
 ) -> requests.Session:
     session = session or requests.Session()
@@ -298,7 +298,7 @@ class ReportClient:
                 return self.handleResponse(respObj, action, callBackData)
             elif (respObj.status_code in [204, ]):  # successful but nothing to return
                 return self.handleResponse(respObj, action, callBackData)
-            elif (respObj.status_code in [400, 403]):
+            elif respObj.status_code in (400, 403, 429):
                 # 400 errors may be an API limit error, which are handled by the result parsing
                 try:
                     try:
