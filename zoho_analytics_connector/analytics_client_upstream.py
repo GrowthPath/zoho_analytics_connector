@@ -1347,7 +1347,7 @@ class AnalyticsClient:
             @raise ServerError: If the server has received the request but did not process the request due to some error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             """
-            config["referenceViewId"] = ref_view_id;
+            config["referenceViewId"] = ref_view_id
             config["referenceColumnId"] = ref_column_id
             endpoint = self.endpoint + "/columns/" + column_id + "/lookup"
             self.ac.send_api_request("POST", endpoint, config, self.request_headers)

@@ -7,12 +7,12 @@ import requests.exceptions
 
 from zoho_analytics_connector.enhanced_report_client import EnhancedZohoAnalyticsClient
 from zoho_analytics_connector.report_client import ReportClient, ServerError
-from zoho_analytics_connector.typed_dicts import TableView, TableView_v2
+from zoho_analytics_connector.typed_dicts import TableView_v2
 
 try:
     from zoho_analytics_connector.private import config
 except ModuleNotFoundError:
-    from zoho_analytics_connector.private import config_example
+    pass
 
 class Config:
     LOGINEMAILID = os.getenv("ZOHOANALYTICS_LOGINEMAIL")
@@ -114,13 +114,13 @@ def test_create_tables(enhanced_zoho_analytics_client):
         enhanced_zoho_analytics_client.create_table(table_design=zoho_sales_table)
     else:
         # get an error, but error handling is not working, the API returns a 400 with no content in the message
-        print(f"\nThe table store_sales exists already; delete it manually to test")
+        print("\nThe table store_sales exists already; delete it manually to test")
 
     if "animals" not in zoho_tables:
         enhanced_zoho_analytics_client.create_table(table_design=animals_table)
     else:
         # get an error, but error handling is not working, the API returns a 400 with no content in the message
-        print(f"\nThe table animals table exists already; delete it manually to test")
+        print("\nThe table animals table exists already; delete it manually to test")
 
 
 def test_data_upload():
@@ -408,7 +408,7 @@ def test_connection_error_data_upload(monkeypatch):
         print(e)
         print (f"Retries: {count_retries}")
         assert count_retries == allowed_retries
-    except Exception as e:
+    except Exception:
         assert False
 
 

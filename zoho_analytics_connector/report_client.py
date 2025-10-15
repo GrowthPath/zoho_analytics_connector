@@ -305,7 +305,7 @@ class ReportClient:
                         # j = respObj.response.json(strict=False) #getting decode errors in this and they don't make sense
                         j = json.loads(respObj.response.text, strict=False)
                         code = j['response']['error']['code']
-                    except json.JSONDecodeError as e:
+                    except json.JSONDecodeError:
                         logger.error(f"API caused a JSONDecodeError for {respObj.response.text} ")
                         code = None
                     if not code:
@@ -369,7 +369,7 @@ class ReportClient:
 
                         if retry_countdown <= 0:
                             logger.error(
-                                f"Zoho API Recoverable error (table maintenance ongoing), but exhausted retries")
+                                "Zoho API Recoverable error (table maintenance ongoing), but exhausted retries")
                             raise UnrecoverableRateLimitError(urlResp=respObj, zoho_error_code=code)
                         else:
                             time.sleep(min(10 - retry_countdown, 1) * 10)
@@ -409,24 +409,24 @@ class ReportClient:
                             self.getOAuthToken()
                         except:
                             pass
-                        logger.error(f"Zoho API Recoverable error encountered (invalid oauth token), will retry")
+                        logger.error("Zoho API Recoverable error encountered (invalid oauth token), will retry")
                         if retry_countdown <= 0:
                             logger.error(
-                                f"Zoho API Recoverable error (invalid oauth token) exhausted retries")
+                                "Zoho API Recoverable error (invalid oauth token) exhausted retries")
                             raise UnrecoverableRateLimitError(urlResp=respObj, zoho_error_code=code)
                         else:
                             time.sleep(min(10 - retry_countdown, 1) * 10)
                             continue
                     elif code in [8509, ]:  # parameter does not match accepted input pattern
                         logger.error(
-                            f"Error 8509 encountered, something is wrong with the data format, no retry is attempted")
+                            "Error 8509 encountered, something is wrong with the data format, no retry is attempted")
                         raise BadDataError(respObj, zoho_error_code=code)
                     elif code in [10001, ]:  # 10001 is "Another import is in progress, so we can try this again"
                         logger.error(
-                            f"Zoho API Recoverable error encountered (Another import is in progress), will retry")
+                            "Zoho API Recoverable error encountered (Another import is in progress), will retry")
                         if retry_countdown <= 0:
                             logger.error(
-                                f"Zoho API Recoverable error (Another import is in progress) but exhausted retries")
+                                "Zoho API Recoverable error (Another import is in progress) but exhausted retries")
                             raise UnrecoverableRateLimitError(urlResp=respObj, zoho_error_code=code,
                                                               message="Zoho error: Another import is in progress")
                         else:
@@ -445,7 +445,7 @@ class ReportClient:
                         continue
                 except (RecoverableRateLimitError, UnrecoverableRateLimitError, BadDataError):
                     raise
-                except ServerError as e:
+                except ServerError:
                     logger.error(f"ServerError raised on _sendRequest.  {url=} {payLoad=} {action=} ")
                     import_data = payLoad.get("ZOHO_IMPORT_DATA") if payLoad else None
                     if import_data:
@@ -457,7 +457,7 @@ class ReportClient:
                     # j = respObj.response.json(strict=False) #getting decode errors in this and they don't make sense
                     j = json.loads(respObj.response.text, strict=False)
                     code = j['response']['error']['code']
-                except json.JSONDecodeError as e:
+                except json.JSONDecodeError:
                     logger.error(f"API caused a JSONDecodeError for {respObj.response.text} ")
                     code = None
                 logger.debug(f"API returned a 401 result and an error code: {code} ")
@@ -466,10 +466,10 @@ class ReportClient:
                         self.getOAuthToken()
                     except:
                         pass
-                    logger.error(f"Zoho API Recoverable error encountered (invalid oauth token), will retry")
+                    logger.error("Zoho API Recoverable error encountered (invalid oauth token), will retry")
                     if retry_countdown <= 0:
                         logger.error(
-                            f"Zoho API Recoverable error (invalid oauth token) exhausted retries")
+                            "Zoho API Recoverable error (invalid oauth token) exhausted retries")
                         raise UnrecoverableRateLimitError(urlResp=respObj, zoho_error_code=code)
                     else:
                         time.sleep(min(10 - retry_countdown, 1) * 10)
@@ -488,7 +488,7 @@ class ReportClient:
             else:
                 try:
                     response_text = respObj.response.text
-                except Exception as e:
+                except Exception:
                     response_text = "unreadable response text"
                 msg = f"Unexpected status code in from __sendRequest. Server response code is {respObj.status_code=} {response_text=}.  {url=}, {httpMethod=}, {payLoad=}, {action=} Retry attempts will be made..."
                 logger.exception(msg)
@@ -768,7 +768,7 @@ class ReportClient:
         importConfig["ZOHO_ON_IMPORT_ERROR"] = onError
         importConfig["ZOHO_AUTO_IDENTIFY"] = autoIdentify
 
-        if not ("ZOHO_CREATE_TABLE" in importConfig):
+        if "ZOHO_CREATE_TABLE" not in importConfig:
             importConfig["ZOHO_CREATE_TABLE"] = 'false'
 
         files = {"ZOHO_FILE": ("file", importContent, 'multipart/form-data')}
@@ -882,7 +882,7 @@ class ReportClient:
         dict = {"ZOHO_AUTO_IDENTIFY": autoIdentify, "ZOHO_ON_IMPORT_ERROR": onError,
                 "ZOHO_IMPORT_TYPE": importType, "ZOHO_IMPORT_DATA": importContent}
 
-        if not ("ZOHO_CREATE_TABLE" in importConfig):
+        if "ZOHO_CREATE_TABLE" not in importConfig:
             importConfig["ZOHO_CREATE_TABLE"] = 'false'
 
         payLoad = ReportClientHelper.getAsPayLoad([dict, importConfig], None, None)
@@ -1001,7 +1001,7 @@ class ReportClient:
         """
        A v2 API functions
         """
-        config_dict = {"newWorkspaceName": new_workspace_name, "newWorkspaceDesc": f"copy",
+        config_dict = {"newWorkspaceName": new_workspace_name, "newWorkspaceDesc": "copy",
                        "workspaceKey": workspace_key,
                        "copyWithData": copy_with_data,
                        "copyWithImportSource": copy_with_import_source}
@@ -1014,11 +1014,11 @@ class ReportClient:
                                   extra_headers=extra_headers)
 
     def get_orgs_metadata_api_v2(self):
-        url = self.getURI_v2() + f"orgs/"
+        url = self.getURI_v2() + "orgs/"
         return self.__sendRequest(url, "GET", payLoad=None, action=None)
 
     def get_all_workspaces_metadata_api_v2(self) -> ZohoWorkspacesResponse:
-        url = self.getURI_v2() + f"workspaces/"
+        url = self.getURI_v2() + "workspaces/"
         return self.__sendRequest(url, "GET", payLoad=None, action=None)
 
     def get_views_api_v2(self, org_id: str, workspace_id: str, view_types: list[int] = None) -> ZohoWorkspacesResponse:
@@ -1048,7 +1048,7 @@ class ReportClient:
 
 
     def get_meta_details_view_api_v2(self,org_id:str,workspace_name:str,view_name:str):
-        url = self.getURI_v2() + f"metadetails"
+        url = self.getURI_v2() + "metadetails"
         config_dict = {"workspaceName": workspace_name, "viewName": view_name}
         # Convert the dictionary to a JSON string
         json_config = json.dumps(config_dict)
@@ -2364,14 +2364,14 @@ class ServerError(Exception):
 
         parseable = False
         if not urlResp:
-            logger.error(f"response object is None")
+            logger.error("response object is None")
         else:
             try:
                 contHeader = urlResp.headers.get("Content-Type", None)
                 if (contHeader and contHeader.find("text/xml") > -1):
                     self.__parseErrorResponse()
             except AttributeError:
-                logger.error(f"response object is None")
+                logger.error("response object is None")
         super().__init__(self.message)
 
 
@@ -2387,14 +2387,14 @@ class BadDataError(Exception):
 
         parseable = False
         if not urlResp:
-            logger.error(f"response object is None")
+            logger.error("response object is None")
         else:
             try:
                 contHeader = urlResp.headers.get("Content-Type", None)
                 if (contHeader and contHeader.find("text/xml") > -1):
                     self.__parseErrorResponse()
             except AttributeError:
-                logger.error(f"response object is None")
+                logger.error("response object is None")
         super().__init__(self.message)
 
 
@@ -2427,13 +2427,13 @@ class ImportResult:
         try:
             self.result_code = int(ReportClientHelper.getInfo(dom, "code", response))
 
-        except ParseError as e:
+        except ParseError:
             # logger.debug(f"Note in import result: could not find result code {msg}")
             self.result_code = 0
 
         try:
             self.totalColCount = int(ReportClientHelper.getInfo(dom, "totalColumnCount", response))
-        except ParseError as e:
+        except ParseError:
             logger.debug(f"Error in import result: did not get a good return message: {msg}")
             raise ParseError(responseContent=msg, message=None, origExcep=None)
         """

@@ -15,7 +15,7 @@ from typing import MutableMapping, Optional, List, Callable
 from . import report_client
 from .model_helpers import AnalyticsTableZohoDef_v2
 
-from .typed_dicts import ZohoSchemaModel, TableView, Catalog, ZohoSchemaModel_v2, TableView_v2
+from .typed_dicts import ZohoSchemaModel, Catalog, ZohoSchemaModel_v2, TableView_v2
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
