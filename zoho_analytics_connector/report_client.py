@@ -2578,7 +2578,7 @@ class ReportClientHelper:
         if (criteria != None):
             payload["ZOHO_CRITERIA"] = criteria
 
-        if (sql != None):
+        if (sql is not None):
             payload["ZOHO_SQLQUERY"] = sql
 
         if len(payload) != 0:
