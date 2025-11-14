@@ -286,7 +286,7 @@ class ReportClient:
                                 )
                             # same exponential back-off used elsewhere
                             attempts_made = init_retry_countdown - retry_countdown
-                            backoff_seconds = min(2 ** attempts_made, 60) + random.random()
+                            backoff_seconds = min(4 ** attempts_made, 120) + random.random()
                             time.sleep(backoff_seconds)
                             continue
                 except (ValueError, json.JSONDecodeError, AttributeError):
@@ -327,9 +327,9 @@ class ReportClient:
                         if retry_countdown <= 0:
                             logger.error("Rate-limit retries exhausted – raising temporary exception")
                             raise RecoverableRateLimitError(urlResp=respObj, zoho_error_code=code)
-                        # exponential back-off (cap at 60 s, add jitter)
+                        # exponential back-off (cap at 120 s, add jitter)
                         attempts_made = init_retry_countdown - retry_countdown
-                        backoff_seconds = min(2 ** attempts_made, 60) + random.random()
+                        backoff_seconds = min(4 ** attempts_made, 120) + random.random()
                         time.sleep(backoff_seconds)
                         continue
                     elif code in [6001, ]:
@@ -407,7 +407,7 @@ class ReportClient:
                     elif code in [8535, ]:  # invalid oauth token
                         try:
                             self.getOAuthToken()
-                        except:
+                        except Exception:
                             pass
                         logger.error("Zoho API Recoverable error encountered (invalid oauth token), will retry")
                         if retry_countdown <= 0:
@@ -464,7 +464,7 @@ class ReportClient:
                 if code in [8535, ]:  # invalid oauth token
                     try:
                         self.getOAuthToken()
-                    except:
+                    except Exception:
                         pass
                     logger.error("Zoho API Recoverable error encountered (invalid oauth token), will retry")
                     if retry_countdown <= 0:
@@ -762,7 +762,7 @@ class ReportClient:
         due to some error.
         @raise ParseError: If the server has responded but client was not able to parse the response.
         """
-        if (importConfig == None):
+        if importConfig is None:
             importConfig = {}
         importConfig['ZOHO_IMPORT_TYPE'] = importType
         importConfig["ZOHO_ON_IMPORT_ERROR"] = onError
@@ -777,7 +777,7 @@ class ReportClient:
         headers = {}
         # To set access token for the first time when an instance is created.
         if ReportClient.isOAuth:
-            if self.accesstoken == None:
+            if self.accesstoken is None:
                 self.accesstoken = self.getOAuthToken()
             headers = {"Authorization": "Zoho-oauthtoken " + self.accesstoken}
 
@@ -971,7 +971,7 @@ class ReportClient:
         url = ReportClientHelper.addQueryParams(tableOrReportURI, self.access_token, "EXPORT", format,
                                                 sql=sql)  # urlencoding is done in here
         callback_object = io.BytesIO()
-        r = self.__sendRequest(url=url, httpMethod="POST", payLoad=payload, action="EXPORT",
+        self.__sendRequest(url=url, httpMethod="POST", payLoad=payload, action="EXPORT",
                                callBackData=callback_object, retry_countdown=retry_countdown)
         return callback_object
 
@@ -1229,8 +1229,8 @@ class ReportClient:
         url = ReportClientHelper.addQueryParams(tableURI, self.access_token, "CREATESIMILARVIEWS", "JSON")
         url += "&ZOHO_REFVIEW=" + urllib.parse.quote(refView)
         url += "&ZOHO_FOLDERNAME=" + urllib.parse.quote(folderName)
-        url += "&ISCOPYCUSTOMFORMULA=" + urllib.parse.quote("true" if customFormula == True else "false")
-        url += "&ISCOPYAGGFORMULA=" + urllib.parse.quote("true" if aggFormula == True else "false")
+        url += "&ISCOPYCUSTOMFORMULA=" + urllib.parse.quote("true" if customFormula else "false")
+        url += "&ISCOPYAGGFORMULA=" + urllib.parse.quote("true" if aggFormula else "false")
         return self.__sendRequest(url, "POST", payLoad, "CREATESIMILARVIEWS", None)
 
     def renameView(self, dbURI, viewName, newViewName, viewDesc="", config=None):
@@ -1358,7 +1358,7 @@ class ReportClient:
         encoded_config = urllib.parse.quote_plus(json_config)
         url += f"?CONFIG={encoded_config}"
         extra_headers = {"ZANALYTICS-ORGID": org_id, }
-        add_col_result =  self.__sendRequest(url, "POST", payLoad=None, action=None,extra_headers=extra_headers)
+        self.__sendRequest(url, "POST", payLoad=None, action=None,extra_headers=extra_headers)
 
         # if "LOOKUPCOLUMN" in col_def:
         #     url = self.getURI_v2() + f"workspaces/{workspace_id}/views/{view_id}/columns"
@@ -1514,7 +1514,7 @@ class ReportClient:
         payLoad = ReportClientHelper.getAsPayLoad([config], None, None)
         url = ReportClientHelper.addQueryParams(userURI, self.access_token, "CREATEBLANKDB", "JSON")
         url += "&ZOHO_DATABASE_NAME=" + urllib.parse.quote(dbName)
-        if (dbDesc != None):
+        if dbDesc is not None:
             url += "&ZOHO_DATABASE_DESC=" + urllib.parse.quote(dbDesc)
         self.__sendRequest(url, "POST", payLoad, "CREATEBLANKDB", None)
 
@@ -2362,7 +2362,6 @@ class ServerError(Exception):
         self.zoho_error_code = kwargs.get("zoho_error_code")
         self.extra = kwargs
 
-        parseable = False
         if not urlResp:
             logger.error("response object is None")
         else:
@@ -2385,7 +2384,6 @@ class BadDataError(Exception):
         self.zoho_error_code = kwargs.get("zoho_error_code")
         self.extra = kwargs
 
-        parseable = False
         if not urlResp:
             logger.error("response object is None")
         else:
@@ -2555,7 +2553,7 @@ class ReportClientHelper:
         url += "&ZOHO_ERROR_FORMAT=JSON&ZOHO_ACTION=" + urllib.parse.quote(action)
         url += "&ZOHO_OUTPUT_FORMAT=" + urllib.parse.quote(exportFormat)
         url += "&ZOHO_API_VERSION=" + ReportClientHelper.API_VERSION
-        if ReportClient.isOAuth == False:
+        if not ReportClient.isOAuth:
             url += "&authtoken=" + urllib.parse.quote(authtoken)
         if exportFormat == "JSON":
             url += "&ZOHO_VALID_JSON=TRUE"
@@ -2572,10 +2570,10 @@ class ReportClientHelper:
     def getAsPayLoad(separateDicts, criteria: Optional[str], sql: Optional[str], encode_payload=False):
         payload = {}
         for i in separateDicts:
-            if (i != None):
+            if i is not None:
                 payload.update(i)
 
-        if (criteria != None):
+        if criteria is not None:
             payload["ZOHO_CRITERIA"] = criteria
 
         if (sql is not None):
