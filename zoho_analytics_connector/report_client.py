@@ -2315,14 +2315,22 @@ class RecoverableRateLimitError(Exception):
     """
 
     def __init__(self, urlResp, **kwargs):
-        self.httpStatusCode = urlResp.status_code  # :The http status code for the request.
-        self.errorCode = self.httpStatusCode  # The error code sent by the server.
-        self.uri = ""  # : The uri which threw this exception.
-        self.action = ""  # :The action to be performed over the resource specified by the uri
-        if hasattr(urlResp, 'response') and urlResp.response is not None:
-            self.message = urlResp.response.text
+        if hasattr(urlResp, 'status_code'):
+            self.httpStatusCode = urlResp.status_code  # :The http status code for the request.
+            self.errorCode = self.httpStatusCode  # The error code sent by the server.
+            self.uri = ""  # : The uri which threw this exception.
+            self.action = ""  # :The action to be performed over the resource specified by the uri
+            if hasattr(urlResp, 'response') and urlResp.response is not None:
+                self.message = urlResp.response.text
+            else:
+                self.message = urlResp.content  # : Returns the message sent by the server.
         else:
-            self.message = urlResp.content  # : Returns the message sent by the server.
+            self.httpStatusCode = 0
+            self.errorCode = 0
+            self.uri = ""
+            self.action = ""
+            self.message = str(urlResp)
+
         self.zoho_error_code = kwargs.get("zoho_error_code")
         self.extra = kwargs
         super().__init__(self.message)
@@ -2334,14 +2342,22 @@ class UnrecoverableRateLimitError(Exception):
     """
 
     def __init__(self, urlResp, **kwargs):
-        self.httpStatusCode = urlResp.status_code  # :The http status code for the request.
-        self.errorCode = self.httpStatusCode  # The error code sent by the server.
-        self.uri = ""  # : The uri which threw this exception.
-        self.action = ""  # :The action to be performed over the resource specified by the uri
-        if hasattr(urlResp, 'response') and urlResp.response is not None:
-            self.message = urlResp.response.text
+        if hasattr(urlResp, 'status_code'):
+            self.httpStatusCode = urlResp.status_code  # :The http status code for the request.
+            self.errorCode = self.httpStatusCode  # The error code sent by the server.
+            self.uri = ""  # : The uri which threw this exception.
+            self.action = ""  # :The action to be performed over the resource specified by the uri
+            if hasattr(urlResp, 'response') and urlResp.response is not None:
+                self.message = urlResp.response.text
+            else:
+                self.message = urlResp.content  # : Returns the message sent by the server.
         else:
-            self.message = urlResp.content  # : Returns the message sent by the server.
+            self.httpStatusCode = 0
+            self.errorCode = 0
+            self.uri = ""
+            self.action = ""
+            self.message = str(urlResp)
+
         self.zoho_error_code = kwargs.get("zoho_error_code")
         self.extra = kwargs
         super().__init__(self.message)
