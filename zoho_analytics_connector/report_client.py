@@ -377,7 +377,7 @@ class ReportClient:
                     elif code in [7232, ]:
                         logger.error(
                             f"7232 error,an invalid value has been provided according to the column's data type) {respObj.response.text=} ")
-                        raise ServerError(urlResp=respObj, zoho_error_code=code)
+                        raise BadDataError(urlResp=respObj, zoho_error_code=code)
                     elif code in [7280, ]:
                         logger.error(
                             f"7280 error, relating to schema errors, return immediately {respObj.response.text}")
