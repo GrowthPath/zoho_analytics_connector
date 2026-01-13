@@ -40,7 +40,7 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
          and some other meta data.
 
          """
-        db_name = catalog['tableCat']
+        catalog['tableCat']
         table_data = {}
         for table in catalog['views']:
             if table['tableType'] == 'TABLE':
@@ -128,7 +128,6 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
         tables_data = self.get_views_api_v2(org_id=org_id, workspace_id=workspace_id,
                                                                       view_types=[0])
         table_catalog:dict[str,TableView_v2] = {}
-        table_views = []
         for table in tables_data["data"]["views"]:
             view_id = table["viewId"]
             table_details = self.get_view_details_api_v2(view_id=view_id)
@@ -219,7 +218,6 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
         """ data is a csv-style string, newline separated. Matching columns is a comma separated string
         import_mode is one of TRUNCATEADD, APPEND, UPDATEADD
         """
-        retry_count = 0
         retry_limit = retry_limit or self.default_retries
         logger.info("Retry limit for data_upload: %s", retry_limit)
         impResult = None

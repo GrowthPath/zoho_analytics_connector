@@ -414,7 +414,7 @@ class AnalyticsClient:
             @raise ParseError: If the server has responded but client was not able to parse the response.
             """
             config["workspaceName"] = workspace_name
-            response = self.ac.send_api_request("PUT", self.endpoint, config, self.request_headers)
+            self.ac.send_api_request("PUT", self.endpoint, config, self.request_headers)
 
         def delete(self):
             """
@@ -422,7 +422,7 @@ class AnalyticsClient:
             @raise ServerError: If the server has received the request but did not process the request due to some error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             """
-            response = self.ac.send_api_request("DELETE", self.endpoint, None, self.request_headers)
+            self.ac.send_api_request("DELETE", self.endpoint, None, self.request_headers)
 
         def get_secret_key(self, config={}):
             """
@@ -445,7 +445,7 @@ class AnalyticsClient:
             @raise ParseError: If the server has responded but client was not able to parse the response.
             """
             endpoint = self.endpoint + "/favorite"
-            response = self.ac.send_api_request("POST", endpoint, None, self.request_headers)
+            self.ac.send_api_request("POST", endpoint, None, self.request_headers)
 
         def remove_favorite(self):
             """
@@ -454,7 +454,7 @@ class AnalyticsClient:
             @raise ParseError: If the server has responded but client was not able to parse the response.
             """
             endpoint = self.endpoint + "/favorite"
-            response = self.ac.send_api_request("DELETE", endpoint, None, self.request_headers)
+            self.ac.send_api_request("DELETE", endpoint, None, self.request_headers)
 
         def add_default(self):
             """
@@ -463,7 +463,7 @@ class AnalyticsClient:
             @raise ParseError: If the server has responded but client was not able to parse the response.
             """
             endpoint = self.endpoint + "/default"
-            response = self.ac.send_api_request("POST", endpoint, None, self.request_headers)
+            self.ac.send_api_request("POST", endpoint, None, self.request_headers)
 
         def remove_default(self):
             """
@@ -472,7 +472,7 @@ class AnalyticsClient:
             @raise ParseError: If the server has responded but client was not able to parse the response.
             """
             endpoint = self.endpoint + "/default"
-            response = self.ac.send_api_request("DELETE", endpoint, None, self.request_headers)
+            self.ac.send_api_request("DELETE", endpoint, None, self.request_headers)
 
         def get_admins(self):
             """
@@ -655,7 +655,7 @@ class AnalyticsClient:
             @raise ParseError: If the server has responded but client was not able to parse the response.
             """
             endpoint = self.endpoint + "/wlaccess"
-            response = self.ac.send_api_request("POST", endpoint, None, self.request_headers)
+            self.ac.send_api_request("POST", endpoint, None, self.request_headers)
 
         def disable_domain_access(self):
             """
@@ -664,7 +664,7 @@ class AnalyticsClient:
             @raise ParseError: If the server has responded but client was not able to parse the response.
             """
             endpoint = self.endpoint + "/wlaccess"
-            response = self.ac.send_api_request("DELETE", endpoint, None, self.request_headers)
+            self.ac.send_api_request("DELETE", endpoint, None, self.request_headers)
 
         def rename_folder(self, folder_id, folder_name, config={}):
             """
@@ -927,7 +927,7 @@ class AnalyticsClient:
             config["variableName"] = variable_name
             config["variableDataType"] = variable_datatype
             config["variableType"] = variable_type
-            response = self.ac.send_api_request("PUT", endpoint, config, self.request_headers)
+            self.ac.send_api_request("PUT", endpoint, config, self.request_headers)
 
         def delete_variable(self, variable_id):
             """
@@ -938,7 +938,7 @@ class AnalyticsClient:
             @raise ParseError: If the server has responded but client was not able to parse the response.
             """
             endpoint = self.endpoint + "/variables/" + variable_id
-            response = self.ac.send_api_request("DELETE", endpoint, None, self.request_headers)
+            self.ac.send_api_request("DELETE", endpoint, None, self.request_headers)
 
         def get_variables(self):
             """
@@ -975,7 +975,7 @@ class AnalyticsClient:
             @raise ParseError: If the server has responded but client was not able to parse the response.
             """
             endpoint = self.endpoint + "/folders/" + folder_id + "/default"
-            response = self.ac.send_api_request("PUT", endpoint, None, self.request_headers)
+            self.ac.send_api_request("PUT", endpoint, None, self.request_headers)
 
         def get_datasources(self):
             """
@@ -1000,7 +1000,7 @@ class AnalyticsClient:
             @raise ParseError: If the server has responded but client was not able to parse the response.
             """
             endpoint = self.endpoint + "/datasources/" + datasource_id + "/sync"
-            response = self.ac.send_api_request("POST", endpoint, config, self.request_headers)
+            self.ac.send_api_request("POST", endpoint, config, self.request_headers)
 
         def update_datasource_connection(self, datasource_id, config={}):
             """
@@ -1013,7 +1013,7 @@ class AnalyticsClient:
             @raise ParseError: If the server has responded but client was not able to parse the response.
             """
             endpoint = self.endpoint + "/datasources/" + datasource_id
-            response = self.ac.send_api_request("PUT", endpoint, config, self.request_headers)
+            self.ac.send_api_request("PUT", endpoint, config, self.request_headers)
 
     class ViewAPI:
         """
@@ -1037,7 +1037,7 @@ class AnalyticsClient:
             @raise ParseError: If the server has responded but client was not able to parse the response.
             """
             config["viewName"] = view_name
-            response = self.ac.send_api_request("PUT", self.endpoint, config, self.request_headers)
+            self.ac.send_api_request("PUT", self.endpoint, config, self.request_headers)
 
         def delete(self, config={}):
             """
@@ -1047,7 +1047,7 @@ class AnalyticsClient:
             @raise ServerError: If the server has received the request but did not process the request due to some error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             """
-            response = self.ac.send_api_request("DELETE", self.endpoint, config, self.request_headers)
+            self.ac.send_api_request("DELETE", self.endpoint, config, self.request_headers)
 
         def save_as(self, new_view_name, config={}):
             """
@@ -1095,7 +1095,7 @@ class AnalyticsClient:
             @raise ParseError: If the server has responded but client was not able to parse the response.
             """
             endpoint = self.endpoint + "/favorite"
-            response = self.ac.send_api_request("POST", endpoint, None, self.request_headers)
+            self.ac.send_api_request("POST", endpoint, None, self.request_headers)
 
         def remove_favorite(self):
             """
@@ -1104,7 +1104,7 @@ class AnalyticsClient:
             @raise ParseError: If the server has responded but client was not able to parse the response.
             """
             endpoint = self.endpoint + "/favorite"
-            response = self.ac.send_api_request("DELETE", endpoint, None, self.request_headers)
+            self.ac.send_api_request("DELETE", endpoint, None, self.request_headers)
 
         def create_similar_views(self, ref_view_id, folder_id, config={}):
             """
@@ -1387,7 +1387,7 @@ class AnalyticsClient:
             @raise ParseError: If the server has responded but client was not able to parse the response.
             """
             endpoint = self.endpoint + "/sync"
-            response = self.ac.send_api_request("POST", endpoint, config, self.request_headers)
+            self.ac.send_api_request("POST", endpoint, config, self.request_headers)
 
         def get_last_import_details(self):
             """

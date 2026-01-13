@@ -182,8 +182,7 @@ def test_get_v2_table_model_data(enhanced_zoho_analytics_client: EnhancedZohoAna
 
 def test_workspace_details(enhanced_zoho_analytics_client:EnhancedZohoAnalyticsClient):
     org_metadata = enhanced_zoho_analytics_client.get_orgs_metadata_api_v2()
-    origin_orgid = org_metadata["data"]["orgs"][0]["orgId"]
-    dest_orgid = origin_orgid
+    org_metadata["data"]["orgs"][0]["orgId"]
     workspaces_metadata = enhanced_zoho_analytics_client.get_all_workspaces_metadata_api_v2()
     source_workspace_name = "DearTest"
     for workspace in workspaces_metadata["data"]["ownedWorkspaces"]:
@@ -201,7 +200,7 @@ def test_meta_details_v2(enhanced_zoho_analytics_client:EnhancedZohoAnalyticsCli
     target_workspace_name = "Cin7Omni"
     for workspace in workspaces_metadata["data"]["sharedWorkspaces"]:
         if workspace["workspaceName"] == target_workspace_name:
-            workspace_id = workspace["workspaceId"]
+            workspace["workspaceId"]
             org_id = workspace["orgId"]
             break
     else:
@@ -227,11 +226,11 @@ def test_copy_workspace(enhanced_zoho_analytics_client:EnhancedZohoAnalyticsClie
     new_workspace_name = "NewWorkspace"
     new_workspace = next((w for w in workspaces_metadata["data"]["ownedWorkspaces"] if w["workspaceName"] == new_workspace_name), None)
     if new_workspace:
-        r = enhanced_zoho_analytics_client.delete_workspace_api_v2(workspace_id=new_workspace["workspaceId"],org_id=origin_orgid)
+        enhanced_zoho_analytics_client.delete_workspace_api_v2(workspace_id=new_workspace["workspaceId"],org_id=origin_orgid)
 
     workspace_secret_key_result = enhanced_zoho_analytics_client.get_workspace_secretkey_api_v2(workspace_id=workspace_id,org_id=origin_orgid)
     workspace_secret_key = workspace_secret_key_result["data"]["workspaceKey"]
-    r = enhanced_zoho_analytics_client.copy_workspace_api_v2(new_workspace_name=new_workspace_name,
+    enhanced_zoho_analytics_client.copy_workspace_api_v2(new_workspace_name=new_workspace_name,
                                                              workspace_id=workspace_id,
                                                              copy_with_data=False,   # to make it faster
                                                              dest_org_id=dest_orgid,
@@ -244,7 +243,7 @@ def test_copy_workspace(enhanced_zoho_analytics_client:EnhancedZohoAnalyticsClie
 @pytest.mark.skip
 def test_multiple_clients():
     # this does not work
-    enhance_client = get_enhanced_zoho_analytics_client()
+    get_enhanced_zoho_analytics_client()
     enhance_client1 = get_enhanced_zoho_analytics_client()
     table_meta_data = enhance_client1.get_table_metadata()
     assert table_meta_data
@@ -268,7 +267,7 @@ def test_exportData_csv():
                                                dbName=enhanced_client.default_databasename,
                                                tableOrReportName='animals')
     output = io.BytesIO()
-    r = enhanced_client.exportData(tableOrReportURI=animals_table_uri, format='CSV', exportToFileObj=output)
+    enhanced_client.exportData(tableOrReportURI=animals_table_uri, format='CSV', exportToFileObj=output)
     assert (output.getvalue())
 
 
@@ -279,13 +278,13 @@ def test_exportData_csv_with_criteria():
                                                dbName=enhanced_client.default_databasename,
                                                tableOrReportName='animals')
     criteria = """ "size" in ('small') """
-    row_count = enhanced_client.deleteData(tableURI=animals_table_uri, criteria=criteria)
+    enhanced_client.deleteData(tableURI=animals_table_uri, criteria=criteria)
     new_row = {'common_name': 'Rabbit', 'size': 'small'}
     enhanced_client.addRow(tableURI=animals_table_uri, columnValues=new_row)
     new_row = {'common_name': 'Elephant', 'size': 'large'}
     enhanced_client.addRow(tableURI=animals_table_uri, columnValues=new_row)
     output = io.BytesIO()
-    r = enhanced_client.exportData(tableOrReportURI=animals_table_uri, format='CSV', exportToFileObj=output,
+    enhanced_client.exportData(tableOrReportURI=animals_table_uri, format='CSV', exportToFileObj=output,
                                    criteria="size = 'small'")
     returned_data = output.getvalue().decode()
     # assert (output.getvalue())
@@ -300,7 +299,7 @@ def test_exportData_json():
                                                tableOrReportName='animals')
     output = io.BytesIO()
     enhanced_client.default_retries = 3
-    r = enhanced_client.exportData(tableOrReportURI=animals_table_uri, format='JSON', exportToFileObj=output)
+    enhanced_client.exportData(tableOrReportURI=animals_table_uri, format='JSON', exportToFileObj=output)
     assert (json.loads(output.getvalue()))
 
 
@@ -359,7 +358,7 @@ def test_rate_limits_data_upload():
     while i < 100:
         i += 1
         try:
-            impResult = enhanced_client.data_upload(
+            enhanced_client.data_upload(
                 import_content=import_content, table_name="store_sales"
             )
             print(f"Import {i} done")
@@ -401,7 +400,7 @@ def test_connection_error_data_upload(monkeypatch):
         # import_modes = APPEND / TRUNCATEADD / UPDATEADD
 
     try:
-        impResult = enhanced_client.data_upload(
+        enhanced_client.data_upload(
             import_content=import_content, table_name="store_sales"
         )
     except ConnectionError as e:
@@ -421,7 +420,7 @@ def test_timeout():
                                                tableOrReportName='animals')
     output = io.BytesIO()
     with pytest.raises(requests.exceptions.ConnectTimeout):
-        r = enhanced_client.exportData(tableOrReportURI=animals_table_uri, format='JSON', exportToFileObj=output)
+        enhanced_client.exportData(tableOrReportURI=animals_table_uri, format='JSON', exportToFileObj=output)
 
 
 def test_data_download(enhanced_zoho_analytics_client):
@@ -448,7 +447,6 @@ def test_copy_report(enhanced_zoho_analytics_client):
         "Animals",
     ]
 
-    target_zoho_email = "tim@growthpath.com.au"
     source_zoho_email = "tim@growthpath.com.au"
     target_zoho_client = enhanced_zoho_analytics_client  # for the test, we have the same client as source and target
     source_dbURI = target_zoho_client.getDBURI(
