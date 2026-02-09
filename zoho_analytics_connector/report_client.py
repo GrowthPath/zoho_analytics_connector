@@ -29,9 +29,23 @@ logger = logging.getLogger(__name__)
 def requests_retry_session(
         retries=5,
         backoff_factor=2,
-        status_forcelist=(500, 502, 503, 504, 429),
+        status_forcelist=(),
         session=None,
 ) -> requests.Session:
+    """Configure a requests session with urllib3 retry for network-level errors only.
+
+    This handles transport failures (ReadTimeout, ConnectionError, SSL handshake
+    failures) where the request never reached Zoho's server — retrying is safe
+    because no work was performed.
+
+    HTTP status code retries (status_forcelist) are intentionally empty: all HTTP
+    responses are passed through to __sendRequest, which has comprehensive per-error-code
+    handling with its own retry loop and backoff logic.
+
+    allowed_methods=None is required because urllib3 defaults to only retrying
+    idempotent methods (GET, HEAD, etc.), which excludes POST — the method used
+    for all Zoho Analytics API calls.
+    """
     session = session or requests.Session()
     retry_strategy = Retry(
         total=retries,
@@ -39,6 +53,7 @@ def requests_retry_session(
         connect=retries,
         backoff_factor=backoff_factor,
         status_forcelist=status_forcelist,
+        allowed_methods=None,
     )
     adapter = HTTPAdapter(max_retries=retry_strategy)
     session.mount('http://', adapter)
