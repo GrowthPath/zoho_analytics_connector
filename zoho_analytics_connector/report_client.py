@@ -1,10 +1,11 @@
-""" this is rewritten from some very old python 2 code from zoho, although I merged their more recent OAuth support.
+"""this is rewritten from some very old python 2 code from zoho, although I merged their more recent OAuth support.
 Functions which are modified and tested have PEP8 underscore names
 
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at https://mozilla.org/MPL/2.0/.
 """
+
 import io
 import json
 import logging
@@ -15,22 +16,26 @@ import time
 import urllib
 import urllib.parse
 import xml.dom.minidom
-from typing import MutableMapping, Optional, Union
+from typing import MutableMapping, Optional, Union, List, Any
 
 import requests
 from requests.adapters import HTTPAdapter, Retry
 
 from zoho_analytics_connector.zoho_analytics_connector.model_helpers import AnalyticsTableZohoDef_v2, ColumnDef_v2
-from zoho_analytics_connector.zoho_analytics_connector.typed_dicts import DataTypeAddColumn, ZohoWorkspacesResponse
+from zoho_analytics_connector.zoho_analytics_connector.typed_dicts import (
+    DataTypeAddColumn,
+    ZohoWorkspacesResponse,
+    ZohoViewsResponse,
+)
 
 logger = logging.getLogger(__name__)
 
 
 def requests_retry_session(
-        retries=5,
-        backoff_factor=2,
-        status_forcelist=(),
-        session=None,
+    retries=5,
+    backoff_factor=2,
+    status_forcelist=(),
+    session=None,
 ) -> requests.Session:
     """Configure a requests session with urllib3 retry for network-level errors only.
 
@@ -56,8 +61,8 @@ def requests_retry_session(
         allowed_methods=None,
     )
     adapter = HTTPAdapter(max_retries=retry_strategy)
-    session.mount('http://', adapter)
-    session.mount('https://', adapter)
+    session.mount("http://", adapter)
+    session.mount("https://", adapter)
     return session
 
 
@@ -72,9 +77,10 @@ def requests_retry_session(
 
 class ReportClient:
     """
-     ReportClient provides the python based language binding to the https based API of Zoho Analytics.
-     @note: Authentication via authtoken is deprecated, use OAuth. kindly send parameter as ReportClient(token,clientId,clientSecret).
-     """
+    ReportClient provides the python based language binding to the https based API of Zoho Analytics.
+    @note: Authentication via authtoken is deprecated, use OAuth.
+    kindly send parameter as ReportClient(token,clientId,clientSecret).
+    """
 
     # Define a default file name for token persistence.
     token_file = "access_token.json"
@@ -82,8 +88,16 @@ class ReportClient:
     isOAuth = False
     request_timeout = 60
 
-    def __init__(self, refresh_token, clientId=None, clientSecret=None,
-                 serverURL=None, reportServerURL=None, default_retries=6, access_token=None):
+    def __init__(
+        self,
+        refresh_token,
+        clientId=None,
+        clientSecret=None,
+        serverURL=None,
+        reportServerURL=None,
+        default_retries=6,
+        access_token=None,
+    ):
         """
         Initializes a ReportClient instance.
         """
@@ -129,10 +143,7 @@ class ReportClient:
         Saves the access token and token timestamp as JSON to a local file.
         Subclasses may override this method to provide a different persistence mechanism.
         """
-        data = {
-            "access_token": token,
-            "token_timestamp": self.token_timestamp
-        }
+        data = {"access_token": token, "token_timestamp": self.token_timestamp}
         try:
             with open(self.token_file, "w") as out_file:
                 json.dump(data, out_file)
@@ -140,7 +151,7 @@ class ReportClient:
         except Exception as e:
             logger.error("Error persisting the token: %s", e)
 
-    def load_token(self) -> str:
+    def load_token(self) -> Optional[str]:
         """
         Default implementation of token loading.
         Loads the access token and token timestamp from a local JSON file.
@@ -174,7 +185,7 @@ class ReportClient:
             "client_id": self.clientId,
             "client_secret": self.clientSecret,
             "refresh_token": self.refresh_token,
-            "grant_type": "refresh_token"
+            "grant_type": "refresh_token",
         }
         accUrl = self.iamServerURL + "/oauth/v2/token"
         respObj = self.getResp(accUrl, "POST", auth_dict, add_token=False)
@@ -197,18 +208,18 @@ class ReportClient:
 
         # Build common headers
         headers = {}
-        if add_token and ReportClient.isOAuth and hasattr(self, 'access_token'):
+        if add_token and ReportClient.isOAuth and hasattr(self, "access_token"):
             headers["Authorization"] = "Zoho-oauthtoken " + self.access_token
-        headers['User-Agent'] = "ZohoAnalytics Python GrowthPath Library"
+        headers["User-Agent"] = "ZohoAnalytics Python GrowthPath Library"
 
         if extra_headers:
             headers = {**headers, **extra_headers}
 
         # Process based on HTTP method
-        if httpMethod.upper() == 'POST':
+        if httpMethod.upper() == "POST":
             try:
                 resp = requests_session.post(url, data=payLoad, headers=headers, timeout=self.request_timeout, **kwargs)
-                if 'invalid client' in resp.text:
+                if "invalid client" in resp.text:
                     raise requests.exceptions.RequestException("Invalid Client")
                 respObj = ResponseObj(resp)
             except requests.exceptions.RequestException as e:
@@ -216,11 +227,12 @@ class ReportClient:
                 raise e
             return respObj
 
-        elif httpMethod.upper() == 'GET':
+        elif httpMethod.upper() == "GET":
             try:
-                resp = requests_session.get(url, params=payLoad, headers=headers, timeout=self.request_timeout,
-                                            **kwargs)
-                if 'invalid client' in resp.text:
+                resp = requests_session.get(
+                    url, params=payLoad, headers=headers, timeout=self.request_timeout, **kwargs
+                )
+                if "invalid client" in resp.text:
                     raise requests.exceptions.RequestException("Invalid Client")
                 respObj = ResponseObj(resp)
             except requests.exceptions.RequestException as e:
@@ -228,13 +240,14 @@ class ReportClient:
                 raise e
             return respObj
 
-        elif httpMethod.upper() == 'DELETE':
+        elif httpMethod.upper() == "DELETE":
             try:
                 # Depending on the API, a DELETE request might accept data or params.
                 # Here we assume payLoad can be sent as either 'data' or 'params'. Adjust as required.
-                resp = requests_session.delete(url, data=payLoad, headers=headers, timeout=self.request_timeout,
-                                               **kwargs)
-                if 'invalid client' in resp.text:
+                resp = requests_session.delete(
+                    url, data=payLoad, headers=headers, timeout=self.request_timeout, **kwargs
+                )
+                if "invalid client" in resp.text:
                     raise requests.exceptions.RequestException("Invalid Client")
                 respObj = ResponseObj(resp)
             except requests.exceptions.RequestException as e:
@@ -245,17 +258,24 @@ class ReportClient:
         else:
             raise RuntimeError(f"Unexpected httpMethod in getResp, expected POST, GET, or DELETE but got {httpMethod}")
 
-    def __sendRequest(self, url, httpMethod, payLoad, action, callBackData=None, retry_countdown: int = None,
-                      extra_headers=None, **keywords):
-        code = ""
+    def __sendRequest(
+        self,
+        url,
+        httpMethod,
+        payLoad,
+        action,
+        callBackData=None,
+        retry_countdown: Optional[int] = None,
+        extra_headers=None,
+        **keywords,
+    ):
+        code: Union[str, int, None] = ""
         # If retry_countdown is not set, use self.default_retries.
         # If still falsy (0/None), treat as *zero* retries (one attempt, no retries).
         if retry_countdown is None:
             retry_countdown = self.default_retries
         init_retry_countdown = retry_countdown
-        logger.info(
-            "Retry countdown initialised: %s", retry_countdown
-        )
+        logger.info("Retry countdown initialised: %s", retry_countdown)
         last_exception = None
         last_respObj = None
         while retry_countdown > 0:
@@ -271,8 +291,9 @@ class ReportClient:
                 if retry_countdown <= 0:
                     raise e
                 else:
-                    sleep_time = min((3 * (2 ** (10 - retry_countdown))) + random.random(),
-                                     60)  # Add jitter and cap max delay at 60 seconds
+                    sleep_time = min(
+                        (3 * (2 ** (10 - retry_countdown))) + random.random(), 60
+                    )  # Add jitter and cap max delay at 60 seconds
 
                     time.sleep(sleep_time)
                     continue
@@ -285,23 +306,19 @@ class ReportClient:
             if respObj.status_code == 200:
                 try:
                     json_body = json.loads(respObj.response.text)
-                    err_obj   = json_body.get("response", {}).get("error")
+                    err_obj = json_body.get("response", {}).get("error")
                     if err_obj:
                         code = int(err_obj.get("code", -1))
-                        if code in (6045, 10001):     # 6045 = rate-limit, 10001 = import in progress
+                        if code in (6045, 10001):  # 6045 = rate-limit, 10001 = import in progress
                             logger.error(
-                                "Zoho API rate-limit error (6045) "
-                                "arrived with HTTP 200 – will retry "
-                                "(%s retries left)", retry_countdown
+                                "Zoho API rate-limit error (6045) arrived with HTTP 200 – will retry (%s retries left)",
+                                retry_countdown,
                             )
                             if retry_countdown <= 0:
-                                raise RecoverableRateLimitError(
-                                    urlResp=respObj,
-                                    zoho_error_code=code
-                                )
+                                raise RecoverableRateLimitError(urlResp=respObj, zoho_error_code=code)
                             # same exponential back-off used elsewhere
                             attempts_made = init_retry_countdown - retry_countdown
-                            backoff_seconds = min(4 ** attempts_made, 120) + random.random()
+                            backoff_seconds = min(4**attempts_made, 120) + random.random()
                             time.sleep(backoff_seconds)
                             continue
                 except (ValueError, json.JSONDecodeError, AttributeError):
@@ -309,17 +326,22 @@ class ReportClient:
                     # treat it as a normal success path.
                     pass
 
-            if (respObj.status_code in [200, ]):
+            if respObj.status_code in [
+                200,
+            ]:
                 return self.handleResponse(respObj, action, callBackData)
-            elif (respObj.status_code in [204, ]):  # successful but nothing to return
+            elif respObj.status_code in [
+                204,
+            ]:  # successful but nothing to return
                 return self.handleResponse(respObj, action, callBackData)
             elif respObj.status_code in (400, 403, 429):
                 # 400 errors may be an API limit error, which are handled by the result parsing
                 try:
                     try:
-                        # j = respObj.response.json(strict=False) #getting decode errors in this and they don't make sense
+                        # j = respObj.response.json(strict=False) #getting decode errors in this and they don't make
+                        # sense
                         j = json.loads(respObj.response.text, strict=False)
-                        code = j['response']['error']['code']
+                        code = j["response"]["error"]["code"]
                     except json.JSONDecodeError:
                         logger.error(f"API caused a JSONDecodeError for {respObj.response.text} ")
                         code = None
@@ -335,115 +357,169 @@ class ReportClient:
                             # continue
 
                     logger.debug(f"API returned a 400 result and an error code: {code} ")
-                    if code == 6045:          # rate-limit exceeded
-                        logger.error(
-                            f"Zoho API recoverable rate-limit error; {retry_countdown} retries left")
+                    if code == 6045:  # rate-limit exceeded
+                        logger.error(f"Zoho API recoverable rate-limit error; {retry_countdown} retries left")
                         # exhausted all retries?
                         if retry_countdown <= 0:
                             logger.error("Rate-limit retries exhausted – raising temporary exception")
                             raise RecoverableRateLimitError(urlResp=respObj, zoho_error_code=code)
                         # exponential back-off (cap at 120 s, add jitter)
                         attempts_made = init_retry_countdown - retry_countdown
-                        backoff_seconds = min(4 ** attempts_made, 120) + random.random()
+                        backoff_seconds = min(4**attempts_made, 120) + random.random()
                         time.sleep(backoff_seconds)
                         continue
-                    elif code in [6001, ]:
-                        logger.error(
-                            f"6001 error, rows in Zoho plan exceeded {respObj.response.text}")
+                    elif code in [
+                        6001,
+                    ]:
+                        logger.error(f"6001 error, rows in Zoho plan exceeded {respObj.response.text}")
                         raise UnrecoverableRateLimitError(urlResp=respObj, zoho_error_code=code)
-                    elif code in [6043, ]:
-                        logger.error(
-                            f"6043 error, daily API limit in Zoho plan exceeded {respObj.response.text}")
+                    elif code in [
+                        6043,
+                    ]:
+                        logger.error(f"6043 error, daily API limit in Zoho plan exceeded {respObj.response.text}")
                         raise UnrecoverableRateLimitError(urlResp=respObj, zoho_error_code=code)
-                    elif code in [7103, ]:
-                        logger.error(
-                            f"7103 error, workspace not found (check authentication) {respObj.response.text}")
+                    elif code in [
+                        7103,
+                    ]:
+                        logger.error(f"7103 error, workspace not found (check authentication) {respObj.response.text}")
                         raise ServerError(urlResp=respObj, zoho_error_code=code)
-                    elif code in [7107, ]:
-                        logger.error(
-                            f"7107 error, column does not exist:  {respObj.response.text}")
+                    elif code in [
+                        7107,
+                    ]:
+                        logger.error(f"7107 error, column does not exist:  {respObj.response.text}")
                         raise ServerError(urlResp=respObj, zoho_error_code=code)
-                    elif code in [7111, ]:
-                        logger.error(
-                            f"71111 error, table already exists:  {respObj.response.text}")
+                    elif code in [
+                        7111,
+                    ]:
+                        logger.error(f"71111 error, table already exists:  {respObj.response.text}")
                         raise ServerError(urlResp=respObj, zoho_error_code=code)
-                    elif code in [7179, ]:
+                    elif code in [
+                        7179,
+                    ]:
                         logger.error(
-                            f"7179 error, workspace reports no view present. Initialise with a dummy table {respObj.response.text}")
+                            f"7179 error, workspace reports no view present. Initialise with a dummy table "
+                            f"{respObj.response.text}"
+                        )
                         raise ServerError(urlResp=respObj, zoho_error_code=code)
-                    elif code in [7183, ]:
-                        logger.error(
-                            f"7183 error, lookup column types don't match {respObj.response.text}")
-                    elif code in [7184, ]:
-                        logger.error(
-                            f"7184 error, cyclic lookup detected {respObj.response.text}")
+                    elif code in [
+                        7183,
+                    ]:
+                        logger.error(f"7183 error, lookup column types don't match {respObj.response.text}")
+                    elif code in [
+                        7184,
+                    ]:
+                        logger.error(f"7184 error, cyclic lookup detected {respObj.response.text}")
                         raise ServerError(urlResp=respObj, zoho_error_code=code)
-                    elif code in [7198, ]:
+                    elif code in [
+                        7198,
+                    ]:
                         logger.error(
-                            f"7198 error, table design changes still in progress {respObj.response.text}  there are {retry_countdown + 1} retries left")
+                            f"7198 error, table design changes still in progress {respObj.response.text} "
+                            f" there are {retry_countdown + 1} retries left"
+                        )
 
                         if retry_countdown <= 0:
                             logger.error(
-                                "Zoho API Recoverable error (table maintenance ongoing), but exhausted retries")
+                                "Zoho API Recoverable error (table maintenance ongoing), but exhausted retries"
+                            )
                             raise UnrecoverableRateLimitError(urlResp=respObj, zoho_error_code=code)
                         else:
                             time.sleep(min(10 - retry_countdown, 1) * 10)
                             continue
-                    elif code in [7232, ]:
+                    elif code in [
+                        7232,
+                    ]:
                         logger.error(
-                            f"7232 error,an invalid value has been provided according to the column's data type) {respObj.response.text=} ")
+                            f"7232 error,an invalid value has been provided according to the column's data type) "
+                            f"{respObj.response.text=} "
+                        )
                         raise BadDataError(urlResp=respObj, zoho_error_code=code)
-                    elif code in [7280, ]:
+                    elif code in [
+                        7280,
+                    ]:
                         logger.error(
-                            f"7280 error, relating to schema errors, return immediately {respObj.response.text}")
+                            f"7280 error, relating to schema errors, return immediately {respObj.response.text}"
+                        )
                         raise ServerError(urlResp=respObj, zoho_error_code=code)
-                    elif code in [7301, ]:
+                    elif code in [
+                        7301,
+                    ]:
                         logger.error(
-                            f"7301 error, relating to permission errors, return immediately {respObj.response.text}")
+                            f"7301 error, relating to permission errors, return immediately {respObj.response.text}"
+                        )
                         raise ServerError(urlResp=respObj, zoho_error_code=code)
-                    elif code in [7378, ]:
-                        logger.error(f"7378 Possible attempt to remove a lookup when no such lookup exists {respObj.response.text}")
+                    elif code in [
+                        7378,
+                    ]:
+                        logger.error(
+                            f"7378 Possible attempt to remove a lookup when no such lookup exists "
+                            f"{respObj.response.text}"
+                        )
                         raise ServerError(urlResp=respObj, zoho_error_code=code)
-                    elif code in [7389, ]:
+                    elif code in [
+                        7389,
+                    ]:
                         logger.error(f"7389 Error from zoho Organisation does not exist {respObj.response.text}")
                         raise ServerError(urlResp=respObj, zoho_error_code=code)
-                    elif code in [7403, ]:
+                    elif code in [
+                        7403,
+                    ]:
                         logger.error(f"7403 SQL Parsing Error {respObj.response.text}")
                         raise ServerError(urlResp=respObj, zoho_error_code=code)
-                    elif code in [7407, ]:
+                    elif code in [
+                        7407,
+                    ]:
                         logger.error(f"7403 SQL Unknown column {respObj.response.text}")
                         raise ServerError(urlResp=respObj, zoho_error_code=code)
-                    elif code in [8504, ]:
-                        logger.error(f"8594 Teh ZOHO_REFERREDTABLE argument when calling ADDLOOKUP was wrong {respObj.response.text}")
+                    elif code in [
+                        8504,
+                    ]:
+                        logger.error(
+                            f"8594 Teh ZOHO_REFERREDTABLE argument when calling ADDLOOKUP was wrong "
+                            f"{respObj.response.text}"
+                        )
                         raise ServerError(urlResp=respObj, zoho_error_code=code)
-                    elif code in [8540, ]:
+                    elif code in [
+                        8540,
+                    ]:
                         logger.error(f"8540 Error, token has incorrect scope {respObj.response.text}")
                         raise ServerError(urlResp=respObj, zoho_error_code=code)
-                    elif code in [8535, ]:  # invalid oauth token
+                    elif code in [
+                        8535,
+                    ]:  # invalid oauth token
                         try:
                             self.getOAuthToken()
                         except Exception:
                             pass
                         logger.error("Zoho API Recoverable error encountered (invalid oauth token), will retry")
                         if retry_countdown <= 0:
-                            logger.error(
-                                "Zoho API Recoverable error (invalid oauth token) exhausted retries")
+                            logger.error("Zoho API Recoverable error (invalid oauth token) exhausted retries")
                             raise UnrecoverableRateLimitError(urlResp=respObj, zoho_error_code=code)
                         else:
                             time.sleep(min(10 - retry_countdown, 1) * 10)
                             continue
-                    elif code in [8509, ]:  # parameter does not match accepted input pattern
+                    elif code in [
+                        8509,
+                    ]:  # parameter does not match accepted input pattern
                         logger.error(
-                            "Error 8509 encountered, something is wrong with the data format, no retry is attempted")
+                            "Error 8509 encountered, something is wrong with the data format, no retry is attempted"
+                        )
                         raise BadDataError(respObj, zoho_error_code=code)
-                    elif code in [10001, ]:  # 10001 is "Another import is in progress, so we can try this again"
+                    elif code in [
+                        10001,
+                    ]:  # 10001 is "Another import is in progress, so we can try this again"
                         logger.error(
-                            "Zoho API Recoverable error encountered (Another import is in progress), will retry")
+                            "Zoho API Recoverable error encountered (Another import is in progress), will retry"
+                        )
                         if retry_countdown <= 0:
                             logger.error(
-                                "Zoho API Recoverable error (Another import is in progress) but exhausted retries")
-                            raise UnrecoverableRateLimitError(urlResp=respObj, zoho_error_code=code,
-                                                              message="Zoho error: Another import is in progress")
+                                "Zoho API Recoverable error (Another import is in progress) but exhausted retries"
+                            )
+                            raise UnrecoverableRateLimitError(
+                                urlResp=respObj,
+                                zoho_error_code=code,
+                                message="Zoho error: Another import is in progress",
+                            )
                         else:
                             time.sleep(min(10 - retry_countdown, 1) * 10)
                             continue
@@ -465,47 +541,63 @@ class ReportClient:
                     import_data = payLoad.get("ZOHO_IMPORT_DATA") if payLoad else None
                     if import_data:
                         logger.error(
-                            f"Import data, a csv file as a string. Row 1 is header, col 0 is first col (id): {import_data} ")
+                            f"Import data, a csv file as a string. Row 1 is header, col 0 is first col (id): "
+                            f"{import_data} "
+                        )
                     raise ServerError(respObj, zoho_error_code=code, payload=payLoad)
-            elif (respObj.status_code in [401, ]):
+            elif respObj.status_code in [
+                401,
+            ]:
                 try:
                     # j = respObj.response.json(strict=False) #getting decode errors in this and they don't make sense
                     j = json.loads(respObj.response.text, strict=False)
-                    code = j['response']['error']['code']
+                    code = j["response"]["error"]["code"]
                 except json.JSONDecodeError:
                     logger.error(f"API caused a JSONDecodeError for {respObj.response.text} ")
                     code = None
                 logger.debug(f"API returned a 401 result and an error code: {code} ")
-                if code in [8535, ]:  # invalid oauth token
+                if code in [
+                    8535,
+                ]:  # invalid oauth token
                     try:
                         self.getOAuthToken()
                     except Exception:
                         pass
                     logger.error("Zoho API Recoverable error encountered (invalid oauth token), will retry")
                     if retry_countdown <= 0:
-                        logger.error(
-                            "Zoho API Recoverable error (invalid oauth token) exhausted retries")
+                        logger.error("Zoho API Recoverable error (invalid oauth token) exhausted retries")
                         raise UnrecoverableRateLimitError(urlResp=respObj, zoho_error_code=code)
                     else:
                         time.sleep(min(10 - retry_countdown, 1) * 10)
                         continue
-            elif (respObj.status_code in [414, ]):
-                msg = f"HTTP response 414 was encountered (URI too large), no retry is attempted. {respObj.response.text} URL for {httpMethod=} {url=} {payLoad=}"
+            elif respObj.status_code in [
+                414,
+            ]:
+                msg = (
+                    f"HTTP response 414 was encountered (URI too large), no retry is attempted. "
+                    f"{respObj.response.text} URL for {httpMethod=} {url=} {payLoad=}"
+                )
                 logger.error(msg)
                 raise BadDataError(respObj, zoho_error_code=None)
 
-            elif (respObj.status_code in [500, ]):
+            elif respObj.status_code in [
+                500,
+            ]:
                 code = respObj.response.status_code
                 if ":7005" in respObj.response.text:
                     logger.error(
-                        f"Error 7005 encountered ('unexpected error'), no retry is attempted. {respObj.response.text}")
+                        f"Error 7005 encountered ('unexpected error'), no retry is attempted. {respObj.response.text}"
+                    )
                     raise BadDataError(respObj, zoho_error_code=code)
             else:
                 try:
                     response_text = respObj.response.text
                 except Exception:
                     response_text = "unreadable response text"
-                msg = f"Unexpected status code in from __sendRequest. Server response code is {respObj.status_code=} {response_text=}.  {url=}, {httpMethod=}, {payLoad=}, {action=} Retry attempts will be made..."
+                msg = (
+                    f"Unexpected status code in from __sendRequest. Server response code is {respObj.status_code=} "
+                    f"{response_text=}.  {url=}, {httpMethod=}, {payLoad=}, {action=} Retry attempts will be made..."
+                )
                 logger.exception(msg)
                 time.sleep(min(10 - retry_countdown, 1) * 10)
                 continue
@@ -522,14 +614,15 @@ class ReportClient:
             error_details = f"Last error response status: {last_respObj.status_code}, text: {response_text}"
 
         display_payload = payLoad
-        if isinstance(payLoad, dict) and 'ZOHO_IMPORT_DATA' in payLoad:
+        if isinstance(payLoad, dict) and "ZOHO_IMPORT_DATA" in payLoad:
             display_payload = payLoad.copy()
-            data = display_payload.get('ZOHO_IMPORT_DATA', "")
+            data = display_payload.get("ZOHO_IMPORT_DATA", "")
             if isinstance(data, str) and len(data) > 500:
-                display_payload['ZOHO_IMPORT_DATA'] = data[:500] + '... (truncated)'
+                display_payload["ZOHO_IMPORT_DATA"] = data[:500] + "... (truncated)"
 
         raise RuntimeError(
-            f"After starting with {init_retry_countdown} retries allowed, there are now no more retries left in __sendRequest. "
+            f"After starting with {init_retry_countdown} retries allowed, there are now no more retries left "
+            f"in __sendRequest. "
             f"{error_details}. {url=}, {httpMethod=}, payLoad={display_payload}, {action=}"
         )
 
@@ -537,7 +630,7 @@ class ReportClient:
         """
         Internal method to check whether accesstoken expires or not.
         """
-        if (respObj.status_code != 200):
+        if respObj.status_code != 200:
             try:
                 dom = ReportClientHelper.getAsDOM(respObj.content)
                 err_code = dom.getElementsByTagName("code")
@@ -548,16 +641,18 @@ class ReportClient:
 
         return False
 
-    def handle_response_v2(self, response: requests.Response, action: str, callBackData) -> Optional[
-        Union[MutableMapping, 'ImportResult', 'ShareInfo', 'PlanInfo']]:
-        """ this is a replace for sendRequest: we do the request using requests"""
-        if (response.status_code != 200):
+    def handle_response_v2(
+        self, response: requests.Response, action: str, callBackData
+    ) -> Optional[Union[MutableMapping, "ImportResult", "ShareInfo", "PlanInfo"]]:
+        """this is a replace for sendRequest: we do the request using requests"""
+        if response.status_code != 200:
             raise ServerError(response)
         else:
             return self.handleResponse(response, action, callBackData)
 
-    def handleResponse(self, response, action, callBackData) -> Optional[
-        Union[MutableMapping, 'ImportResult', 'ShareInfo', 'PlanInfo']]:
+    def handleResponse(
+        self, response, action, callBackData
+    ) -> Optional[Union[MutableMapping, "ImportResult", "ShareInfo", "PlanInfo"]]:
         """
         Internal method. To be used by classes extending this. To phase in V2 api,
         set action  to be None or "API_V2"
@@ -566,7 +661,7 @@ class ReportClient:
             resp = response.content
             resp_json = json.loads(resp) if resp else {}  # 204 responses are empty
             return resp_json
-        elif ("ADDROW" == action):
+        elif "ADDROW" == action:
             resp = response.content
             dom = ReportClientHelper.getAsDOM(resp)
             try:
@@ -574,115 +669,122 @@ class ReportClient:
                 cols = dom.getElementsByTagName("column")
                 for el in cols:
                     content = ReportClientHelper.getText(el.childNodes).strip()
-                    if ("" == content):
+                    if "" == content:
                         content = None
                     dict[el.getAttribute("name")] = content
                 return dict
             except Exception as inst:
-                raise ParseError(resp, "Returned XML format for ADDROW not proper.Could possibly be version mismatch",
-                                 inst)
-        elif ("DELETE" == action):
+                raise ParseError(
+                    resp, "Returned XML format for ADDROW not proper.Could possibly be version mismatch", inst
+                )
+        elif "DELETE" == action:
             resp = response.content
             resp = json.loads(resp)
             return resp["response"]["result"]["deletedrows"]
-        elif ("UPDATE" == action):
+        elif "UPDATE" == action:
             resp = response.content
             resp = json.loads(resp)
             return resp["response"]["result"]["updatedRows"]
-        elif ("IMPORT" == action):
+        elif "IMPORT" == action:
             return ImportResult(response.content)
-        elif ("EXPORT" == action):
+        elif "EXPORT" == action:
             f = callBackData
             f.write(response.content)
             return None
-        elif ("COPYDB" == action):
+        elif "COPYDB" == action:
             resp = response.content
             resp = json.loads(resp)
             return resp["response"]["result"]["dbid"]
-        elif ("AUTOGENREPORTS" == action or "CREATESIMILARVIEWS" == action):
+        elif "AUTOGENREPORTS" == action or "CREATESIMILARVIEWS" == action:
             resp = response.content
             resp = json.loads(resp)
             return resp["response"]["result"]
-        elif ("HIDECOLUMN" == action):
+        elif "HIDECOLUMN" == action:
             resp = response.content
             resp = json.loads(resp)
             return resp["response"]["result"]
-        elif ("SHOWCOLUMN" == action):
+        elif "SHOWCOLUMN" == action:
             resp = response.content
             resp = json.loads(resp)
             return resp["response"]["result"]
-        elif ("DATABASEMETADATA" == action):
+        elif "DATABASEMETADATA" == action:
             resp = response.content
             resp = json.loads(resp)
             return resp["response"]["result"]
-        elif ("GETDATABASENAME" == action):
+        elif "GETDATABASENAME" == action:
             resp = response.content
             dom = ReportClientHelper.getAsDOM(resp)
             return ReportClientHelper.getInfo(dom, "dbname", response)
-        elif ("GETDATABASEID" == action):
+        elif "GETDATABASEID" == action:
             resp = response.content
             dom = ReportClientHelper.getAsDOM(resp)
             return ReportClientHelper.getInfo(dom, "dbid", response)
-        elif ("ISDBEXIST" == action):
+        elif "ISDBEXIST" == action:
             resp = response.content
             resp = json.loads(resp)
             return resp["response"]["result"]["isdbexist"]
-        elif ("ISVIEWEXIST" == action):
+        elif "ISVIEWEXIST" == action:
             resp = response.content
             resp = json.loads(resp)
             return resp["response"]["result"]["isviewexist"]
-        elif ("ISCOLUMNEXIST" == action):
+        elif "ISCOLUMNEXIST" == action:
             resp = response.content
             resp = json.loads(resp)
             return resp["response"]["result"]["iscolumnexist"]
-        elif ("GETCOPYDBKEY" == action):
+        elif "GETCOPYDBKEY" == action:
             resp = response.content
             dom = ReportClientHelper.getAsDOM(resp)
             return ReportClientHelper.getInfo(dom, "copydbkey", response)
-        elif ("GETVIEWNAME" == action):
+        elif "GETVIEWNAME" == action:
             resp = response.content
             dom = ReportClientHelper.getAsDOM(resp)
             return ReportClientHelper.getInfo(dom, "viewname", response)
-        elif ("GETINFO" == action):
+        elif "GETINFO" == action:
             resp = response.content
             dom = ReportClientHelper.getAsDOM(resp)
             result = {}
-            result['objid'] = ReportClientHelper.getInfo(dom, "objid", response)
-            result['dbid'] = ReportClientHelper.getInfo(dom, "dbid", response)
+            result["objid"] = ReportClientHelper.getInfo(dom, "objid", response)
+            result["dbid"] = ReportClientHelper.getInfo(dom, "dbid", response)
             return result
-        elif ("GETSHAREINFO" == action):
+        elif "GETSHAREINFO" == action:
             return ShareInfo(response.content)
-        elif ("GETVIEWURL" == action):
+        elif "GETVIEWURL" == action:
             resp = response.content
             dom = ReportClientHelper.getAsDOM(resp)
             return ReportClientHelper.getInfo(dom, "viewurl", response)
-        elif ("GETEMBEDURL" == action):
+        elif "GETEMBEDURL" == action:
             resp = response.content
             dom = ReportClientHelper.getAsDOM(resp)
             return ReportClientHelper.getInfo(dom, "embedurl", response)
-        elif ("GETUSERS" == action):
+        elif "GETUSERS" == action:
             resp = response.content
             resp = json.loads(resp)
             return resp["response"]["result"]
-        elif ("GETUSERPLANDETAILS" == action):
+        elif "GETUSERPLANDETAILS" == action:
             return PlanInfo(response.content)
-        elif ("GETDASHBOARDS" == action):
+        elif "GETDASHBOARDS" == action:
             resp = response.content
-            resp = (json.loads(resp))
-            return (resp["response"]["result"]["dashboards"])
-        elif ("RECENTITEMS" == action):
+            resp = json.loads(resp)
+            return resp["response"]["result"]["dashboards"]
+        elif "RECENTITEMS" == action:
             resp = response.content
-            resp = (json.loads(resp))
-            return (resp["response"]["result"]["recentviews"])
+            resp = json.loads(resp)
+            return resp["response"]["result"]["recentviews"]
         elif (
-                "GETVIEWINFO" == action or "MYWORKSPACELIST" == action or "SHAREDWORKSPACELIST" == action or "VIEWLIST" == action or "FOLDERLIST" == action):
+            "GETVIEWINFO" == action
+            or "MYWORKSPACELIST" == action
+            or "SHAREDWORKSPACELIST" == action
+            or "VIEWLIST" == action
+            or "FOLDERLIST" == action
+        ):
             resp = response.content
-            resp = (json.loads(resp))
-            return (resp["response"]["result"])
-        elif ("SAVEAS" == action):
+            resp = json.loads(resp)
+            return resp["response"]["result"]
+        elif "SAVEAS" == action:
             resp = response.content
-            resp = (json.loads(resp))
-            return (resp["response"]["result"]["message"])
+            resp = json.loads(resp)
+            return resp["response"]["result"]["message"]
+        return None
 
     def addRow(self, tableURI, columnValues, config=None):
         """
@@ -709,7 +811,7 @@ class ReportClient:
         return self.__sendRequest(url, "POST", payLoad, "ADDROW", None)
 
     def deleteData(self, tableURI, criteria=None, config=None, retry_countdown=0) -> int:
-        """  This has been refactored to use requests.post.
+        """This has been refactored to use requests.post.
         Returns the number of rows deleted
         Delete the data in the  specified table identified by the URI.
         @param tableURI: The URI of the table. See L{getURI<getURI>}.
@@ -726,8 +828,14 @@ class ReportClient:
         # payLoad = ReportClientHelper.getAsPayLoad([config], criteria, None)
         payload = None  # can't put the SQL in the body of the post request, the library is wrong or out of date
         url = ReportClientHelper.addQueryParams(tableURI, self.access_token, "DELETE", "JSON", criteria=criteria)
-        r = self.__sendRequest(url=url, httpMethod="POST", payLoad=payload, action="DELETE", callBackData=None,
-                               retry_countdown=retry_countdown)
+        r = self.__sendRequest(
+            url=url,
+            httpMethod="POST",
+            payLoad=payload,
+            action="DELETE",
+            callBackData=None,
+            retry_countdown=retry_countdown,
+        )
         return int(r)
 
     def updateData(self, tableURI, columnValues, criteria, config=None):
@@ -779,43 +887,47 @@ class ReportClient:
         """
         if importConfig is None:
             importConfig = {}
-        importConfig['ZOHO_IMPORT_TYPE'] = importType
+        importConfig["ZOHO_IMPORT_TYPE"] = importType
         importConfig["ZOHO_ON_IMPORT_ERROR"] = onError
         importConfig["ZOHO_AUTO_IDENTIFY"] = autoIdentify
 
         if "ZOHO_CREATE_TABLE" not in importConfig:
-            importConfig["ZOHO_CREATE_TABLE"] = 'false'
+            importConfig["ZOHO_CREATE_TABLE"] = "false"
 
-        files = {"ZOHO_FILE": ("file", importContent, 'multipart/form-data')}
+        files = {"ZOHO_FILE": ("file", importContent, "multipart/form-data")}
         url = ReportClientHelper.addQueryParams(tableURI, self.access_token, "IMPORT", "XML")
 
         headers = {}
         # To set access token for the first time when an instance is created.
         if ReportClient.isOAuth:
-            if self.accesstoken is None:
-                self.accesstoken = self.getOAuthToken()
-            headers = {"Authorization": "Zoho-oauthtoken " + self.accesstoken}
+            if self.access_token is None:
+                self.access_token = self.getOAuthToken()
+            headers = {"Authorization": "Zoho-oauthtoken " + self.access_token}
 
         respObj = requests.post(url, data=importConfig, files=files, headers=headers)
 
         # To generate new access token once after it expires.
         if self.invalidOAUTH(respObj):
-            self.accesstoken = self.getOAuthToken()
-            headers = {"Authorization": "Zoho-oauthtoken " + self.accesstoken}
+            self.access_token = self.getOAuthToken()
+            headers = {"Authorization": "Zoho-oauthtoken " + self.access_token}
             respObj = requests.post(url, data=importConfig, files=files, headers=headers)
 
-        if (respObj.status_code != 200):
+        if respObj.status_code != 200:
             raise ServerError(respObj)
         else:
             return ImportResult(respObj.content)
 
-    def importData_v1a(self, tableURI: str, import_mode: str,
-                       import_content: str,
-                       matching_columns: str = None,
-                       date_format=None,
-                       import_config=None,
-                       retry_countdown=0) -> 'ImportResult':
-        """ Send data to zoho using a string formatted in CSV style.
+    def importData_v1a(
+        self,
+        tableURI: str,
+        import_mode: str,
+        import_content: str,
+        matching_columns: Optional[str] = None,
+        date_format=None,
+        import_config=None,
+        retry_countdown=0,
+    ) -> "ImportResult":
+        """Send data to zoho using a string formatted in CSV style.
         This has been refactored to use requests.post.
         Bulk import data into the table identified by the URI. import_content is a string in csv format (\n separated)
         The first line is column headers.
@@ -836,11 +948,13 @@ class ReportClient:
         @param import_config: Contains any additional control parameters.
         See U{Import types<http://zohoreportsapi.wiki.zoho.com/Importing-CSV-File.html>} for more details.
         @type import_config:dictionary
-        @param matching_columns: A comma separated list of column names to match on.  If this is not provided, then the first column is used.
+        @param matching_columns: A comma separated list of column names to match on.  If this is not provided, then the
+            first column is used.
         @type matching_columns:string
         @param date_format: The Zoho date format to use.  If this is not provided, then the default is used.
         @type date_format:string
-        @param retry_countdown: The number of retries to attempt if the API returns a recoverable error.  If this is not provided, then the default is used.
+        @param retry_countdown: The number of retries to attempt if the API returns a recoverable error.  If this is not
+            provided, then the default is used.
         @type retry_countdown:int
         @return: An L{ImportResult} containing the results of the Import
         @rtype:L{ImportResult}
@@ -850,21 +964,30 @@ class ReportClient:
         """
         date_format = date_format or "yyyy-MM-dd"
 
-        payload = {"ZOHO_AUTO_IDENTIFY": "true",
-                   # "ZOHO_COMMENTCHAR":"#",
-                   # "ZOHO_DELIMITER":0, #comma
-                   # "ZOHO_QUOTED":2, #double quote
-                   "ZOHO_ON_IMPORT_ERROR": "ABORT",
-                   "ZOHO_CREATE_TABLE": "false", "ZOHO_IMPORT_TYPE": import_mode,
-                   "ZOHO_DATE_FORMAT": date_format,
-                   "ZOHO_IMPORT_DATA": import_content}
+        payload = {
+            "ZOHO_AUTO_IDENTIFY": "true",
+            # "ZOHO_COMMENTCHAR":"#",
+            # "ZOHO_DELIMITER":0, #comma
+            # "ZOHO_QUOTED":2, #double quote
+            "ZOHO_ON_IMPORT_ERROR": "ABORT",
+            "ZOHO_CREATE_TABLE": "false",
+            "ZOHO_IMPORT_TYPE": import_mode,
+            "ZOHO_DATE_FORMAT": date_format,
+            "ZOHO_IMPORT_DATA": import_content,
+        }
 
         if matching_columns:
-            payload['ZOHO_MATCHING_COLUMNS'] = matching_columns
+            payload["ZOHO_MATCHING_COLUMNS"] = matching_columns
 
         url = ReportClientHelper.addQueryParams(tableURI, self.access_token, "IMPORT", "XML")
-        r = self.__sendRequest(url=url, httpMethod="POST", payLoad=payload, action="IMPORT", callBackData=None,
-                               retry_countdown=retry_countdown)
+        r = self.__sendRequest(
+            url=url,
+            httpMethod="POST",
+            payLoad=payload,
+            action="IMPORT",
+            callBackData=None,
+            retry_countdown=retry_countdown,
+        )
         return ImportResult(r.response)  # a parser from Zoho
 
     def importDataAsString(self, tableURI, importType, importContent, autoIdentify, onError, importConfig=None):
@@ -894,18 +1017,23 @@ class ReportClient:
         due to some error.
         @raise ParseError: If the server has responded but client was not able to parse the response.
         """
-        dict = {"ZOHO_AUTO_IDENTIFY": autoIdentify, "ZOHO_ON_IMPORT_ERROR": onError,
-                "ZOHO_IMPORT_TYPE": importType, "ZOHO_IMPORT_DATA": importContent}
+        dict = {
+            "ZOHO_AUTO_IDENTIFY": autoIdentify,
+            "ZOHO_ON_IMPORT_ERROR": onError,
+            "ZOHO_IMPORT_TYPE": importType,
+            "ZOHO_IMPORT_DATA": importContent,
+        }
 
         if "ZOHO_CREATE_TABLE" not in importConfig:
-            importConfig["ZOHO_CREATE_TABLE"] = 'false'
+            importConfig["ZOHO_CREATE_TABLE"] = "false"
 
         payLoad = ReportClientHelper.getAsPayLoad([dict, importConfig], None, None)
         url = ReportClientHelper.addQueryParams(tableURI, self.access_token, "IMPORT", "XML")
         return self.__sendRequest(url, "POST", payLoad, "IMPORT", None)
 
-    def exportData(self, tableOrReportURI, format, exportToFileObj,
-                   criteria: Optional[str] = None, config: Optional[str] = None):
+    def exportData(
+        self, tableOrReportURI, format, exportToFileObj, criteria: Optional[str] = None, config: Optional[str] = None
+    ):
         """
         Export the data in the  specified table identified by the URI.
         @param tableOrReportURI: The URI of the table. See L{getURI<getURI>}.
@@ -955,7 +1083,7 @@ class ReportClient:
         return self.__sendRequest(url, "POST", payLoad, "EXPORT", exportToFileObj)
 
     def exportDataUsingSQL_v2(self, tableOrReportURI, format, sql, config=None, retry_countdown=0) -> io.BytesIO:
-        """ This has been refactored to use requests.post
+        """This has been refactored to use requests.post
         Export the data with the  specified SQL query identified by the URI.
         @param tableOrReportURI: The URI of the database. See L{getDBURI<getDBURI>}.
         @type tableOrReportURI:string
@@ -981,13 +1109,21 @@ class ReportClient:
         # payload = ReportClientHelper.getAsPayLoad([config], None, sql)
         payload = None
         """ sql does not need to URL encoded when passed in, but wrap in quotes"""
-        # addQueryParams  adds parameters to the URL, not in the POST body but that seems ok for zoho..   url += "&ZOHO_ERROR_FORMAT=XML&ZOHO_ACTION=" + urllib.parse.quote(action)
+        # addQueryParams  adds parameters to the URL, not in the POST body but that seems ok for zoho..
+        # url += "&ZOHO_ERROR_FORMAT=XML&ZOHO_ACTION=" + urllib.parse.quote(action)
         # addQueryParams adds: ZOHO_ERROR_FORMAT, ZOHO_OUTPUT_FORMAT
-        url = ReportClientHelper.addQueryParams(tableOrReportURI, self.access_token, "EXPORT", format,
-                                                sql=sql)  # urlencoding is done in here
+        url = ReportClientHelper.addQueryParams(
+            tableOrReportURI, self.access_token, "EXPORT", format, sql=sql
+        )  # urlencoding is done in here
         callback_object = io.BytesIO()
-        self.__sendRequest(url=url, httpMethod="POST", payLoad=payload, action="EXPORT",
-                               callBackData=callback_object, retry_countdown=retry_countdown)
+        self.__sendRequest(
+            url=url,
+            httpMethod="POST",
+            payLoad=payload,
+            action="EXPORT",
+            callBackData=callback_object,
+            retry_countdown=retry_countdown,
+        )
         return callback_object
 
     def copyDatabase(self, dbURI, config=None):
@@ -1007,26 +1143,34 @@ class ReportClient:
         url = ReportClientHelper.addQueryParams(dbURI, self.access_token, "COPYDATABASE", "JSON")
         return self.__sendRequest(url, "POST", payLoad, "COPYDB", None)
 
-    def copy_workspace_api_v2(self, workspace_id, new_workspace_name, workspace_key, copy_with_data: bool,
-                              source_org_id,
-                              dest_org_id,
-                              copy_with_import_source: bool = False,
-
-                              ):
+    def copy_workspace_api_v2(
+        self,
+        workspace_id,
+        new_workspace_name,
+        workspace_key,
+        copy_with_data: bool,
+        source_org_id,
+        dest_org_id,
+        copy_with_import_source: bool = False,
+    ):
         """
-       A v2 API functions
+        A v2 API functions
         """
-        config_dict = {"newWorkspaceName": new_workspace_name, "newWorkspaceDesc": "copy",
-                       "workspaceKey": workspace_key,
-                       "copyWithData": copy_with_data,
-                       "copyWithImportSource": copy_with_import_source}
+        config_dict = {
+            "newWorkspaceName": new_workspace_name,
+            "newWorkspaceDesc": "copy",
+            "workspaceKey": workspace_key,
+            "copyWithData": copy_with_data,
+            "copyWithImportSource": copy_with_import_source,
+        }
 
         config_data = "CONFIG=" + urllib.parse.quote_plus(json.dumps(config_dict))
         url = self.getURI_v2() + f"workspaces/{workspace_id}"
 
         extra_headers = {"ZANALYTICS-ORGID": source_org_id, "ZANALYTICS-DEST-ORGID": dest_org_id}
-        return self.__sendRequest(url, "POST", payLoad=None, params=config_data, action=None,
-                                  extra_headers=extra_headers)
+        return self.__sendRequest(
+            url, "POST", payLoad=None, params=config_data, action=None, extra_headers=extra_headers
+        )
 
     def get_orgs_metadata_api_v2(self):
         url = self.getURI_v2() + "orgs/"
@@ -1036,7 +1180,9 @@ class ReportClient:
         url = self.getURI_v2() + "workspaces/"
         return self.__sendRequest(url, "GET", payLoad=None, action=None)
 
-    def get_views_api_v2(self, org_id: str, workspace_id: str, view_types: list[int] = None) -> ZohoWorkspacesResponse:
+    def get_views_api_v2(
+        self, org_id: str, workspace_id: str, view_types: Optional[List[int]] = None
+    ) -> ZohoViewsResponse:
         """ViewType:
         0 - Table
         1 - Tabular View
@@ -1050,9 +1196,9 @@ class ReportClient:
             url += f"?viewTypes={','.join(map(str, view_types))}"
         return self.__sendRequest(url, "GET", payLoad=None, action=None, extra_headers={"ZANALYTICS-ORGID": org_id})
 
-    def get_view_details_api_v2(self,view_id):
+    def get_view_details_api_v2(self, view_id):
         url = self.getURI_v2() + f"views/{view_id}"
-        config_dict = {"withInvolvedMetaInfo":True}
+        config_dict = {"withInvolvedMetaInfo": True}
         json_config = json.dumps(config_dict)
         # URL-encode the JSON string
         # quote_plus is generally preferred for query parameters as it encodes spaces as '+'
@@ -1061,8 +1207,7 @@ class ReportClient:
 
         return self.__sendRequest(url, "GET", payLoad=None, action=None)
 
-
-    def get_meta_details_view_api_v2(self,org_id:str,workspace_name:str,view_name:str):
+    def get_meta_details_view_api_v2(self, org_id: str, workspace_name: str, view_name: str):
         url = self.getURI_v2() + "metadetails"
         config_dict = {"workspaceName": workspace_name, "viewName": view_name}
         # Convert the dictionary to a JSON string
@@ -1071,12 +1216,15 @@ class ReportClient:
         # quote_plus is generally preferred for query parameters as it encodes spaces as '+'
         encoded_config = urllib.parse.quote_plus(json_config)
         url += f"?CONFIG={encoded_config}"
-        extra_headers = {"ZANALYTICS-ORGID": org_id, }
-        return self.__sendRequest(url, "GET", payLoad=None, action=None,extra_headers=extra_headers)
+        extra_headers = {
+            "ZANALYTICS-ORGID": org_id,
+        }
+        return self.__sendRequest(url, "GET", payLoad=None, action=None, extra_headers=extra_headers)
 
-
-    def get_workspace_secretkey_api_v2(self, workspace_id:str, org_id:str):
-        extra_headers = {"ZANALYTICS-ORGID": org_id, }
+    def get_workspace_secretkey_api_v2(self, workspace_id: str, org_id: str):
+        extra_headers = {
+            "ZANALYTICS-ORGID": org_id,
+        }
         url = self.getURI_v2() + f"workspaces/{workspace_id}/secretkey"
         return self.__sendRequest(url, "GET", payLoad=None, action=None, extra_headers=extra_headers)
 
@@ -1160,7 +1308,8 @@ class ReportClient:
         Create a table in the specified database.
         @param dbURI: The URI of the database. See L{getDBURI<getDBURI>}.
         @type dbURI:string
-        @param tableDesign: Table structure in JSON format (includes table name, description, folder name, column and lookup details, is system table).
+        @param tableDesign: Table structure in JSON format (includes table name, description, folder name, column and
+            lookup details, is system table).
         @type tableDesign:string
         @param config: Contains any additional control parameters. Can be C{None}.
         @type config:dictionary
@@ -1175,12 +1324,13 @@ class ReportClient:
 
         return self.__sendRequest(url, "POST", payLoad, "CREATETABLE", None)
 
-    def createTable_v2(self, workspace_id, org_id,tableDesign:AnalyticsTableZohoDef_v2, config=None):
+    def createTable_v2(self, workspace_id, org_id, tableDesign: AnalyticsTableZohoDef_v2, config=None):
         """
         Create a table in the specified database.
         @param dbURI: The URI of the database. See L{getDBURI<getDBURI>}.
         @type dbURI:string
-        @param tableDesign: Table structure in JSON format (includes table name, description, folder name, column and lookup details, is system table).
+        @param tableDesign: Table structure in JSON format (includes table name, description, folder name, column and
+            lookup details, is system table).
         @type tableDesign:string
         @param config: Contains any additional control parameters. Can be C{None}.
         @type config:dictionary
@@ -1190,14 +1340,13 @@ class ReportClient:
         """
         url = self.getURI_v2() + f"workspaces/{workspace_id}/tables"
 
-        json_config=json.dumps({"tableDesign":tableDesign})
+        json_config = json.dumps({"tableDesign": tableDesign})
         encoded_config = urllib.parse.quote_plus(json_config)
         url += f"?CONFIG={encoded_config}"
-        extra_headers = {"ZANALYTICS-ORGID": org_id, }
-        return self.__sendRequest(url, "POST", payLoad=None, action=None,extra_headers=extra_headers)
-
-
-
+        extra_headers = {
+            "ZANALYTICS-ORGID": org_id,
+        }
+        return self.__sendRequest(url, "POST", payLoad=None, action=None, extra_headers=extra_headers)
 
     def autoGenReports(self, tableURI, source, config=None):
         """
@@ -1297,7 +1446,8 @@ class ReportClient:
 
     def copyReports(self, dbURI, views, dbName, dbKey, config=None):
         """
-        The Copy Reports API is used to copy one or more reports from one database to another within the same account or even across user accounts.
+        The Copy Reports API is used to copy one or more reports from one database to another within the same account
+        or even across user accounts.
         @param dbURI: The URI of the source database. See L{getDBURI<getDBURI>}.
         @type dbURI:string
         @param views: This parameter holds the list of view names.
@@ -1321,7 +1471,8 @@ class ReportClient:
 
     def copyFormula(self, tableURI, formula, dbName, dbKey, config=None):
         """
-        The Copy Formula API is used to copy one or more formula columns from one table to another within the same database or across databases and even across one user account to another.
+        The Copy Formula API is used to copy one or more formula columns from one table to another within the same
+        database or across databases and even across one user account to another.
         @param tableURI: The URI of the table. See L{getURI<getURI>}.
         @type tableURI:string
         @param formula: This parameter holds the list of formula names.
@@ -1364,16 +1515,19 @@ class ReportClient:
         url += "&ZOHO_DATATYPE=" + urllib.parse.quote(dataType)
         return self.__sendRequest(url, "POST", payLoad, "ADDCOLUMN", None)
 
-    def addColumn_v2(self, org_id:str, workspace_id:str, view_id:str, column_def:ColumnDef_v2):
+    def addColumn_v2(self, org_id: str, workspace_id: str, view_id: str, column_def: ColumnDef_v2):
         """
-        adds a column,would be nice to lookups too but it's alot of work need the view id and reference id of the other column
+        adds a column,would be nice to lookups too but it's alot of work need the view id and reference id
+        of the other column
         """
         url = self.getURI_v2() + f"workspaces/{workspace_id}/views/{view_id}/columns"
-        json_config=json.dumps({"columnName":column_def["COLUMNNAME"], "dataType":column_def["DATATYPE"]})
+        json_config = json.dumps({"columnName": column_def["COLUMNNAME"], "dataType": column_def["DATATYPE"]})
         encoded_config = urllib.parse.quote_plus(json_config)
         url += f"?CONFIG={encoded_config}"
-        extra_headers = {"ZANALYTICS-ORGID": org_id, }
-        self.__sendRequest(url, "POST", payLoad=None, action=None,extra_headers=extra_headers)
+        extra_headers = {
+            "ZANALYTICS-ORGID": org_id,
+        }
+        self.__sendRequest(url, "POST", payLoad=None, action=None, extra_headers=extra_headers)
 
         # if "LOOKUPCOLUMN" in col_def:
         #     url = self.getURI_v2() + f"workspaces/{workspace_id}/views/{view_id}/columns"
@@ -1382,8 +1536,6 @@ class ReportClient:
         #     url += f"?CONFIG={encoded_config}"
         #     extra_headers = {"ZANALYTICS-ORGID": org_id, }
         #     add_col_result = self.__sendRequest(url, "POST", payLoad=None, action=None, extra_headers=extra_headers)
-
-
 
     def deleteColumn(self, tableURI, columnName, config=None):
         """
@@ -1551,8 +1703,9 @@ class ReportClient:
         payload = ReportClientHelper.getAsPayLoad([config], None, None)
         url = ReportClientHelper.addQueryParams(requestURI, self.access_token, "DATABASEMETADATA", "JSON")
         url += "&ZOHO_METADATA=" + urllib.parse.quote(metadata)
-        r = self.__sendRequest(url=url, httpMethod="POST", payLoad=payload, action="DATABASEMETADATA",
-                               callBackData=None)
+        r = self.__sendRequest(
+            url=url, httpMethod="POST", payLoad=payload, action="DATABASEMETADATA", callBackData=None
+        )
         return r
 
     def getDatabaseName(self, userURI, dbid, config=None):
@@ -1944,7 +2097,8 @@ class ReportClient:
 
     def getEmbedUrl(self, tableURI, criteria=None, config=None):
         """
-        This method is used to get the embed URL of the particular table / view. This API is available only for the White Label Administrator.
+        This method is used to get the embed URL of the particular table / view. This API is available only for the
+        White Label Administrator.
         @param tableURI: The URI of the table. See L{getURI<getURI>}.
         @type tableURI:string
         @param criteria: Set criteria for url. Can be C{None}.
@@ -2001,7 +2155,8 @@ class ReportClient:
         Remove the users from the Zoho Reports Account.
         @param userURI: The URI of the user. See L{getUserURI<getUserURI>}.
         @type userURI:string
-        @param emailIds: The email addresses of the users to be removed from the Zoho Reports Account separated by comma.
+        @param emailIds: The email addresses of the users to be removed from the Zoho Reports Account separated by
+            comma.
         @type emailIds:string
         @param config: Contains any additional control parameters.
         @type config:dictionary
@@ -2019,7 +2174,8 @@ class ReportClient:
         Activate the users in the Zoho Reports Account.
         @param userURI: The URI of the user. See L{getUserURI<getUserURI>}.
         @type userURI:string
-        @param emailIds: The email addresses of the users to be activated in the Zoho Reports Account separated by comma.
+        @param emailIds: The email addresses of the users to be activated in the Zoho Reports Account separated by
+            comma.
         @type emailIds:string
         @param config: Contains any additional control parameters.
         @type config:dictionary
@@ -2037,7 +2193,8 @@ class ReportClient:
         Deactivate the users in the Zoho Reports Account.
         @param userURI: The URI of the user. See L{getUserURI<getUserURI>}.
         @type userURI:string
-        @param emailIds: The email addresses of the users to be deactivated in the Zoho Reports Account separated by comma.
+        @param emailIds: The email addresses of the users to be deactivated in the Zoho Reports Account separated by
+            comma.
         @type emailIds:string
         @param config: Contains any additional control parameters.
         @type config:dictionary
@@ -2105,8 +2262,12 @@ class ReportClient:
         @rtype:string
         """
         url = self.reportServerURL + "/api/" + urllib.parse.quote(dbOwnerName)
-        url += "/" + self.splCharReplace(urllib.parse.quote(dbName)) + "/" + self.splCharReplace(
-            urllib.parse.quote(tableOrReportName))
+        url += (
+            "/"
+            + self.splCharReplace(urllib.parse.quote(dbName))
+            + "/"
+            + self.splCharReplace(urllib.parse.quote(tableOrReportName))
+        )
 
         return url
 
@@ -2187,19 +2348,19 @@ class ShareInfo:
         sharelist = jsonresult["response"]["result"]
 
         userinfo = sharelist["usershareinfo"]
-        if (userinfo):
+        if userinfo:
             self.userInfo = self.getKeyInfo(userinfo, "email")
 
         groupinfo = sharelist["groupshareinfo"]
-        if (groupinfo):
+        if groupinfo:
             self.groupInfo = self.getKeyInfo(groupinfo, "group")
 
         publicinfo = sharelist["publicshareinfo"]
-        if (publicinfo):
+        if publicinfo:
             self.publicInfo = self.getInfo(sharelist["publicshareinfo"])
 
         privateinfo = sharelist["privatelinkshareinfo"]
-        if (privateinfo):
+        if privateinfo:
             self.privateInfo = self.getInfo(privateinfo)
 
         self.adminMembers = sharelist["dbownershareinfo"]["dbowners"]
@@ -2209,7 +2370,7 @@ class ShareInfo:
         shareinfo = {}
         i = 0
         for ele in perminfo:
-            if ("email" == key):
+            if "email" == key:
                 info = ele["shareinfo"]["permissions"]
                 userid = ele["shareinfo"]["email"]
                 self.sharedUsers.append(userid)
@@ -2304,7 +2465,7 @@ class PlanInfo:
         @type:string
         """
 
-        if ("false" != self.trialAvailed):
+        if "false" != self.trialAvailed:
             self.trialPlan = ReportClientHelper.getInfo(dom, "TrialPlan", response)
             """
             The trial plan detail.
@@ -2330,12 +2491,12 @@ class RecoverableRateLimitError(Exception):
     """
 
     def __init__(self, urlResp, **kwargs):
-        if hasattr(urlResp, 'status_code'):
+        if hasattr(urlResp, "status_code"):
             self.httpStatusCode = urlResp.status_code  # :The http status code for the request.
             self.errorCode = self.httpStatusCode  # The error code sent by the server.
             self.uri = ""  # : The uri which threw this exception.
             self.action = ""  # :The action to be performed over the resource specified by the uri
-            if hasattr(urlResp, 'response') and urlResp.response is not None:
+            if hasattr(urlResp, "response") and urlResp.response is not None:
                 self.message = urlResp.response.text
             else:
                 self.message = urlResp.content  # : Returns the message sent by the server.
@@ -2357,12 +2518,12 @@ class UnrecoverableRateLimitError(Exception):
     """
 
     def __init__(self, urlResp, **kwargs):
-        if hasattr(urlResp, 'status_code'):
+        if hasattr(urlResp, "status_code"):
             self.httpStatusCode = urlResp.status_code  # :The http status code for the request.
             self.errorCode = self.httpStatusCode  # The error code sent by the server.
             self.uri = ""  # : The uri which threw this exception.
             self.action = ""  # :The action to be performed over the resource specified by the uri
-            if hasattr(urlResp, 'response') and urlResp.response is not None:
+            if hasattr(urlResp, "response") and urlResp.response is not None:
                 self.message = urlResp.response.text
             else:
                 self.message = urlResp.content  # : Returns the message sent by the server.
@@ -2398,11 +2559,19 @@ class ServerError(Exception):
         else:
             try:
                 contHeader = urlResp.headers.get("Content-Type", None)
-                if (contHeader and contHeader.find("text/xml") > -1):
+                if contHeader and contHeader.find("text/xml") > -1:
                     self.__parseErrorResponse()
             except AttributeError:
                 logger.error("response object is None")
         super().__init__(self.message)
+
+    def __parseErrorResponse(self):
+        try:
+            dom = ReportClientHelper.getAsDOM(self.message)
+            self.errorCode = int(ReportClientHelper.getInfo(dom, "code", self.message))
+            self.message = ReportClientHelper.getInfo(dom, "message", self.message)
+        except Exception:
+            pass
 
 
 class BadDataError(Exception):
@@ -2420,11 +2589,19 @@ class BadDataError(Exception):
         else:
             try:
                 contHeader = urlResp.headers.get("Content-Type", None)
-                if (contHeader and contHeader.find("text/xml") > -1):
+                if contHeader and contHeader.find("text/xml") > -1:
                     self.__parseErrorResponse()
             except AttributeError:
                 logger.error("response object is None")
         super().__init__(self.message)
+
+    def __parseErrorResponse(self):
+        try:
+            dom = ReportClientHelper.getAsDOM(self.message)
+            self.errorCode = int(ReportClientHelper.getInfo(dom, "code", self.message))
+            self.message = ReportClientHelper.getInfo(dom, "message", self.message)
+        except Exception:
+            pass
 
 
 class ParseError(Exception):
@@ -2452,7 +2629,7 @@ class ImportResult:
         @type:string
         """
         dom = ReportClientHelper.getAsDOM(response)
-        msg = response.decode('utf-8')
+        msg = response.decode("utf-8")
         try:
             self.result_code = int(ReportClientHelper.getInfo(dom, "code", response))
 
@@ -2497,14 +2674,14 @@ class ImportResult:
 
         self.impErrors = ReportClientHelper.getInfo(dom, "importErrors", response)
         """
-        The first 100 import errors. Applicable if ZOHO_ON_IMPORT_ERROR parameter is either 
+        The first 100 import errors. Applicable if ZOHO_ON_IMPORT_ERROR parameter is either
         SKIPROW or  SETCOLUMNEMPTY.  In case of ABORT , L{ServerError <ServerError>} is thrown.
         @type:string
         """
 
         self.operation = ReportClientHelper.getInfo(dom, "importOperation", response)
         """
-        The import operation. Can be either 
+        The import operation. Can be either
          1. B{created} if the specified table has been created. For this ZOHO_CREATE_TABLE parameter
             should have been set to true
          2. B{updated} if the specified table already exists.
@@ -2537,12 +2714,11 @@ class ResponseObj:
     """
 
     def __init__(self, resp: requests.Response):
-        """ updated to assume a urllib3 object"""
-        self.content = getattr(resp, 'content', None)
-        self.reason = getattr(resp, 'reason', None)  # This is used for communication about errors
-        self.status_code = getattr(resp, 'status_code', None)
-        self.headers = {}
-        self.headers = getattr(resp, 'headers', None)
+        """updated to assume a urllib3 object"""
+        self.content = getattr(resp, "content", None)
+        self.reason = getattr(resp, "reason", None)  # This is used for communication about errors
+        self.status_code = getattr(resp, "status_code", None)
+        self.headers: MutableMapping = getattr(resp, "headers", {})
         self.response = resp
 
 
@@ -2557,7 +2733,7 @@ class ReportClientHelper:
     @staticmethod
     def getInfo(dom, elName, response):
         nodeList = dom.getElementsByTagName(elName)
-        if (nodeList.length == 0):
+        if nodeList.length == 0:
             raise ParseError(response, elName + " element is not present in the response", None)
         el = nodeList[0]
         return ReportClientHelper.getText(el.childNodes)
@@ -2599,7 +2775,7 @@ class ReportClientHelper:
 
     @staticmethod
     def getAsPayLoad(separateDicts, criteria: Optional[str], sql: Optional[str], encode_payload=False):
-        payload = {}
+        payload: Any = {}
         for i in separateDicts:
             if i is not None:
                 payload.update(i)
@@ -2607,7 +2783,7 @@ class ReportClientHelper:
         if criteria is not None:
             payload["ZOHO_CRITERIA"] = criteria
 
-        if (sql is not None):
+        if sql is not None:
             payload["ZOHO_SQLQUERY"] = sql
 
         if len(payload) != 0:
@@ -2621,8 +2797,8 @@ class ReportClientHelper:
 
     @staticmethod
     def checkAndAppendQMark(url):
-        if (url.find("?") == -1):
+        if url.find("?") == -1:
             url += "?"
-        elif (url[len(url) - 1] != '&'):
+        elif url[len(url) - 1] != "&":
             url += "&"
         return url

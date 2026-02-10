@@ -2,6 +2,7 @@
 import urllib
 import json
 import requests
+from requests.auth import HTTPProxyAuth
 
 
 class AnalyticsClient:
@@ -190,7 +191,8 @@ class AnalyticsClient:
         Returns details of the specified workspace.
         @param workspace_id: Id of the workspace.
         @type workspace_id: string
-        @raise ServerError: If the server has received the request but did not process the request due to some error.
+        @raise ServerError: If the server has received the request but did not process the request
+            due to some error.
         @raise ParseError: If the server has responded but client was not able to parse the response.
         @return: Workspace details.
         @rtype:dictionary
@@ -206,7 +208,8 @@ class AnalyticsClient:
         @type view_id: string
         @param config: Contains any additional control parameters. Can be C{None}.
         @type config:dictionary
-        @raise ServerError: If the server has received the request but did not process the request due to some error.
+        @raise ServerError: If the server has received the request but did not process the request
+            due to some error.
         @raise ParseError: If the server has responded but client was not able to parse the response.
         @return: View details.
         @rtype:dictionary
@@ -232,7 +235,8 @@ class AnalyticsClient:
             @type workspace_name:string
             @param config: Contains any additional control parameters. Can be C{None}.
             @type config:dictionary
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             @return: Created workspace id.
             @rtype:string
@@ -245,7 +249,8 @@ class AnalyticsClient:
         def get_admins(self):
             """
             Returns list of admins for a specified organization.
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             @return: Organization admin list.
             @rtype:list
@@ -257,7 +262,8 @@ class AnalyticsClient:
         def get_users(self):
             """
             Returns list of users for the specified organization.
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             @return: User list.
             @rtype:list
@@ -273,7 +279,8 @@ class AnalyticsClient:
             @type email_ids:list
             @param config: Contains any additional control parameters. Can be C{None}.
             @type config:dictionary
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             """
             config["emailIds"] = email_ids
@@ -287,7 +294,8 @@ class AnalyticsClient:
             @type email_ids:list
             @param config: Contains any additional control parameters. Can be C{None}.
             @type config:dictionary
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             """
             config["emailIds"] = email_ids
@@ -301,7 +309,8 @@ class AnalyticsClient:
             @type email_ids:list
             @param config: Contains any additional control parameters. Can be C{None}.
             @type config:dictionary
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             """
             config["emailIds"] = email_ids
@@ -315,7 +324,8 @@ class AnalyticsClient:
             @type email_ids:list
             @param config: Contains any additional control parameters. Can be C{None}.
             @type config:dictionary
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             """
             config["emailIds"] = email_ids
@@ -331,7 +341,8 @@ class AnalyticsClient:
             @type role:string
             @param config: Contains any additional control parameters. Can be C{None}.
             @type config:dictionary
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             """
             config["emailIds"] = email_ids
@@ -342,7 +353,8 @@ class AnalyticsClient:
         def get_subscription_details(self):
             """
             Returns subscription details of the specified organization.
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             @return: Subscription details.
             @rtype:dictionary
@@ -358,14 +370,15 @@ class AnalyticsClient:
             @type workspace_name:string
             @param view_name: Name of the view.
             @type view_name:string
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             @return: Workspace (or) View meta details.
             @rtype:dictionary
             """
             config = {}
             config["workspaceName"] = workspace_name
-            if view_name != None:
+            if view_name is not None:
                 config["viewName"] = view_name
             endpoint = "/restapi/v2/metadetails"
             response = self.ac.send_api_request("GET", endpoint, config, self.request_headers)
@@ -391,7 +404,8 @@ class AnalyticsClient:
             @type config:dictionary
             @param dest_org_id: Id of the organization where the destination workspace is present. Can be C{None}.
             @type dest_org_id: string
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             @return: Copied workspace id.
             @rtype:string
@@ -410,7 +424,8 @@ class AnalyticsClient:
             @type workspace_name: string
             @param config: Contains any additional control parameters. Can be C{None}.
             @type config:dictionary
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             """
             config["workspaceName"] = workspace_name
@@ -419,7 +434,8 @@ class AnalyticsClient:
         def delete(self):
             """
             Delete a specified workspace in the organization.
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             """
             self.ac.send_api_request("DELETE", self.endpoint, None, self.request_headers)
@@ -429,7 +445,8 @@ class AnalyticsClient:
             Returns the secret key of the specified workspace.
             @param config: Contains any additional control parameters. Can be C{None}.
             @type config:dictionary
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             @return: Workspace secret key.
             @rtype:string
@@ -441,7 +458,8 @@ class AnalyticsClient:
         def add_favorite(self):
             """
             Adds a specified workspace as favorite.
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             """
             endpoint = self.endpoint + "/favorite"
@@ -450,7 +468,8 @@ class AnalyticsClient:
         def remove_favorite(self):
             """
             Remove a specified workspace from favorite.
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             """
             endpoint = self.endpoint + "/favorite"
@@ -459,7 +478,8 @@ class AnalyticsClient:
         def add_default(self):
             """
             Adds a specified workspace as default.
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             """
             endpoint = self.endpoint + "/default"
@@ -468,7 +488,8 @@ class AnalyticsClient:
         def remove_default(self):
             """
             Remove a specified workspace from default.
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             """
             endpoint = self.endpoint + "/default"
@@ -477,7 +498,8 @@ class AnalyticsClient:
         def get_admins(self):
             """
             Returns list of admins for the specified workspace.
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             @return: Workspace admin list.
             @rtype:list
@@ -493,7 +515,8 @@ class AnalyticsClient:
             @type email_ids: list
             @param config: Contains any additional control parameters. Can be C{None}.
             @type config:dictionary
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             """
             config["emailIds"] = email_ids
@@ -507,7 +530,8 @@ class AnalyticsClient:
             @type email_ids: list
             @param config: Contains any additional control parameters. Can be C{None}.
             @type config:dictionary
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             """
             config["emailIds"] = email_ids
@@ -517,7 +541,8 @@ class AnalyticsClient:
         def get_share_info(self):
             """
             Returns shared details of the specified workspace.
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             @return: Workspace share info.
             @rtype:dictionary
@@ -537,7 +562,8 @@ class AnalyticsClient:
             @type permissions: dictionary
             @param config: Contains any additional control parameters. Can be C{None}.
             @type config:dictionary
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             """
             config["viewIds"] = view_ids
@@ -555,11 +581,12 @@ class AnalyticsClient:
             @type email_ids: list
             @param config: Contains any additional control parameters. Can be C{None}.
             @type config:dictionary
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             """
             config["emailIds"] = email_ids
-            if view_ids != None:
+            if view_ids is not None:
                 config["viewIds"] = view_ids
             endpoint = self.endpoint + "/share"
             self.ac.send_api_request("DELETE", endpoint, config, self.request_headers)
@@ -567,7 +594,8 @@ class AnalyticsClient:
         def get_folders(self):
             """
             Returns list of all accessible folders for the specified workspace.
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             @return: Folder list.
             @rtype:list
@@ -583,7 +611,8 @@ class AnalyticsClient:
             @type folder_name: string
             @param config: Contains any additional control parameters. Can be C{None}.
             @type config:dictionary
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             @return: Created folder id.
             @rtype:string
@@ -598,7 +627,8 @@ class AnalyticsClient:
             Returns list of all accessible views for the specified workspace.
             @param config: Contains any additional control parameters. Can be C{None}.
             @type config:dictionary
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             @return: View list.
             @rtype:list
@@ -612,7 +642,8 @@ class AnalyticsClient:
             Create a table in the specified workspace.
             @param table_design: Table structure.
             @type table_design: dictionary
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             @return: created table id.
             @rtype:string
@@ -634,7 +665,8 @@ class AnalyticsClient:
             @type dest_org_id: string
             @param config: Contains any additional control parameters. Can be C{None}.
             @type config:dictionary
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             @return: View list.
             @rtype:list
@@ -651,7 +683,8 @@ class AnalyticsClient:
         def enable_domain_access(self):
             """
             Enable workspace to the specified white label domain.
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             """
             endpoint = self.endpoint + "/wlaccess"
@@ -660,7 +693,8 @@ class AnalyticsClient:
         def disable_domain_access(self):
             """
             Disable workspace from the specified white label domain.
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             """
             endpoint = self.endpoint + "/wlaccess"
@@ -675,7 +709,8 @@ class AnalyticsClient:
             @type folder_name: string
             @param config: Contains any additional control parameters. Can be C{None}.
             @type config:dictionary
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             """
             config["folderName"] = folder_name
@@ -687,7 +722,8 @@ class AnalyticsClient:
             Delete a specified folder in the workspace.
             @param folder_id: Id of the folder to be deleted.
             @type folder_id: string
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             """
             endpoint = self.endpoint + "/folders/" + folder_id
@@ -696,7 +732,8 @@ class AnalyticsClient:
         def get_groups(self):
             """
             Returns list of groups for the specified workspace.
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             @return: Group list.
             @rtype:list
@@ -714,7 +751,8 @@ class AnalyticsClient:
             @type email_ids: list
             @param config: Contains any additional control parameters. Can be C{None}.
             @type config:dictionary
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             @return: Created group id.
             @rtype:string
@@ -730,7 +768,8 @@ class AnalyticsClient:
             Get the details of the specified group.
             @param group_id: Id of the group.
             @type group_id: string
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             @return: Details of the specified group.
             @rtype:dictionary
@@ -748,7 +787,8 @@ class AnalyticsClient:
             @type group_name: string
             @param config: Contains any additional control parameters. Can be C{None}.
             @type config:dictionary
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             """
             config["groupName"] = group_name
@@ -760,7 +800,8 @@ class AnalyticsClient:
             Delete a specified group.
             @param group_id: The id of the group.
             @type group_id: string
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             """
             endpoint = self.endpoint + "/groups/" + group_id
@@ -775,7 +816,8 @@ class AnalyticsClient:
             @type email_ids: list
             @param config: Contains any additional control parameters. Can be C{None}.
             @type config:dictionary
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             """
             config["emailIds"] = email_ids
@@ -791,7 +833,8 @@ class AnalyticsClient:
             @type email_ids: list
             @param config: Contains any additional control parameters. Can be C{None}.
             @type config:dictionary
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             """
             config["emailIds"] = email_ids
@@ -807,7 +850,8 @@ class AnalyticsClient:
             @type view_ids: list
             @param config: Contains any additional control parameters. Can be C{None}.
             @type config:dictionary
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             @return: Id of the created slideshow.
             @rtype:string
@@ -825,7 +869,8 @@ class AnalyticsClient:
             @type slide_id: string
             @param config - Contains the control configurations.
             @type config:dictionary
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             """
             endpoint = self.endpoint + "/slides/" + slide_id
@@ -836,7 +881,8 @@ class AnalyticsClient:
             Delete a specified slideshow in the workspace.
             @param slide_id: Id of the slideshow.
             @type slide_id: string
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             """
             endpoint = self.endpoint + "/slides/" + slide_id
@@ -845,7 +891,8 @@ class AnalyticsClient:
         def get_slideshows(self):
             """
             Returns list of slideshows for the specified workspace.
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             @return: Slideshow list.
             @rtype:list
@@ -861,7 +908,8 @@ class AnalyticsClient:
             @type slide_id: string
             @param config: Contains any additional control parameters. Can be C{None}.
             @type config:dictionary
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             @return: Slideshow URL.
             @rtype:string
@@ -875,7 +923,8 @@ class AnalyticsClient:
             Returns details of the specified slideshow.
             @param slide_id: Id of the slideshow.
             @type slide_id: string
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             @return: Slideshow details.
             @rtype:dictionary
@@ -895,7 +944,8 @@ class AnalyticsClient:
             @type variable_type: string
             @param config: Contains the control parameters.
             @type config:dictionary
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             @return: Id of the created variable.
             @rtype:string
@@ -920,7 +970,8 @@ class AnalyticsClient:
             @type variable_type: string
             @param config: Contains the control parameters.
             @type config:dictionary
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             """
             endpoint = self.endpoint + "/variables/" + variable_id
@@ -934,7 +985,8 @@ class AnalyticsClient:
             Delete the specified variable in the workspace.
             @param variable_id: Id of the variable.
             @type variable_id: string
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             """
             endpoint = self.endpoint + "/variables/" + variable_id
@@ -943,7 +995,8 @@ class AnalyticsClient:
         def get_variables(self):
             """
             Returns list of variables for the specified workspace.
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             @return: Variable list.
             @rtype:list
@@ -957,7 +1010,8 @@ class AnalyticsClient:
             Returns list of variables for the specified workspace.
             @param variable_id: Id of the variable.
             @type variable_id: string
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             @return: Variable details.
             @rtype:dictionary
@@ -971,7 +1025,8 @@ class AnalyticsClient:
             Make the specified folder as default.
             @param folder_id: Id of the folder.
             @type folder_id: string
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             """
             endpoint = self.endpoint + "/folders/" + folder_id + "/default"
@@ -980,7 +1035,8 @@ class AnalyticsClient:
         def get_datasources(self):
             """
             Returns list of datasources for the specified workspace.
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             @return: Datasource list.
             @rtype:list
@@ -996,7 +1052,8 @@ class AnalyticsClient:
             @type datasource_id: string
             @param config: Contains any additional control parameters. Can be C{None}.
             @type config:dictionary
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             """
             endpoint = self.endpoint + "/datasources/" + datasource_id + "/sync"
@@ -1009,7 +1066,8 @@ class AnalyticsClient:
             @type datasource_id: string
             @param config: Contains the control parameters.
             @type config:dictionary
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             """
             endpoint = self.endpoint + "/datasources/" + datasource_id
@@ -1033,7 +1091,8 @@ class AnalyticsClient:
             @type view_name: string
             @param config: Contains any additional control parameters. Can be C{None}.
             @type config:dictionary
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             """
             config["viewName"] = view_name
@@ -1044,7 +1103,8 @@ class AnalyticsClient:
             Delete a specified view in the workspace.
             @param config: Contains any additional control parameters. Can be C{None}.
             @type config:dictionary
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             """
             self.ac.send_api_request("DELETE", self.endpoint, config, self.request_headers)
@@ -1056,7 +1116,8 @@ class AnalyticsClient:
             @type new_view_name: string
             @param config: Contains any additional control parameters. Can be C{None}.
             @type config:dictionary
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             @return: Created view id.
             @rtype:string
@@ -1077,7 +1138,8 @@ class AnalyticsClient:
             @type dest_org_id: string
             @param config: Contains any additional control parameters. Can be C{None}.
             @type config:dictionary
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             """
             config["formulaColumnNames"] = formula_names
@@ -1091,7 +1153,8 @@ class AnalyticsClient:
         def add_favorite(self):
             """
             Adds a specified view as favorite.
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             """
             endpoint = self.endpoint + "/favorite"
@@ -1100,7 +1163,8 @@ class AnalyticsClient:
         def remove_favorite(self):
             """
             Remove a specified view from favorite.
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             """
             endpoint = self.endpoint + "/favorite"
@@ -1115,7 +1179,8 @@ class AnalyticsClient:
             @type folder_id: string
             @param config: Contains any additional control parameters. Can be C{None}.
             @type config:dictionary
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             """
             config["referenceViewId"] = ref_view_id
@@ -1128,7 +1193,8 @@ class AnalyticsClient:
             Auto generate reports for the specified table.
             @param config: Contains any additional control parameters. Can be C{None}.
             @type config:dictionary
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             """
             endpoint = self.endpoint + "/autoanalyse"
@@ -1137,7 +1203,8 @@ class AnalyticsClient:
         def get_my_permissions(self):
             """
             Returns permissions for the specified view.
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             @return: Permission details.
             @rtype:dictionary
@@ -1151,7 +1218,8 @@ class AnalyticsClient:
             Returns the URL to access the specified view.
             @param config: Contains any additional control parameters. Can be C{None}.
             @type config:dictionary
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             @return: View URL.
             @rtype:string
@@ -1165,7 +1233,8 @@ class AnalyticsClient:
             Returns embed URL to access the specified view.
             @param config: Contains any additional control parameters. Can be C{None}.
             @type config:dictionary
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             @return: Embed URL.
             @rtype:string
@@ -1179,7 +1248,8 @@ class AnalyticsClient:
             Returns private URL to access the specified view.
             @param config: Contains any additional control parameters. Can be C{None}.
             @type config:dictionary
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             @return: Private URL.
             @rtype:string
@@ -1193,7 +1263,8 @@ class AnalyticsClient:
             Create a private URL for the specified view.
             @param config: Contains any additional control parameters. Can be C{None}.
             @type config:dictionary
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             @return: Private URL.
             @rtype:string
@@ -1211,7 +1282,8 @@ class AnalyticsClient:
             @type data_type: string
             @param config: Contains any additional control parameters. Can be C{None}.
             @type config:dictionary
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             @return: Created column id.
             @rtype:string
@@ -1227,7 +1299,8 @@ class AnalyticsClient:
             Hide the specified columns in the table.
             @param column_ids: Ids of the columns to be hidden.
             @type column_ids: list
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             """
             config = {}
@@ -1240,7 +1313,8 @@ class AnalyticsClient:
             Show the specified hidden columns in the table.
             @param column_ids: Ids of the columns to be shown.
             @type column_ids: list
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             """
             config = {}
@@ -1255,7 +1329,8 @@ class AnalyticsClient:
             @type column_values: dictionary
             @param config: Contains any additional control parameters. Can be C{None}.
             @type config:dictionary
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             @return: Column Names and Added Row Values.
             @rtype:dictionary
@@ -1270,17 +1345,19 @@ class AnalyticsClient:
             Update rows in the specified table.
             @param column_values: Contains the values for the row. The column names are the key.
             @type column_values: dictionary
-            @param criteria: The criteria to be applied for updating data. Only rows matching the criteria will be updated. Should be null for update all rows.
+            @param criteria: The criteria to be applied for updating data. Only rows matching the criteria will be
+                updated. Should be null for update all rows.
             @type criteria: string
             @param config: Contains any additional control parameters. Can be C{None}.
             @type config:dictionary
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             @return: Updated Columns List and Updated Rows Count.
             @rtype:dictionary
             """
             config["columns"] = column_values
-            if criteria != None:
+            if criteria is not None:
                 config["criteria"] = criteria
             endpoint = self.endpoint + "/rows"
             response = self.ac.send_api_request("PUT", endpoint, config, self.request_headers)
@@ -1289,16 +1366,18 @@ class AnalyticsClient:
         def delete_row(self, criteria, config={}):
             """
             Delete rows in the specified table.
-            @param criteria: The criteria to be applied for deleting data. Only rows matching the criteria will be deleted. Should be null for delete all rows.
+            @param criteria: The criteria to be applied for deleting data. Only rows matching the criteria will be
+                deleted. Should be null for delete all rows.
             @type criteria: string
             @param config: Contains any additional control parameters. Can be C{None}.
             @type config:dictionary
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             @return: Deleted rows details.
             @rtype:string
             """
-            if criteria != None:
+            if criteria is not None:
                 config["criteria"] = criteria
             endpoint = self.endpoint + "/rows"
             response = self.ac.send_api_request("DELETE", endpoint, config, self.request_headers)
@@ -1313,7 +1392,8 @@ class AnalyticsClient:
             @type column_name: string
             @param config: Contains any additional control parameters. Can be C{None}.
             @type config:dictionary
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             """
             config["columnName"] = column_name
@@ -1327,7 +1407,8 @@ class AnalyticsClient:
             @type column_id: string
             @param config: Contains any additional control parameters. Can be C{None}.
             @type config:dictionary
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             """
             endpoint = self.endpoint + "/columns/" + column_id
@@ -1344,7 +1425,8 @@ class AnalyticsClient:
             @type ref_column_id: string
             @param config: Contains any additional control parameters. Can be C{None}.
             @type config:dictionary
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             """
             config["referenceViewId"] = ref_view_id
@@ -1359,7 +1441,8 @@ class AnalyticsClient:
             @type column_id: string
             @param config: Contains any additional control parameters. Can be C{None}.
             @type config:dictionary
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             """
             endpoint = self.endpoint + "/columns/" + column_id + "/lookup"
@@ -1372,7 +1455,8 @@ class AnalyticsClient:
             @type column_id: string
             @param config: Contains any additional control parameters. Can be C{None}.
             @type config:dictionary
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             """
             endpoint = self.endpoint + "/columns/" + column_id + "/autoanalyse"
@@ -1383,7 +1467,8 @@ class AnalyticsClient:
             Sync data from available datasource for the specified view.
             @param config: Contains any additional control parameters. Can be C{None}.
             @type config:dictionary
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             """
             endpoint = self.endpoint + "/sync"
@@ -1392,7 +1477,8 @@ class AnalyticsClient:
         def get_last_import_details(self):
             """
             Returns last import details of the specified view.
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             @return: Last import details.
             @rtype:dictionary
@@ -1420,13 +1506,15 @@ class AnalyticsClient:
             @type table_name: string
             @param file_type: Type of the file to be imported.
             @type file_type: string
-            @param auto_identify: Used to specify whether to auto identify the CSV format. Allowable values - true/false.
+            @param auto_identify: Used to specify whether to auto identify the CSV format. Allowable values -
+                true/false.
             @type auto_identify: string
             @param file_path: Path of the file to be imported.
             @type file_path: string
             @param config: Contains any additional control parameters. Can be C{None}.
             @type config:dictionary
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             @return Import result
             @rtype:dictionary
@@ -1445,13 +1533,15 @@ class AnalyticsClient:
             @type table_name: string
             @param file_type: Type of the file to be imported.
             @type file_type: string
-            @param auto_identify: Used to specify whether to auto identify the CSV format. Allowable values - true/false.
+            @param auto_identify: Used to specify whether to auto identify the CSV format. Allowable values -
+                true/false.
             @type auto_identify: string
             @param data: Raw data to be imported.
             @type data: string
             @param config: Contains any additional control parameters. Can be C{None}.
             @type config:dictionary
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             @return Import result
             @rtype:dictionary
@@ -1472,13 +1562,15 @@ class AnalyticsClient:
             @type import_type: string
             @param file_type: Type of the file to be imported.
             @type file_type: string
-            @param auto_identify: Used to specify whether to auto identify the CSV format. Allowable values - true/false.
+            @param auto_identify: Used to specify whether to auto identify the CSV format. Allowable values -
+                true/false.
             @type auto_identify: string
             @param file_path: Path of the file to be imported.
             @type file_path: string
             @param config: Contains any additional control parameters. Can be C{None}.
             @type config:dictionary
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             @return Import result
             @rtype:dictionary
@@ -1499,13 +1591,15 @@ class AnalyticsClient:
             @type import_type: string
             @param file_type: Type of the file to be imported.
             @type file_type: string
-            @param auto_identify: Used to specify whether to auto identify the CSV format. Allowable values - true/false.
+            @param auto_identify: Used to specify whether to auto identify the CSV format. Allowable values -
+                true/false.
             @type auto_identify: string
             @param data: Raw data to be imported.
             @type data: string
             @param config: Contains any additional control parameters. Can be C{None}.
             @type config:dictionary
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             @return Import result
             @rtype:dictionary
@@ -1519,18 +1613,21 @@ class AnalyticsClient:
 
         def import_bulk_data_in_new_table(self, table_name, file_type, auto_identify, file_path, config={}):
             """
-            Asynchronously create a new table and import the data contained in the mentioned file into the created table.
+            Asynchronously create a new table and import the data contained in the mentioned file
+            into the created table.
             @param table_name: Name of the new table to be created.
             @type table_name: string
             @param file_type: Type of the file to be imported.
             @type file_type: string
-            @param auto_identify: Used to specify whether to auto identify the CSV format. Allowable values - true/false.
+            @param auto_identify: Used to specify whether to auto identify the CSV format. Allowable values -
+                true/false.
             @type auto_identify: string
             @param file_path: Path of the file to be imported.
             @type file_path: string
             @param config: Contains any additional control parameters. Can be C{None}.
             @type config:dictionary
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             @return Import job id
             @rtype:string
@@ -1551,13 +1648,15 @@ class AnalyticsClient:
             @type import_type: string
             @param file_type: Type of the file to be imported.
             @type file_type: string
-            @param auto_identify: Used to specify whether to auto identify the CSV format. Allowable values - true/false.
+            @param auto_identify: Used to specify whether to auto identify the CSV format. Allowable values -
+                true/false.
             @type auto_identify: string
             @param file_path: Path of the file to be imported.
             @type file_path: string
             @param config: Contains any additional control parameters. Can be C{None}.
             @type config:dictionary
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             @return Import job id
             @rtype:string
@@ -1574,7 +1673,8 @@ class AnalyticsClient:
             Returns the details of the import job.
             @param job_id: Id of the job.
             @type job_id: string
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             @return Import job details
             @rtype:dictionary
@@ -1594,7 +1694,8 @@ class AnalyticsClient:
             @type file_path: string
             @param config: Contains any additional control parameters. Can be C{None}.
             @type config:dictionary
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             """
             endpoint = self.endpoint + "/views/" + view_id + "/data"
@@ -1610,7 +1711,8 @@ class AnalyticsClient:
             @type response_format: string
             @param config: Contains any additional control parameters. Can be C{None}.
             @type config:dictionary
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             @return Export job id
             @rtype:string
@@ -1629,7 +1731,8 @@ class AnalyticsClient:
             @type response_format: string
             @param config: Contains any additional control parameters. Can be C{None}.
             @type config:dictionary
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             @return Export job id
             @rtype:string
@@ -1645,7 +1748,8 @@ class AnalyticsClient:
             Returns the details of the export job.
             @param job_id: Id of the export job.
             @type job_id: string
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             @return Export job details
             @rtype:dictionary
@@ -1661,7 +1765,8 @@ class AnalyticsClient:
             @type job_id: string
             @param file_path: Path of the file where the data exported to be stored.
             @type file_path: string
-            @raise ServerError: If the server has received the request but did not process the request due to some error.
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
             @raise ParseError: If the server has responded but client was not able to parse the response.
             """
             endpoint = self.bulk_endpoint + "/exportjobs/" + job_id + "/data"
@@ -1681,16 +1786,16 @@ class AnalyticsClient:
         """
         Internal method to handle HTTP request.
         """
-        if self.access_token == None:
+        if self.access_token is None:
             self.regenerate_analytics_oauth_token()
 
         request_url = self.analytics_server_url + request_url
-        config_data = None
+        config_data = ""
         if bool(config):
             config_data = "CONFIG=" + urllib.parse.quote_plus(json.dumps(config))
 
         if bool(data):
-            if (bool(config_data)):
+            if bool(config_data):
                 config_data += "&"
             else:
                 config_data = ""
@@ -1698,17 +1803,18 @@ class AnalyticsClient:
             config_data += "DATA=" + urllib.parse.quote_plus(json.dumps(data))
             resp_obj = self.submit_import_request(request_url, config_data, request_headers, self.access_token)
         else:
-            files = {'FILE': open(file_path, 'rb')}
+            files = {"FILE": open(file_path, "rb")}
             resp_obj = self.submit_import_request(request_url, config_data, request_headers, self.access_token, files)
 
         if not (str(resp_obj.status_code).startswith("2")):
-            if (self.is_oauth_expired(resp_obj)):
+            if self.is_oauth_expired(resp_obj):
                 self.regenerate_analytics_oauth_token()
                 if bool(data):
                     resp_obj = self.submit_import_request(request_url, config_data, request_headers, self.access_token)
                 else:
-                    resp_obj = self.submit_import_request(request_url, config_data, request_headers, self.access_token,
-                                                          files)
+                    resp_obj = self.submit_import_request(
+                        request_url, config_data, request_headers, self.access_token, files
+                    )
                 if not (str(resp_obj.status_code).startswith("2")):
                     raise ServerError(resp_obj.resp_content, False)
             else:
@@ -1723,23 +1829,24 @@ class AnalyticsClient:
         Internal method to send request to server.
         """
         try:
-            if request_headers == None:
+            if request_headers is None:
                 request_headers = {}
 
-            if access_token != None:
+            if access_token is not None:
                 request_headers["Authorization"] = "Zoho-oauthtoken " + access_token
 
             request_headers["User-Agent"] = "Analytics Python Client v" + self.CLIENT_VERSION
 
             req_obj = req_obj = requests.Session()
             if self.proxy:
+                assert self.proxy_host and self.proxy_port
                 proxy_details = {
                     "http": "http://" + self.proxy_host + ":" + self.proxy_port,
-                    "https": "http://" + self.proxy_host + ":" + self.proxy_port
+                    "https": "http://" + self.proxy_host + ":" + self.proxy_port,
                 }
                 req_obj.proxies = proxy_details
-                if self.proxy_user_name != None and self.proxy_password != None:
-                    proxy_auth_details = HTTPProxyDigestAuth(self.proxy_user_name, self.proxy_password)
+                if self.proxy_user_name is not None and self.proxy_password is not None:
+                    proxy_auth_details = HTTPProxyAuth(self.proxy_user_name, self.proxy_password)
                     req_obj.auth = proxy_auth_details
 
             if bool(files):
@@ -1747,9 +1854,10 @@ class AnalyticsClient:
             else:
                 resp_obj = req_obj.post(request_url, params=parameters, headers=request_headers)
 
-            resp_obj = response_obj(resp_obj)
+            resp_obj = response_obj(resp_obj)  # type: ignore
+
         except Exception as ex:
-            resp_obj = response_obj(ex)
+            resp_obj = response_obj(ex)  # type: ignore
 
         return resp_obj
 
@@ -1759,7 +1867,7 @@ class AnalyticsClient:
         """
         file = open(file_path, "wb")
 
-        if self.access_token == None:
+        if self.access_token is None:
             self.regenerate_analytics_oauth_token()
 
         request_url = self.analytics_server_url + request_url
@@ -1771,7 +1879,8 @@ class AnalyticsClient:
 
         if not (str(resp_obj.status_code).startswith("2")):
             resp_obj = response_obj(resp_obj)
-            if (self.is_oauth_expired(resp_obj)):
+
+            if self.is_oauth_expired(resp_obj):
                 self.regenerate_analytics_oauth_token()
                 resp_obj = self.submit_export_request(request_url, config_data, request_headers, self.access_token)
                 if not (str(resp_obj.status_code).startswith("2")):
@@ -1788,29 +1897,30 @@ class AnalyticsClient:
         Internal method to send request to server.
         """
         try:
-            if request_headers == None:
+            if request_headers is None:
                 request_headers = {}
 
-            if access_token != None:
+            if access_token is not None:
                 request_headers["Authorization"] = "Zoho-oauthtoken " + access_token
 
             request_headers["User-Agent"] = "Analytics Python Client v" + self.CLIENT_VERSION
 
             req_obj = req_obj = requests.Session()
             if self.proxy:
+                assert self.proxy_host and self.proxy_port
                 proxy_details = {
                     "http": "http://" + self.proxy_host + ":" + self.proxy_port,
-                    "https": "http://" + self.proxy_host + ":" + self.proxy_port
+                    "https": "http://" + self.proxy_host + ":" + self.proxy_port,
                 }
                 req_obj.proxies = proxy_details
-                if self.proxy_user_name != None and self.proxy_password != None:
-                    proxy_auth_details = HTTPProxyDigestAuth(self.proxy_user_name, self.proxy_password)
+                if self.proxy_user_name is not None and self.proxy_password is not None:
+                    proxy_auth_details = HTTPProxyAuth(self.proxy_user_name, self.proxy_password)
                     req_obj.auth = proxy_auth_details
 
             resp_obj = req_obj.get(request_url, params=parameters, headers=request_headers)
 
         except Exception as ex:
-            resp_obj = response_obj(ex)
+            resp_obj = response_obj(ex)  # type: ignore
 
         return resp_obj
 
@@ -1818,7 +1928,7 @@ class AnalyticsClient:
         """
         Internal method to handle HTTP request.
         """
-        if self.access_token == None:
+        if self.access_token is None:
             self.regenerate_analytics_oauth_token()
 
         request_url = self.analytics_server_url + request_url
@@ -1829,17 +1939,18 @@ class AnalyticsClient:
         resp_obj = self.submit_request(request_method, request_url, config_data, request_headers, self.access_token)
 
         if not (str(resp_obj.status_code).startswith("2")):
-            if (self.is_oauth_expired(resp_obj)):
+            if self.is_oauth_expired(resp_obj):
                 self.regenerate_analytics_oauth_token()
-                resp_obj = self.submit_request(request_method, request_url, config_data, request_headers,
-                                               self.access_token)
+                resp_obj = self.submit_request(
+                    request_method, request_url, config_data, request_headers, self.access_token
+                )
                 if not (str(resp_obj.status_code).startswith("2")):
                     raise ServerError(resp_obj.resp_content, False)
             else:
                 raise ServerError(resp_obj.resp_content, False)
 
         # API success - No response case
-        if (str(resp_obj.status_code) != "200"):
+        if str(resp_obj.status_code) != "200":
             return
 
         response = resp_obj.resp_content
@@ -1852,23 +1963,24 @@ class AnalyticsClient:
         Internal method to send request to server.
         """
         try:
-            if request_headers == None:
+            if request_headers is None:
                 request_headers = {}
 
-            if access_token != None:
+            if access_token is not None:
                 request_headers["Authorization"] = "Zoho-oauthtoken " + access_token
 
             request_headers["User-Agent"] = "Analytics Python Client v" + self.CLIENT_VERSION
 
             req_obj = req_obj = requests.Session()
             if self.proxy:
+                assert self.proxy_host and self.proxy_port
                 proxy_details = {
                     "http": "http://" + self.proxy_host + ":" + self.proxy_port,
-                    "https": "http://" + self.proxy_host + ":" + self.proxy_port
+                    "https": "http://" + self.proxy_host + ":" + self.proxy_port,
                 }
                 req_obj.proxies = proxy_details
-                if self.proxy_user_name != None and self.proxy_password != None:
-                    proxy_auth_details = HTTPProxyDigestAuth(self.proxy_user_name, self.proxy_password)
+                if self.proxy_user_name is not None and self.proxy_password is not None:
+                    proxy_auth_details = HTTPProxyAuth(self.proxy_user_name, self.proxy_password)
                     req_obj.auth = proxy_auth_details
 
             resp_obj = None
@@ -1882,9 +1994,10 @@ class AnalyticsClient:
             elif request_method == "DELETE":
                 resp_obj = req_obj.delete(request_url, params=parameters, headers=request_headers)
 
-            resp_obj = response_obj(resp_obj)
+            resp_obj = response_obj(resp_obj)  # type: ignore
+
         except Exception as ex:
-            resp_obj = response_obj(ex)
+            resp_obj = response_obj(ex)  # type: ignore
 
         return resp_obj
 
@@ -1895,15 +2008,16 @@ class AnalyticsClient:
         req_obj = requests.Session()
 
         if self.proxy:
+            assert self.proxy_host and self.proxy_port
             proxy_details = {
                 "http": "http://" + self.proxy_host + ":" + self.proxy_port,
-                "https": "http://" + self.proxy_host + ":" + self.proxy_port
+                "https": "http://" + self.proxy_host + ":" + self.proxy_port,
             }
             req_obj.proxies = proxy_details
-            if self.proxy_user_name != None and self.proxy_password != None:
-                proxy_auth_details = HTTPProxyDigestAuth(self.proxy_user_name, self.proxy_password)
+            if self.proxy_user_name is not None and self.proxy_password is not None:
+                proxy_auth_details = HTTPProxyAuth(self.proxy_user_name, self.proxy_password)
                 req_obj.auth = proxy_auth_details
-        return request_obj
+        return req_obj
 
     def is_oauth_expired(self, resp_obj):
         """
@@ -1925,13 +2039,14 @@ class AnalyticsClient:
         oauth_params["client_secret"] = self.client_secret
         oauth_params["refresh_token"] = self.refresh_token
         oauth_params["grant_type"] = "refresh_token"
-        oauth_params = urllib.parse.urlencode(oauth_params)  # .encode(self.COMMON_ENCODE_CHAR)
+        oauth_params = urllib.parse.urlencode(oauth_params)  # type: ignore # .encode(self.COMMON_ENCODE_CHAR)
+
         req_url = self.accounts_server_url + "/oauth/v2/token"
         oauth_resp_obj = self.submit_request("POST", req_url, oauth_params)
 
-        if (oauth_resp_obj.status_code == 200):
+        if oauth_resp_obj.status_code == 200:
             oauth_json_resp = json.loads(oauth_resp_obj.resp_content)
-            if ("access_token" in oauth_json_resp):
+            if "access_token" in oauth_json_resp:
                 self.access_token = oauth_json_resp["access_token"]
                 return
 

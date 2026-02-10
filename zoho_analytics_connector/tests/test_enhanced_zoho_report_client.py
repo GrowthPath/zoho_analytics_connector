@@ -10,9 +10,11 @@ from zoho_analytics_connector.report_client import ReportClient, ServerError
 from zoho_analytics_connector.typed_dicts import TableView_v2
 
 try:
-    from zoho_analytics_connector.private import config
+    # from zoho_analytics_connector.private import config
+    pass
 except ModuleNotFoundError:
     pass
+
 
 class Config:
     LOGINEMAILID = os.getenv("ZOHOANALYTICS_LOGINEMAIL")
@@ -27,6 +29,7 @@ class Config:
 
 
 # see readme for tips on oauth authentication
+
 
 # show how to create a ReportClient individually, for the sake of clarity
 @pytest.fixture
@@ -54,7 +57,7 @@ def enhanced_zoho_analytics_client(zoho_email=None) -> EnhancedZohoAnalyticsClie
         clientId=Config.CLIENTID if TEST_OAUTH else None,
         default_databasename=Config.DATABASENAME,
         serverURL=Config.SERVER_URL,
-        reportServerURL=Config.REPORT_SERVER_URL
+        reportServerURL=Config.REPORT_SERVER_URL,
     )
     return rc
 
@@ -69,10 +72,12 @@ def get_enhanced_zoho_analytics_client(zoho_email=None, retries=3) -> EnhancedZo
         default_databasename=Config.DATABASENAME,
         serverURL=Config.SERVER_URL,
         reportServerURL=Config.REPORT_SERVER_URL,
-        default_retries=retries
+        default_retries=retries,
     )
     return rc
-#"Date","Region","Product Category","Product","Customer Name","Sales","Cost","Profit"
+
+
+# "Date","Region","Product Category","Product","Customer Name","Sales","Cost","Profit"
 
 # see
 zoho_sales_table = {
@@ -83,7 +88,6 @@ zoho_sales_table = {
         {"COLUMNNAME": "product_category", "DATATYPE": "PLAIN"},
         {"COLUMNNAME": "product", "DATATYPE": "PLAIN"},
         {"COLUMNNAME": "customer_name", "DATATYPE": "PLAIN"},
-
         {"COLUMNNAME": "sales", "DATATYPE": "DECIMAL_NUMBER"},
         {"COLUMNNAME": "cost", "DATATYPE": "DECIMAL_NUMBER"},
         {"COLUMNNAME": "profit", "DATATYPE": "DECIMAL_NUMBER"},
@@ -92,10 +96,7 @@ zoho_sales_table = {
 
 animals_table = {
     "TABLENAME": "animals",
-    "COLUMNS": [
-        {"COLUMNNAME": "common_name", "DATATYPE": "PLAIN"},
-        {"COLUMNNAME": "size", "DATATYPE": "PLAIN"}
-    ],
+    "COLUMNS": [{"COLUMNNAME": "common_name", "DATATYPE": "PLAIN"}, {"COLUMNNAME": "size", "DATATYPE": "PLAIN"}],
 }
 
 
@@ -130,39 +131,43 @@ def test_data_upload():
             import_content = f.read()
     except Exception as e:
         print(
-            "Error Check if file StoreSales.csv exists in the current directory; assumption is that the tests directory is the working directory. ",
+            "Error Check if file StoreSales.csv exists in the current directory; "
+            "assumption is that the tests directory is the working directory. ",
             str(e),
         )
         return
         # import_modes = APPEND / TRUNCATEADD / UPDATEADD
     impResult = enhanced_client.data_upload(
-        import_content=import_content, table_name="store_sales",
+        import_content=import_content,
+        table_name="store_sales",
         import_mode="UPDATEADD",
-        matching_columns="date,region,product_category,product,customer_name"
+        matching_columns="date,region,product_category,product,customer_name",
     )
     assert impResult
     assert impResult.successRowCount == impResult.totalRowCount
 
 
 def test_get_database_metadata(enhanced_zoho_analytics_client: EnhancedZohoAnalyticsClient):
-    """ this is the way of getting table metadata with the V1 API"""
+    """this is the way of getting table metadata with the V1 API"""
     table_meta_data = enhanced_zoho_analytics_client.get_table_metadata()
     assert table_meta_data
 
 
 def test_get_database_metadata_v2(enhanced_zoho_analytics_client: EnhancedZohoAnalyticsClient):
-    """ this is the way of getting table metadata with the V1 API"""
+    """this is the way of getting table metadata with the V1 API"""
     table_meta_data_v2 = enhanced_zoho_analytics_client.get_table_metadata_v2()
     assert table_meta_data_v2
+
 
 def test_get_v2_metadata(enhanced_zoho_analytics_client: EnhancedZohoAnalyticsClient):
     metadata = enhanced_zoho_analytics_client.get_orgs_metadata_api_v2()
     assert metadata
 
+
 def test_get_v2_table_model_data(enhanced_zoho_analytics_client: EnhancedZohoAnalyticsClient):
     workspaces_metadata = enhanced_zoho_analytics_client.get_all_workspaces_metadata_api_v2()
     source_workspace_name = "Cin7Omni"
-    for workspace in workspaces_metadata["data"]["ownedWorkspaces"]+ workspaces_metadata["data"]["sharedWorkspaces"]:
+    for workspace in workspaces_metadata["data"]["ownedWorkspaces"] + workspaces_metadata["data"]["sharedWorkspaces"]:
         if workspace["workspaceName"] == source_workspace_name:
             workspace_id = workspace["workspaceId"]
             org_id = workspace["orgId"]
@@ -170,17 +175,21 @@ def test_get_v2_table_model_data(enhanced_zoho_analytics_client: EnhancedZohoAna
     else:
         raise "workspace not found"
     table_catalog = {}
-    tables_data = enhanced_zoho_analytics_client.get_views_api_v2(org_id=org_id,workspace_id=workspace_id,view_types=[0])
+    tables_data = enhanced_zoho_analytics_client.get_views_api_v2(
+        org_id=org_id, workspace_id=workspace_id, view_types=[0]
+    )
     for table in tables_data["data"]["views"]:
         view_id = table["viewId"]
         table_details = enhanced_zoho_analytics_client.get_view_details_api_v2(view_id=view_id)
         table = table_details["data"]["views"]
 
-        table_catalog[table["viewName"]] = TableView_v2(columns=table["columns"],tableName=table["viewName"],tableType=table["viewType"],viewID=table["viewId"])
+        table_catalog[table["viewName"]] = TableView_v2(
+            columns=table["columns"], tableName=table["viewName"], tableType=table["viewType"], viewID=table["viewId"]
+        )
     assert table_catalog
 
 
-def test_workspace_details(enhanced_zoho_analytics_client:EnhancedZohoAnalyticsClient):
+def test_workspace_details(enhanced_zoho_analytics_client: EnhancedZohoAnalyticsClient):
     org_metadata = enhanced_zoho_analytics_client.get_orgs_metadata_api_v2()
     org_metadata["data"]["orgs"][0]["orgId"]
     workspaces_metadata = enhanced_zoho_analytics_client.get_all_workspaces_metadata_api_v2()
@@ -194,7 +203,8 @@ def test_workspace_details(enhanced_zoho_analytics_client:EnhancedZohoAnalyticsC
     workspace_details = enhanced_zoho_analytics_client.get_workspace_details_api_v2(workspace_id=workspace_id)
     assert workspace_details
 
-def test_meta_details_v2(enhanced_zoho_analytics_client:EnhancedZohoAnalyticsClient):
+
+def test_meta_details_v2(enhanced_zoho_analytics_client: EnhancedZohoAnalyticsClient):
 
     workspaces_metadata = enhanced_zoho_analytics_client.get_all_workspaces_metadata_api_v2()
     target_workspace_name = "Cin7Omni"
@@ -205,11 +215,13 @@ def test_meta_details_v2(enhanced_zoho_analytics_client:EnhancedZohoAnalyticsCli
             break
     else:
         raise "workspace not found"
-    meta_detail = enhanced_zoho_analytics_client.get_meta_details_view_api_v2(org_id=org_id,workspace_name="Cin7Omni", view_name="Test")
+    meta_detail = enhanced_zoho_analytics_client.get_meta_details_view_api_v2(
+        org_id=org_id, workspace_name="Cin7Omni", view_name="Test"
+    )
     assert meta_detail
 
 
-def test_copy_workspace(enhanced_zoho_analytics_client:EnhancedZohoAnalyticsClient):
+def test_copy_workspace(enhanced_zoho_analytics_client: EnhancedZohoAnalyticsClient):
     org_metadata = enhanced_zoho_analytics_client.get_orgs_metadata_api_v2()
     origin_orgid = org_metadata["data"]["orgs"][0]["orgId"]
     dest_orgid = origin_orgid
@@ -224,20 +236,26 @@ def test_copy_workspace(enhanced_zoho_analytics_client:EnhancedZohoAnalyticsClie
 
     # delete the new destination workspace in case it already exists
     new_workspace_name = "NewWorkspace"
-    new_workspace = next((w for w in workspaces_metadata["data"]["ownedWorkspaces"] if w["workspaceName"] == new_workspace_name), None)
+    new_workspace = next(
+        (w for w in workspaces_metadata["data"]["ownedWorkspaces"] if w["workspaceName"] == new_workspace_name), None
+    )
     if new_workspace:
-        enhanced_zoho_analytics_client.delete_workspace_api_v2(workspace_id=new_workspace["workspaceId"],org_id=origin_orgid)
+        enhanced_zoho_analytics_client.delete_workspace_api_v2(
+            workspace_id=new_workspace["workspaceId"], org_id=origin_orgid
+        )
 
-    workspace_secret_key_result = enhanced_zoho_analytics_client.get_workspace_secretkey_api_v2(workspace_id=workspace_id,org_id=origin_orgid)
+    workspace_secret_key_result = enhanced_zoho_analytics_client.get_workspace_secretkey_api_v2(
+        workspace_id=workspace_id, org_id=origin_orgid
+    )
     workspace_secret_key = workspace_secret_key_result["data"]["workspaceKey"]
-    enhanced_zoho_analytics_client.copy_workspace_api_v2(new_workspace_name=new_workspace_name,
-                                                             workspace_id=workspace_id,
-                                                             copy_with_data=False,   # to make it faster
-                                                             dest_org_id=dest_orgid,
-                                                             source_org_id=origin_orgid,
-                                                             workspace_key=workspace_secret_key)
-
-
+    enhanced_zoho_analytics_client.copy_workspace_api_v2(
+        new_workspace_name=new_workspace_name,
+        workspace_id=workspace_id,
+        copy_with_data=False,  # to make it faster
+        dest_org_id=dest_orgid,
+        source_org_id=origin_orgid,
+        workspace_key=workspace_secret_key,
+    )
 
 
 @pytest.mark.skip
@@ -248,44 +266,53 @@ def test_multiple_clients():
     table_meta_data = enhance_client1.get_table_metadata()
     assert table_meta_data
 
+
 @pytest.mark.skip
 def test_addRow():
     # test the standard Zoho ReportClient library function to add two rows
     enhanced_client = get_enhanced_zoho_analytics_client()
-    animals_table_uri = enhanced_client.getURI(dbOwnerName=enhanced_client.login_email_id,
-                                               dbName=enhanced_client.default_databasename, tableOrReportName='animals')
-    new_row = {'common_name': 'Rabbit', 'size': 'small'}
+    animals_table_uri = enhanced_client.getURI(
+        dbOwnerName=enhanced_client.login_email_id,
+        dbName=enhanced_client.default_databasename,
+        tableOrReportName="animals",
+    )
+    new_row = {"common_name": "Rabbit", "size": "small"}
     enhanced_client.addRow(tableURI=animals_table_uri, columnValues=new_row)
-    new_row = {'common_name': 'Elephant', 'size': 'large'}
+    new_row = {"common_name": "Elephant", "size": "large"}
     enhanced_client.addRow(tableURI=animals_table_uri, columnValues=new_row)
 
 
 def test_exportData_csv():
     # Testing a ReportClient function. a binary file object is required to pass in
     enhanced_client = get_enhanced_zoho_analytics_client()
-    animals_table_uri = enhanced_client.getURI(dbOwnerName=enhanced_client.login_email_id,
-                                               dbName=enhanced_client.default_databasename,
-                                               tableOrReportName='animals')
+    animals_table_uri = enhanced_client.getURI(
+        dbOwnerName=enhanced_client.login_email_id,
+        dbName=enhanced_client.default_databasename,
+        tableOrReportName="animals",
+    )
     output = io.BytesIO()
-    enhanced_client.exportData(tableOrReportURI=animals_table_uri, format='CSV', exportToFileObj=output)
-    assert (output.getvalue())
+    enhanced_client.exportData(tableOrReportURI=animals_table_uri, format="CSV", exportToFileObj=output)
+    assert output.getvalue()
 
 
 def test_exportData_csv_with_criteria():
     # this test assumes that test_addRow has run
     enhanced_client = get_enhanced_zoho_analytics_client()
-    animals_table_uri = enhanced_client.getURI(dbOwnerName=enhanced_client.login_email_id,
-                                               dbName=enhanced_client.default_databasename,
-                                               tableOrReportName='animals')
+    animals_table_uri = enhanced_client.getURI(
+        dbOwnerName=enhanced_client.login_email_id,
+        dbName=enhanced_client.default_databasename,
+        tableOrReportName="animals",
+    )
     criteria = """ "size" in ('small') """
     enhanced_client.deleteData(tableURI=animals_table_uri, criteria=criteria)
-    new_row = {'common_name': 'Rabbit', 'size': 'small'}
+    new_row = {"common_name": "Rabbit", "size": "small"}
     enhanced_client.addRow(tableURI=animals_table_uri, columnValues=new_row)
-    new_row = {'common_name': 'Elephant', 'size': 'large'}
+    new_row = {"common_name": "Elephant", "size": "large"}
     enhanced_client.addRow(tableURI=animals_table_uri, columnValues=new_row)
     output = io.BytesIO()
-    enhanced_client.exportData(tableOrReportURI=animals_table_uri, format='CSV', exportToFileObj=output,
-                                   criteria="size = 'small'")
+    enhanced_client.exportData(
+        tableOrReportURI=animals_table_uri, format="CSV", exportToFileObj=output, criteria="size = 'small'"
+    )
     returned_data = output.getvalue().decode()
     # assert (output.getvalue())
     assert len(returned_data.split()) == 2  # first row is the headers
@@ -294,50 +321,57 @@ def test_exportData_csv_with_criteria():
 def test_exportData_json():
     # Testing a ReportClient function. a binary file object is required to pass in
     enhanced_client = get_enhanced_zoho_analytics_client()
-    animals_table_uri = enhanced_client.getURI(dbOwnerName=enhanced_client.login_email_id,
-                                               dbName=enhanced_client.default_databasename,
-                                               tableOrReportName='animals')
+    animals_table_uri = enhanced_client.getURI(
+        dbOwnerName=enhanced_client.login_email_id,
+        dbName=enhanced_client.default_databasename,
+        tableOrReportName="animals",
+    )
     output = io.BytesIO()
     enhanced_client.default_retries = 3
-    enhanced_client.exportData(tableOrReportURI=animals_table_uri, format='JSON', exportToFileObj=output)
-    assert (json.loads(output.getvalue()))
+    enhanced_client.exportData(tableOrReportURI=animals_table_uri, format="JSON", exportToFileObj=output)
+    assert json.loads(output.getvalue())
 
 
 def test_add_and_delete_data(enhanced_zoho_analytics_client):
-    """ This tests the underlying ReportClient function.
+    """This tests the underlying ReportClient function.
     for criteria tips see https://www.zoho.com/analytics/api/?shell#applying-filter-criteria"""
     enhanced_client = get_enhanced_zoho_analytics_client()
-    animals_table_uri = enhanced_client.getURI(dbOwnerName=enhanced_client.login_email_id,
-                                               dbName=enhanced_client.default_databasename,
-                                               tableOrReportName='animals')
+    animals_table_uri = enhanced_client.getURI(
+        dbOwnerName=enhanced_client.login_email_id,
+        dbName=enhanced_client.default_databasename,
+        tableOrReportName="animals",
+    )
 
-    animals_table_uri = enhanced_client.getURI(dbOwnerName=enhanced_client.login_email_id,
-                                               dbName=enhanced_client.default_databasename, tableOrReportName='animals')
-    new_row = {'common_name': 'Rabbit', 'size': 'small'}
+    animals_table_uri = enhanced_client.getURI(
+        dbOwnerName=enhanced_client.login_email_id,
+        dbName=enhanced_client.default_databasename,
+        tableOrReportName="animals",
+    )
+    new_row = {"common_name": "Rabbit", "size": "small"}
     enhanced_client.addRow(tableURI=animals_table_uri, columnValues=new_row)
-    new_row = {'common_name': 'Elephant', 'size': 'large'}
+    new_row = {"common_name": "Elephant", "size": "large"}
     enhanced_client.addRow(tableURI=animals_table_uri, columnValues=new_row)
-    new_row = {'common_name': 'wolf', 'size': 'medium'}
+    new_row = {"common_name": "wolf", "size": "medium"}
     enhanced_client.addRow(tableURI=animals_table_uri, columnValues=new_row)
-    new_row = {'common_name': 'leopard', 'size': 'medium'}
+    new_row = {"common_name": "leopard", "size": "medium"}
     enhanced_client.addRow(tableURI=animals_table_uri, columnValues=new_row)
 
     criteria = """ 'Rabbit' in "common_name" """
     pre_delete_row_count = enhanced_client.pre_delete_rows(table_name="animals", sql=criteria, retry_countdown=10)
     row_count = enhanced_client.deleteData(tableURI=animals_table_uri, criteria=criteria, retry_countdown=10)
-    assert (int(row_count)>=1)
+    assert int(row_count) >= 1
     assert row_count == pre_delete_row_count
 
     criteria = """ "common_name" like '%phant' """
     pre_delete_row_count = enhanced_client.pre_delete_rows(table_name="animals", sql=criteria, retry_countdown=10)
     row_count = enhanced_client.deleteData(tableURI=animals_table_uri, criteria=criteria)
-    assert (int(row_count) >= 1)
+    assert int(row_count) >= 1
     assert row_count == pre_delete_row_count
 
     criteria = """ "common_name" in ('leopard', 'wolf') """
     pre_delete_row_count = enhanced_client.pre_delete_rows(table_name="animals", sql=criteria, retry_countdown=10)
     row_count = enhanced_client.deleteData(tableURI=animals_table_uri, criteria=criteria)
-    assert (int(row_count) >= 1)
+    assert int(row_count) >= 1
     assert row_count == pre_delete_row_count
 
 
@@ -358,9 +392,7 @@ def test_rate_limits_data_upload():
     while i < 100:
         i += 1
         try:
-            enhanced_client.data_upload(
-                import_content=import_content, table_name="store_sales"
-            )
+            enhanced_client.data_upload(import_content=import_content, table_name="store_sales")
             print(f"Import {i} done")
         except Exception as e:
             print(e)
@@ -370,6 +402,7 @@ class MockResponse:
     # needs to have the sort of things that a Request ersult has
     text = "123"
     response = {}
+
     @staticmethod
     def json():
         raise ConnectionError
@@ -400,12 +433,10 @@ def test_connection_error_data_upload(monkeypatch):
         # import_modes = APPEND / TRUNCATEADD / UPDATEADD
 
     try:
-        enhanced_client.data_upload(
-            import_content=import_content, table_name="store_sales"
-        )
+        enhanced_client.data_upload(import_content=import_content, table_name="store_sales")
     except ConnectionError as e:
         print(e)
-        print (f"Retries: {count_retries}")
+        print(f"Retries: {count_retries}")
         assert count_retries == allowed_retries
     except Exception:
         assert False
@@ -415,19 +446,19 @@ def test_timeout():
     #
     enhanced_client = get_enhanced_zoho_analytics_client(retries=2)
     enhanced_client.request_timeout = 0.001
-    animals_table_uri = enhanced_client.getURI(dbOwnerName=enhanced_client.login_email_id,
-                                               dbName=enhanced_client.default_databasename,
-                                               tableOrReportName='animals')
+    animals_table_uri = enhanced_client.getURI(
+        dbOwnerName=enhanced_client.login_email_id,
+        dbName=enhanced_client.default_databasename,
+        tableOrReportName="animals",
+    )
     output = io.BytesIO()
     with pytest.raises(requests.exceptions.ConnectTimeout):
-        enhanced_client.exportData(tableOrReportURI=animals_table_uri, format='JSON', exportToFileObj=output)
+        enhanced_client.exportData(tableOrReportURI=animals_table_uri, format="JSON", exportToFileObj=output)
 
 
 def test_data_download(enhanced_zoho_analytics_client):
     sql = "select * from store_sales"
-    result = enhanced_zoho_analytics_client.data_export_using_sql(
-        sql=sql, table_name="store_sales"
-    )
+    result = enhanced_zoho_analytics_client.data_export_using_sql(sql=sql, table_name="store_sales")
     assert len(list(result)) > 0
 
     # # the table name does not matter
@@ -441,7 +472,7 @@ def test_data_download(enhanced_zoho_analytics_client):
 # needs a COPY_DB_KEY, refer to Zoho documentation
 @pytest.mark.skip
 def test_copy_report(enhanced_zoho_analytics_client):
-    """ actually, it copies reports,tables and query tables"""
+    """actually, it copies reports,tables and query tables"""
 
     views = [
         "Animals",
@@ -449,9 +480,7 @@ def test_copy_report(enhanced_zoho_analytics_client):
 
     source_zoho_email = "tim@growthpath.com.au"
     target_zoho_client = enhanced_zoho_analytics_client  # for the test, we have the same client as source and target
-    source_dbURI = target_zoho_client.getDBURI(
-        dbOwnerName=source_zoho_email, dbName="Super Store Sales"
-    )
+    source_dbURI = target_zoho_client.getDBURI(dbOwnerName=source_zoho_email, dbName="Super Store Sales")
     r = target_zoho_client.copyReports(
         dbURI=source_dbURI,
         views=",".join(views),
