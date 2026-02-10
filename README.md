@@ -2,12 +2,13 @@ Zoho Analytics Connector for Python
 ========================
 
 Zoho's Python SDK for Zoho Reports is old, however it is very complete.
-This is a version which is Python 3 ready, tested on Python 3.8 and 3.9 and in fairly substantial production use.
+This is a version which is Python 3 ready, currently deployed on Python 3.12 and 3.13.
 
 A more convenient wrapper class is in enhanced_report_client. This is based on Zoho's ReportClient but provides some more convenient features.
 I use it mostly for uploading data, and creating and modifying tables.
 
-This library uses the Analytics V1 API and as of v.1.4 will phase in v2 API endpoints bit by bit
+This library uses a pragmatic mix of the v1 and v2 Zoho APIs, and attempted comprehensive error handling with errors
+encountered in practice, many of which are not documented.
 
 Authentication
 ==============
@@ -278,6 +279,16 @@ this is, the cache object needs to offer cache.set(...) and cache.get(...) as Dj
 
 Changes
 -------------
+1.5.3
+Major updates to V2 API support including table and column operations.
+Enhanced error handling and retry logic:
+- Added handling for HTTP 429 (Too Many Requests) and Zoho error 6045 with exponential backoff.
+- Improved handling of recoverable errors and network POST errors.
+- Fixed unpickleable RecoverableRateLimitError.
+- Raise BadDataError for error code 7232.
+Enhanced token management with access_token support and persistence callback.
+Refactoring and code cleanup including ruff/mypy fixes, typing improvements, and model_helpers module.
+
 1.5.1 setup.py fixes
 
 1.5.0 Variable name refactoring to make token use more clear. Also moved testing set-up into a module for more convenience. Reduced amount of access token refreshes.
