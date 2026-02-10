@@ -13,7 +13,7 @@ DataTypeName = Literal[
     "Date",
     "Yes/No Decision",
     "URL",
-    "Auto Number"
+    "Auto Number",
 ]
 
 # these are the values when adding a column
@@ -29,15 +29,15 @@ DataTypeAddColumn = Literal[
     "DATE",
     "BOOLEAN",
     "URL",
-    "AUTO_NUMBER"
+    "AUTO_NUMBER",
 ]
 
 data_type_nbr_data_type_mapping: Final = {
-    12: [s.strip() for s in "PLAIN / MULTI_LINE / EMAIL / URL".split('/')],
-    -7: [s.strip() for s in "BOOLEAN".split('/')],
-    8: [s.strip() for s in "PERCENT / CURRENCY / DECIMAL_NUMBER".split('/')],
-    -5: [s.strip() for s in "NUMBER / AUTO_NUMBER / POSITIVE_NUMBER".split('/')],
-    93: [s.strip() for s in "DATE".split('/')]  # Handles cases with no delimiter gracefully
+    12: [s.strip() for s in "PLAIN / MULTI_LINE / EMAIL / URL".split("/")],
+    -7: [s.strip() for s in "BOOLEAN".split("/")],
+    8: [s.strip() for s in "PERCENT / CURRENCY / DECIMAL_NUMBER".split("/")],
+    -5: [s.strip() for s in "NUMBER / AUTO_NUMBER / POSITIVE_NUMBER".split("/")],
+    93: [s.strip() for s in "DATE".split("/")],  # Handles cases with no delimiter gracefully
 }
 
 
@@ -45,6 +45,7 @@ class ColumnMetadata(TypedDict):
     """
     A TypedDict representing the metadata of a database column.
     """
+
     columnFormula: Optional[str]
     columnName: str
     columnSize: int
@@ -63,6 +64,7 @@ class ColumnMetadata_v2(TypedDict):
     """
     A TypedDict representing the metadata of a database column.
     """
+
     columnDesc: str
     columnId: str
     columnIndex: int
@@ -78,7 +80,9 @@ class ColumnMetadata_v2(TypedDict):
     pkTableName: str
 
 
-class TableView(TypedDict, ):
+class TableView(
+    TypedDict,
+):
     columns: list[ColumnMetadata]
     isfav: bool
     remarks: Optional[str]
@@ -87,7 +91,9 @@ class TableView(TypedDict, ):
     viewID: NotRequired[str]
 
 
-class TableView_v2(TypedDict, ):
+class TableView_v2(
+    TypedDict,
+):
     columns: list[ColumnMetadata_v2]
     tableName: str
     tableType: str
@@ -109,6 +115,7 @@ ZohoSchemaModel_v2 = dict[TableName, ZohoTableModel_v2]
 
 class ZohoWorkspace(TypedDict):
     """TypedDict representing a single Zoho workspace's metadata."""
+
     createdBy: str  # Email address of the creator
     createdTime: str  # Timestamp string (e.g., "1740617804006") - Note: It's a string in the JSON
     isDefault: bool  # Whether this is the default workspace
@@ -120,12 +127,29 @@ class ZohoWorkspace(TypedDict):
 
 class ZohoWorkspaceData(TypedDict):
     """TypedDict representing the 'data' section of the workspace response."""
+
     ownedWorkspaces: list[ZohoWorkspace]
     sharedWorkspaces: list[ZohoWorkspace]
 
 
 class ZohoWorkspacesResponse(TypedDict):
     """TypedDict representing the full response structure for getting all workspaces."""
+
     data: ZohoWorkspaceData
     status: str  # Status indicator (e.g., "success")
     summary: str  # Summary message (e.g., "Get all workspaces")
+
+
+class ZohoViewListEntry(TypedDict):
+    viewId: str
+    viewName: str
+    viewType: str
+    # Add other fields if necessary
+
+
+class ZohoViewsData(TypedDict):
+    views: list[ZohoViewListEntry]
+
+
+class ZohoViewsResponse(TypedDict):
+    data: ZohoViewsData

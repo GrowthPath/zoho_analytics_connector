@@ -46,7 +46,8 @@ class AnalyticsTableZohoDef_v2(TypedDict):
     COLUMNS: List[ColumnDef_v2]
 
 
-# this class is used by the original Dear Analytics, and replacing it with the abstract version causes migration nightmares
+# this class is used by the original Dear Analytics, and replacing it with the abstract version causes migration
+# nightmares
 
 
 # --- Assumptions ---
@@ -54,5 +55,3 @@ class AnalyticsTableZohoDef_v2(TypedDict):
 # 2. We want to find *any* concrete Django model that ultimately inherits
 #    from EITHER base and has the analytics_table_name attribute.
 # for backwards compatability, default the app_label_filter to dear_zoho_analytics
-
-
