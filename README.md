@@ -28,6 +28,13 @@ For OAuth2:
 
 Only the admin user, the owner, can make the Self Client. Other users, even organisational admins, won't work.
 
+Therefore, it is more flexible to use a "Server-based Applications" client (currently, the blue color)
+This type of client is my recommendation.
+
+You can use an internal redirect URL as usual (e.g. http://localhost:8000/dear_zoho_analytics/zoho_analytics_proxied_auth_redirect)
+
+
+
 ### Choose the correct API Console site
 
 You need to be aware of the Zoho hosting domain, e.g. .com or .com.au etc.
