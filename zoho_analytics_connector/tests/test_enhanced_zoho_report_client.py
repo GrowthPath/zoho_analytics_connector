@@ -2,6 +2,7 @@ import io
 import json
 import os
 import urllib.parse
+from types import SimpleNamespace
 
 import pytest
 import requests.exceptions
@@ -208,6 +209,104 @@ def test_process_table_meta_data_v2_lowercases_columns() -> None:
 
     assert "Sales" in metadata
     assert "invoicetotal" in metadata["Sales"]
+
+
+def test_extract_zoho_error_handles_v2_failure_payload() -> None:
+    response_text = json.dumps(
+        {
+            "status": "failure",
+            "summary": "COMMON_INTERNAL_SERVER_ERROR",
+            "data": {
+                "errorCode": 7005,
+                "errorMessage": "Sorry, an unexpected error occurred.",
+            },
+        }
+    )
+
+    code, message = ReportClient._extract_zoho_error(response_text)
+
+    assert code == 7005
+    assert message == "Sorry, an unexpected error occurred."
+
+
+def test_get_table_catalog_v2_uses_detail_payload_columns(monkeypatch: pytest.MonkeyPatch) -> None:
+    client = object.__new__(EnhancedZohoAnalyticsClient)
+    monkeypatch.setattr(client, "get_org_and_workspace_id", lambda database_name=None: ("org-1", "workspace-1"))
+    monkeypatch.setattr(
+        client,
+        "get_views_api_v2",
+        lambda org_id, workspace_id, view_types=None: {
+            "data": {
+                "views": [
+                    {
+                        "viewId": "view-1",
+                        "viewName": "dear_financial_transactions",
+                        "viewType": "Table",
+                    }
+                ]
+            }
+        },
+    )
+    monkeypatch.setattr(
+        client,
+        "get_view_details_api_v2",
+        lambda view_id: {
+            "status": "success",
+            "data": {
+                "views": {
+                    "viewId": view_id,
+                    "viewName": "dear_financial_transactions",
+                    "viewType": "Table",
+                    "columns": [
+                        {
+                            "columnDesc": "Test description",
+                            "columnId": "col-1",
+                            "columnIndex": 0,
+                            "columnMaxSize": 10,
+                            "columnName": "probe_col",
+                            "dataType": "PLAIN",
+                            "dataTypeName": "Plain Text",
+                            "dataTypeId": 1,
+                            "defaultValue": "",
+                            "formulaDisplayName": "",
+                            "isNullable": True,
+                            "pkColumnName": "",
+                            "pkTableName": "",
+                        }
+                    ],
+                }
+            },
+        },
+    )
+
+    catalog = client.get_table_catalog_v2(database_name="DearTest")
+
+    assert catalog["dear_financial_transactions"]["viewID"] == "view-1"
+    assert catalog["dear_financial_transactions"]["columns"][0]["columnName"] == "probe_col"
+
+
+def test_send_request_treats_201_as_success(monkeypatch: pytest.MonkeyPatch) -> None:
+    client = object.__new__(ReportClient)
+    client.default_retries = 1
+
+    fake_response = SimpleNamespace(
+        status_code=201,
+        response=SimpleNamespace(text='{"status": "success"}'),
+        content=b'{"status": "success"}',
+    )
+
+    monkeypatch.setattr(client, "getResp", lambda *args, **kwargs: fake_response)
+
+    result = client._ReportClient__sendRequest(
+        url="https://analytics.example.com/restapi/v2/workspaces/1/views/2/columns",
+        httpMethod="POST",
+        payLoad=None,
+        action=None,
+        retry_countdown=1,
+        extra_headers=None,
+    )
+
+    assert result == {"status": "success"}
 
 
 def test_create_tables(enhanced_zoho_analytics_client):

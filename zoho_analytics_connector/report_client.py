@@ -321,10 +321,8 @@ class ReportClient:
             # ----------------------------------------------------------
             if respObj.status_code == 200:
                 try:
-                    json_body = json.loads(respObj.response.text)
-                    err_obj = json_body.get("response", {}).get("error")
-                    if err_obj:
-                        code = int(err_obj.get("code", -1))
+                    code, _ = self._extract_zoho_error(respObj.response.text)
+                    if code is not None:
                         if code in (6045, 10001):  # 6045 = rate-limit, 10001 = import in progress
                             logger.error(
                                 "Zoho API rate-limit error (6045) arrived with HTTP 200 – will retry (%s retries left)",
@@ -342,35 +340,16 @@ class ReportClient:
                     # treat it as a normal success path.
                     pass
 
-            if respObj.status_code in [
-                200,
-            ]:
-                return self.handleResponse(respObj, action, callBackData)
-            elif respObj.status_code in [
-                204,
-            ]:  # successful but nothing to return
+            if 200 <= respObj.status_code < 300:
                 return self.handleResponse(respObj, action, callBackData)
             elif respObj.status_code in (400, 403, 429):
                 # 400 errors may be an API limit error, which are handled by the result parsing
                 try:
-                    try:
-                        # j = respObj.response.json(strict=False) #getting decode errors in this and they don't make
-                        # sense
-                        j = json.loads(respObj.response.text, strict=False)
-                        code = j["response"]["error"]["code"]
-                    except json.JSONDecodeError:
-                        logger.error(f"API caused a JSONDecodeError for {respObj.response.text} ")
-                        code = None
-                    if not code:
-                        m = re.search(r'"code":(\d+)', respObj.response.text)
-                        if m:
-                            code = int(m.group(1))
-                        else:
-                            code = -1
-                            logger.error(f"could not find error code in {respObj.response.text} ")
-                            raise ServerError(urlResp=respObj, zoho_error_code=code)
-                            # time.sleep(min(10 - retry_countdown, 1) * 10)
-                            # continue
+                    code, error_message = self._extract_zoho_error(respObj.response.text)
+                    if code is None:
+                        code = -1
+                        logger.error(f"could not find error code in {respObj.response.text} ")
+                        raise ServerError(urlResp=respObj, zoho_error_code=code)
 
                     logger.debug(f"API returned a 400 result and an error code: {code} ")
                     if code == 6045:  # rate-limit exceeded
@@ -544,6 +523,8 @@ class ReportClient:
                         # raise ServerError(respObj,zoho_error_code=code)
                         msg = f"Unexpected status code {code=}, will attempt retry"
                         try:
+                            if error_message:
+                                msg += f" {error_message}"
                             msg += respObj.response.text
                         except Exception:
                             pass
@@ -565,9 +546,7 @@ class ReportClient:
                 401,
             ]:
                 try:
-                    # j = respObj.response.json(strict=False) #getting decode errors in this and they don't make sense
-                    j = json.loads(respObj.response.text, strict=False)
-                    code = j["response"]["error"]["code"]
+                    code, _ = self._extract_zoho_error(respObj.response.text)
                 except json.JSONDecodeError:
                     logger.error(f"API caused a JSONDecodeError for {respObj.response.text} ")
                     code = None
@@ -641,6 +620,35 @@ class ReportClient:
             f"in __sendRequest. "
             f"{error_details}. {url=}, {httpMethod=}, payLoad={display_payload}, {action=}"
         )
+
+    @staticmethod
+    def _extract_zoho_error(response_text: str) -> tuple[Optional[int], str]:
+        try:
+            body = json.loads(response_text, strict=False)
+        except json.JSONDecodeError:
+            match = re.search(r'"code":\s*(\d+)', response_text)
+            if match:
+                return int(match.group(1)), response_text
+            return None, ""
+
+        error_obj = body.get("response", {}).get("error")
+        if isinstance(error_obj, dict):
+            code = error_obj.get("code")
+            try:
+                return int(code), str(error_obj.get("message") or "")
+            except (TypeError, ValueError):
+                return None, str(error_obj.get("message") or "")
+
+        if body.get("status") == "failure":
+            data_obj = body.get("data") if isinstance(body.get("data"), dict) else {}
+            code = data_obj.get("errorCode")
+            message = str(data_obj.get("errorMessage") or body.get("summary") or "")
+            try:
+                return int(code), message
+            except (TypeError, ValueError):
+                return None, message
+
+        return None, ""
 
     def invalidOAUTH(self, respObj):
         """

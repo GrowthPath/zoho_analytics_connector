@@ -88,12 +88,19 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
         for table in tables_data["data"]["views"]:
             view_id = table["viewId"]
             table_details = self.get_view_details_api_v2(view_id=view_id)
-            table = table_details["data"]["views"]
-            table_catalog[table["viewName"]] = TableView_v2(
-                columns=table["columns"],
-                tableName=table["viewName"],
-                tableType=table["viewType"],
-                viewID=table["viewId"],
+            detailed_view = table_details.get("data", {}).get("views", {})
+            columns = detailed_view.get("columns") or []
+            table_name = detailed_view.get("viewName") or table.get("viewName")
+            table_type = detailed_view.get("viewType") or table.get("viewType")
+            resolved_view_id = detailed_view.get("viewId") or view_id
+            if not table_name or not table_type:
+                logger.warning("Skipping malformed v2 view metadata for %s: %s", view_id, table_details)
+                continue
+            table_catalog[table_name] = TableView_v2(
+                columns=columns,
+                tableName=table_name,
+                tableType=table_type,
+                viewID=resolved_view_id,
             )
 
         return table_catalog
