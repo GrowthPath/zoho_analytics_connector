@@ -21,7 +21,10 @@ from typing import MutableMapping, Optional, Union, List, Any
 import requests
 from requests.adapters import HTTPAdapter, Retry
 
-from zoho_analytics_connector.zoho_analytics_connector.model_helpers import AnalyticsTableZohoDef_v2, ColumnDef_v2
+from zoho_analytics_connector.zoho_analytics_connector.model_helpers import (
+    AnalyticsTableZohoDef_v2,
+    ColumnUpdateDef_v2,
+)
 from zoho_analytics_connector.zoho_analytics_connector.typed_dicts import (
     DataTypeAddColumn,
     ZohoWorkspacesResponse,
@@ -240,6 +243,17 @@ class ReportClient:
                 raise e
             return respObj
 
+        elif httpMethod.upper() == "PUT":
+            try:
+                resp = requests_session.put(url, data=payLoad, headers=headers, timeout=self.request_timeout, **kwargs)
+                if "invalid client" in resp.text:
+                    raise requests.exceptions.RequestException("Invalid Client")
+                respObj = ResponseObj(resp)
+            except requests.exceptions.RequestException as e:
+                logger.exception(f"{e=}")
+                raise e
+            return respObj
+
         elif httpMethod.upper() == "DELETE":
             try:
                 # Depending on the API, a DELETE request might accept data or params.
@@ -256,7 +270,9 @@ class ReportClient:
             return respObj
 
         else:
-            raise RuntimeError(f"Unexpected httpMethod in getResp, expected POST, GET, or DELETE but got {httpMethod}")
+            raise RuntimeError(
+                f"Unexpected httpMethod in getResp, expected POST, GET, PUT, or DELETE but got {httpMethod}"
+            )
 
     def __sendRequest(
         self,
@@ -1515,19 +1531,40 @@ class ReportClient:
         url += "&ZOHO_DATATYPE=" + urllib.parse.quote(dataType)
         return self.__sendRequest(url, "POST", payLoad, "ADDCOLUMN", None)
 
-    def addColumn_v2(self, org_id: str, workspace_id: str, view_id: str, column_def: ColumnDef_v2):
+    def addColumn_v2(self, org_id: str, workspace_id: str, view_id: str, column_def: dict[str, Any]):
         """
         adds a column,would be nice to lookups too but it's alot of work need the view id and reference id
         of the other column
         """
         url = self.getURI_v2() + f"workspaces/{workspace_id}/views/{view_id}/columns"
-        json_config = json.dumps({"columnName": column_def["COLUMNNAME"], "dataType": column_def["DATATYPE"]})
+        config = {"columnName": column_def["COLUMNNAME"], "dataType": column_def["DATATYPE"]}
+        column_desc = column_def.get("DESCRIPTION")
+        if column_desc:
+            config["columnDesc"] = column_desc
+        json_config = json.dumps(config)
         encoded_config = urllib.parse.quote_plus(json_config)
         url += f"?CONFIG={encoded_config}"
         extra_headers = {
             "ZANALYTICS-ORGID": org_id,
         }
         self.__sendRequest(url, "POST", payLoad=None, action=None, extra_headers=extra_headers)
+
+    def updateColumn_v2(
+        self,
+        org_id: str,
+        workspace_id: str,
+        view_id: str,
+        column_id: str,
+        column_update: ColumnUpdateDef_v2,
+    ):
+        url = self.getURI_v2() + f"workspaces/{workspace_id}/views/{view_id}/columns/{column_id}"
+        json_config = json.dumps(column_update)
+        encoded_config = urllib.parse.quote_plus(json_config)
+        url += f"?CONFIG={encoded_config}"
+        extra_headers = {
+            "ZANALYTICS-ORGID": org_id,
+        }
+        self.__sendRequest(url, "PUT", payLoad=None, action=None, extra_headers=extra_headers)
 
         # if "LOOKUPCOLUMN" in col_def:
         #     url = self.getURI_v2() + f"workspaces/{workspace_id}/views/{view_id}/columns"

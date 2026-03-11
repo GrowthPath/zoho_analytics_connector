@@ -1383,6 +1383,20 @@ class AnalyticsClient:
             response = self.ac.send_api_request("DELETE", endpoint, config, self.request_headers)
             return response["data"]["deletedRows"]
 
+        def update_column(self, column_id, config={}):
+            """
+            Update a specified column in the table.
+            @param column_id: Id of the column.
+            @type column_id: string
+            @param config: Contains any supported editable column properties.
+            @type config:dictionary
+            @raise ServerError: If the server has received the request but did not process the request due to some
+                error.
+            @raise ParseError: If the server has responded but client was not able to parse the response.
+            """
+            endpoint = self.endpoint + "/columns/" + column_id
+            self.ac.send_api_request("PUT", endpoint, config, self.request_headers)
+
         def rename_column(self, column_id, column_name, config={}):
             """
             Rename a specified column in the table.
@@ -1397,8 +1411,7 @@ class AnalyticsClient:
             @raise ParseError: If the server has responded but client was not able to parse the response.
             """
             config["columnName"] = column_name
-            endpoint = self.endpoint + "/columns/" + column_id
-            self.ac.send_api_request("PUT", endpoint, config, self.request_headers)
+            self.update_column(column_id, config)
 
         def delete_column(self, column_id, config={}):
             """

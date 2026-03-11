@@ -13,7 +13,7 @@ import time
 from typing import MutableMapping, Optional, List, Callable
 
 from . import report_client
-from .model_helpers import AnalyticsTableZohoDef_v2
+from .model_helpers import AnalyticsTableZohoDef_v2, ColumnUpdateDef_v2
 
 from .typed_dicts import ZohoSchemaModel, Catalog, ZohoSchemaModel_v2, TableView_v2
 
@@ -72,10 +72,35 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
         table_data_zoho_schema: ZohoSchemaModel_v2 = {}
         for table_name, table in catalog.items():
             if table["tableType"] == "Table":
-                zoho_schema_model = {d["columnName"]: d for d in table["columns"]}
+                zoho_schema_model = {
+                    (d["columnName"].lower() if force_lowercase_column_names else d["columnName"]): d
+                    for d in table["columns"]
+                }
                 table_data_zoho_schema[table_name] = zoho_schema_model
 
         return table_data_zoho_schema
+
+    def get_table_catalog_v2(self, database_name: Optional[str] = None) -> dict[str, TableView_v2]:
+        org_id, workspace_id = self.get_org_and_workspace_id(database_name=database_name)
+
+        tables_data = self.get_views_api_v2(org_id=org_id, workspace_id=workspace_id, view_types=[0])
+        table_catalog: dict[str, TableView_v2] = {}
+        for table in tables_data["data"]["views"]:
+            view_id = table["viewId"]
+            table_details = self.get_view_details_api_v2(view_id=view_id)
+            table = table_details["data"]["views"]
+            table_catalog[table["viewName"]] = TableView_v2(
+                columns=table["columns"],
+                tableName=table["viewName"],
+                tableType=table["viewType"],
+                viewID=table["viewId"],
+            )
+
+        return table_catalog
+
+    def get_table_view_ids_v2(self, database_name: Optional[str] = None) -> dict[str, str]:
+        table_catalog = self.get_table_catalog_v2(database_name=database_name)
+        return {table_name: table["viewID"] for table_name, table in table_catalog.items()}
 
     def __init__(
         self,
@@ -148,26 +173,28 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
         self, database_name: Optional[str] = None, force_lowercase_column_names=False
     ) -> ZohoSchemaModel_v2:
         """Use the v2 API to get table metadata but return it in a similar data structure as the v1 function"""
-
-        org_id, workspace_id = self.get_org_and_workspace_id(database_name=database_name)
-
-        tables_data = self.get_views_api_v2(org_id=org_id, workspace_id=workspace_id, view_types=[0])
-        table_catalog: dict[str, TableView_v2] = {}
-        for table in tables_data["data"]["views"]:
-            view_id = table["viewId"]
-            table_details = self.get_view_details_api_v2(view_id=view_id)
-            table = table_details["data"]["views"]
-            table_catalog[table["viewName"]] = TableView_v2(
-                columns=table["columns"],
-                tableName=table["viewName"],
-                tableType=table["viewType"],
-                viewID=table["viewId"],
-            )
+        table_catalog = self.get_table_catalog_v2(database_name=database_name)
 
         table_metadata = self.process_table_meta_data_v2(
             catalog=table_catalog, force_lowercase_column_names=force_lowercase_column_names
         )
         return table_metadata
+
+    def update_column_v2(
+        self,
+        database_name: Optional[str],
+        view_id: str,
+        column_id: str,
+        column_update: ColumnUpdateDef_v2,
+    ) -> None:
+        org_id, workspace_id = self.get_org_and_workspace_id(database_name=database_name)
+        self.updateColumn_v2(
+            org_id=org_id,
+            workspace_id=workspace_id,
+            view_id=view_id,
+            column_id=column_id,
+            column_update=column_update,
+        )
 
     def create_table(self, table_design, database_name: Optional[str] = None) -> MutableMapping:
         """

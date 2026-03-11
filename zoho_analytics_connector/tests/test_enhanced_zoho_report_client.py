@@ -1,13 +1,14 @@
 import io
 import json
 import os
+import urllib.parse
 
 import pytest
 import requests.exceptions
 
-from zoho_analytics_connector.enhanced_report_client import EnhancedZohoAnalyticsClient
-from zoho_analytics_connector.report_client import ReportClient, ServerError
-from zoho_analytics_connector.typed_dicts import TableView_v2
+from zoho_analytics_connector.zoho_analytics_connector.enhanced_report_client import EnhancedZohoAnalyticsClient
+from zoho_analytics_connector.zoho_analytics_connector.report_client import ReportClient, ServerError
+from zoho_analytics_connector.zoho_analytics_connector.typed_dicts import TableView_v2
 
 try:
     # from zoho_analytics_connector.private import config
@@ -98,6 +99,115 @@ animals_table = {
     "TABLENAME": "animals",
     "COLUMNS": [{"COLUMNNAME": "common_name", "DATATYPE": "PLAIN"}, {"COLUMNNAME": "size", "DATATYPE": "PLAIN"}],
 }
+
+
+def test_add_column_v2_includes_description(monkeypatch: pytest.MonkeyPatch) -> None:
+    client = object.__new__(ReportClient)
+    client.reportServerURL = "https://analytics.example.com"
+
+    captured: dict[str, object] = {}
+
+    def fake_send_request(url, http_method, payLoad, action, extra_headers=None, **kwargs):
+        captured.update(
+            {
+                "url": url,
+                "http_method": http_method,
+                "payLoad": payLoad,
+                "action": action,
+                "extra_headers": extra_headers,
+            }
+        )
+
+    monkeypatch.setattr(client, "_ReportClient__sendRequest", fake_send_request)
+
+    client.addColumn_v2(
+        org_id="org-1",
+        workspace_id="workspace-1",
+        view_id="view-1",
+        column_def={
+            "COLUMNNAME": "invoice_total",
+            "django_model_column_name": "invoice_total",
+            "DESCRIPTION": "Invoice total in reporting currency",
+            "MANDATORY": "false",
+            "DATATYPE": "CURRENCY",
+            "LOOKUPCOLUMN": {"TABLENAME": "", "COLUMNNAME": ""},
+        },
+    )
+
+    assert captured["http_method"] == "POST"
+    assert captured["extra_headers"] == {"ZANALYTICS-ORGID": "org-1"}
+    decoded_url = urllib.parse.unquote_plus(str(captured["url"]))
+    assert '"columnDesc": "Invoice total in reporting currency"' in decoded_url
+
+
+def test_update_column_v2_uses_put(monkeypatch: pytest.MonkeyPatch) -> None:
+    client = object.__new__(ReportClient)
+    client.reportServerURL = "https://analytics.example.com"
+
+    captured: dict[str, object] = {}
+
+    def fake_send_request(url, http_method, payLoad, action, extra_headers=None, **kwargs):
+        captured.update(
+            {
+                "url": url,
+                "http_method": http_method,
+                "payLoad": payLoad,
+                "action": action,
+                "extra_headers": extra_headers,
+            }
+        )
+
+    monkeypatch.setattr(client, "_ReportClient__sendRequest", fake_send_request)
+
+    client.updateColumn_v2(
+        org_id="org-1",
+        workspace_id="workspace-1",
+        view_id="view-1",
+        column_id="column-99",
+        column_update={"dataType": "DATE", "columnDesc": "Invoice date"},
+    )
+
+    assert captured["http_method"] == "PUT"
+    assert captured["extra_headers"] == {"ZANALYTICS-ORGID": "org-1"}
+    decoded_url = urllib.parse.unquote_plus(str(captured["url"]))
+    assert '"dataType": "DATE"' in decoded_url
+    assert decoded_url.endswith(
+        "/restapi/v2/workspaces/workspace-1/views/view-1/columns/column-99?CONFIG="
+        '{"dataType": "DATE", "columnDesc": "Invoice date"}'
+    )
+
+
+def test_process_table_meta_data_v2_lowercases_columns() -> None:
+    metadata = EnhancedZohoAnalyticsClient.process_table_meta_data_v2(
+        {
+            "Sales": TableView_v2(
+                columns=[
+                    {
+                        "columnDesc": "Invoice total",
+                        "columnId": "1",
+                        "columnIndex": 0,
+                        "columnMaxSize": 10,
+                        "columnName": "InvoiceTotal",
+                        "dataType": "CURRENCY",
+                        "dataTypeName": "Currency",
+                        "dataTypeId": 8,
+                        "defaultValue": "",
+                        "formulaDisplayName": "",
+                        "isNullable": True,
+                        "pkColumnName": "",
+                        "pkTableName": "",
+                    }
+                ],
+                tableName="Sales",
+                tableType="Table",
+                viewID="view-1",
+            )
+        },
+        force_lowercase_column_names=True,
+    )
+
+    assert "Sales" in metadata
+    assert "invoicetotal" in metadata["Sales"]
 
 
 def test_create_tables(enhanced_zoho_analytics_client):

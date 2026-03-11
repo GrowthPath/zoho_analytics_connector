@@ -31,6 +31,12 @@ class ColumnDef_v2(TypedDict):
     LOOKUPCOLUMN: LookupDef_v2
 
 
+class ColumnUpdateDef_v2(TypedDict, total=False):
+    columnName: str
+    columnDesc: str
+    dataType: DataTypeAddColumn
+
+
 class AnalyticsTableZohoDef(TypedDict):
     TABLENAME: str
     TABLEDESCRIPTION: str
