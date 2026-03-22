@@ -1541,14 +1541,15 @@ class ReportClient:
 
     def addColumn_v2(self, org_id: str, workspace_id: str, view_id: str, column_def: dict[str, Any]):
         """
-        adds a column,would be nice to lookups too but it's alot of work need the view id and reference id
-        of the other column
+        Add a column using the Zoho Analytics v2 API.
+
+        The live v2 add-column endpoint accepts a narrower CONFIG payload than the
+        metadata returned from view details. In particular, passing `columnDesc`
+        here currently raises EXTRA_KEY_FOUND_IN_JSON for some workspaces, so we
+        only send the fields known to be accepted during column creation.
         """
         url = self.getURI_v2() + f"workspaces/{workspace_id}/views/{view_id}/columns"
         config = {"columnName": column_def["COLUMNNAME"], "dataType": column_def["DATATYPE"]}
-        column_desc = column_def.get("DESCRIPTION")
-        if column_desc:
-            config["columnDesc"] = column_desc
         json_config = json.dumps(config)
         encoded_config = urllib.parse.quote_plus(json_config)
         url += f"?CONFIG={encoded_config}"

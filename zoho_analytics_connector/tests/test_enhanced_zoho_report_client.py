@@ -102,7 +102,7 @@ animals_table = {
 }
 
 
-def test_add_column_v2_includes_description(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_add_column_v2_omits_description_from_config(monkeypatch: pytest.MonkeyPatch) -> None:
     client = object.__new__(ReportClient)
     client.reportServerURL = "https://analytics.example.com"
 
@@ -138,7 +138,9 @@ def test_add_column_v2_includes_description(monkeypatch: pytest.MonkeyPatch) -> 
     assert captured["http_method"] == "POST"
     assert captured["extra_headers"] == {"ZANALYTICS-ORGID": "org-1"}
     decoded_url = urllib.parse.unquote_plus(str(captured["url"]))
-    assert '"columnDesc": "Invoice total in reporting currency"' in decoded_url
+    assert '"columnName": "invoice_total"' in decoded_url
+    assert '"dataType": "CURRENCY"' in decoded_url
+    assert '"columnDesc": "Invoice total in reporting currency"' not in decoded_url
 
 
 def test_update_column_v2_uses_put(monkeypatch: pytest.MonkeyPatch) -> None:
