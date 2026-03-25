@@ -287,6 +287,50 @@ def test_get_table_catalog_v2_uses_detail_payload_columns(monkeypatch: pytest.Mo
     assert catalog["dear_financial_transactions"]["columns"][0]["columnName"] == "probe_col"
 
 
+def test_get_table_catalog_v2_limits_detail_fetches_to_target_tables(monkeypatch: pytest.MonkeyPatch) -> None:
+    client = object.__new__(EnhancedZohoAnalyticsClient)
+    detail_calls: list[str] = []
+
+    monkeypatch.setattr(client, "get_org_and_workspace_id", lambda database_name=None: ("org-1", "workspace-1"))
+    monkeypatch.setattr(
+        client,
+        "get_views_api_v2",
+        lambda org_id, workspace_id, view_types=None: {
+            "data": {
+                "views": [
+                    {"viewId": "view-1", "viewName": "dear_financial_transactions", "viewType": "Table"},
+                    {"viewId": "view-2", "viewName": "other_table", "viewType": "Table"},
+                ]
+            }
+        },
+    )
+
+    def _fake_get_view_details_api_v2(view_id: str) -> dict[str, object]:
+        detail_calls.append(view_id)
+        view_name = "dear_financial_transactions" if view_id == "view-1" else "other_table"
+        return {
+            "status": "success",
+            "data": {
+                "views": {
+                    "viewId": view_id,
+                    "viewName": view_name,
+                    "viewType": "Table",
+                    "columns": [],
+                }
+            },
+        }
+
+    monkeypatch.setattr(client, "get_view_details_api_v2", _fake_get_view_details_api_v2)
+
+    catalog = client.get_table_catalog_v2(
+        database_name="DearTest",
+        target_table_names=["dear_financial_transactions"],
+    )
+
+    assert set(catalog) == {"dear_financial_transactions"}
+    assert detail_calls == ["view-1"]
+
+
 def test_send_request_treats_201_as_success(monkeypatch: pytest.MonkeyPatch) -> None:
     client = object.__new__(ReportClient)
     client.default_retries = 1

@@ -10,7 +10,8 @@ import csv
 import json
 import logging
 import time
-from typing import MutableMapping, Optional, List, Callable
+from collections.abc import Iterable
+from typing import Callable, List, MutableMapping, Optional
 
 from . import report_client
 from .model_helpers import AnalyticsTableZohoDef_v2, ColumnUpdateDef_v2
@@ -80,17 +81,25 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
 
         return table_data_zoho_schema
 
-    def get_table_catalog_v2(self, database_name: Optional[str] = None) -> dict[str, TableView_v2]:
+    def get_table_catalog_v2(
+        self,
+        database_name: Optional[str] = None,
+        target_table_names: Optional[Iterable[str]] = None,
+    ) -> dict[str, TableView_v2]:
         org_id, workspace_id = self.get_org_and_workspace_id(database_name=database_name)
 
         tables_data = self.get_views_api_v2(org_id=org_id, workspace_id=workspace_id, view_types=[0])
         table_catalog: dict[str, TableView_v2] = {}
+        target_table_names_set = {table_name.lower() for table_name in target_table_names or []}
         for table in tables_data["data"]["views"]:
+            table_name_hint = str(table.get("viewName") or "")
+            if target_table_names_set and table_name_hint.lower() not in target_table_names_set:
+                continue
             view_id = table["viewId"]
             table_details = self.get_view_details_api_v2(view_id=view_id)
             detailed_view = table_details.get("data", {}).get("views", {})
             columns = detailed_view.get("columns") or []
-            table_name = detailed_view.get("viewName") or table.get("viewName")
+            table_name = detailed_view.get("viewName") or table_name_hint
             table_type = detailed_view.get("viewType") or table.get("viewType")
             resolved_view_id = detailed_view.get("viewId") or view_id
             if not table_name or not table_type:
@@ -105,8 +114,15 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
 
         return table_catalog
 
-    def get_table_view_ids_v2(self, database_name: Optional[str] = None) -> dict[str, str]:
-        table_catalog = self.get_table_catalog_v2(database_name=database_name)
+    def get_table_view_ids_v2(
+        self,
+        database_name: Optional[str] = None,
+        target_table_names: Optional[Iterable[str]] = None,
+    ) -> dict[str, str]:
+        table_catalog = self.get_table_catalog_v2(
+            database_name=database_name,
+            target_table_names=target_table_names,
+        )
         return {table_name: table["viewID"] for table_name, table in table_catalog.items()}
 
     def __init__(
@@ -177,10 +193,16 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
             raise RuntimeError("workspace not found")
 
     def get_table_metadata_v2(
-        self, database_name: Optional[str] = None, force_lowercase_column_names=False
+        self,
+        database_name: Optional[str] = None,
+        force_lowercase_column_names=False,
+        target_table_names: Optional[Iterable[str]] = None,
     ) -> ZohoSchemaModel_v2:
         """Use the v2 API to get table metadata but return it in a similar data structure as the v1 function"""
-        table_catalog = self.get_table_catalog_v2(database_name=database_name)
+        table_catalog = self.get_table_catalog_v2(
+            database_name=database_name,
+            target_table_names=target_table_names,
+        )
 
         table_metadata = self.process_table_meta_data_v2(
             catalog=table_catalog, force_lowercase_column_names=force_lowercase_column_names
