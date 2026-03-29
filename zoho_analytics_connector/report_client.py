@@ -541,7 +541,7 @@ class ReportClient:
                             f"Import data, a csv file as a string. Row 1 is header, col 0 is first col (id): "
                             f"{import_data} "
                         )
-                    raise ServerError(respObj, zoho_error_code=code, payload=payLoad)
+                    raise ServerError(respObj, zoho_error_code=code, payload=payLoad, action=action, uri=url)
             elif respObj.status_code in [
                 401,
             ]:
@@ -2594,16 +2594,24 @@ class ServerError(Exception):
     def __init__(self, urlResp, **kwargs):
         self.httpStatusCode = urlResp.status_code  #:The http status code for the request.
         self.errorCode = self.httpStatusCode  # The error code sent by the server.
-        self.uri = ""  #: The uri which threw this exception.
-        self.action = ""  #:The action to be performed over the resource specified by the uri
+        self.uri = kwargs.get("uri", "")  #: The uri which threw this exception.
+        self.action = kwargs.get("action", "")  #:The action to be performed over the resource specified by the uri
         self.message = urlResp.content  #: Returns the message sent by the server.
         self.zoho_error_code = kwargs.get("zoho_error_code")
+        self.payload = kwargs.get("payload")
         self.extra = kwargs
+        self.raw_response_text = ""
 
         if not urlResp:
             logger.error("response object is None")
         else:
             try:
+                if hasattr(urlResp, "response") and urlResp.response is not None:
+                    self.raw_response_text = getattr(urlResp.response, "text", "") or ""
+                elif isinstance(self.message, bytes):
+                    self.raw_response_text = self.message.decode("utf-8", errors="ignore")
+                else:
+                    self.raw_response_text = str(self.message)
                 contHeader = urlResp.headers.get("Content-Type", None)
                 if contHeader and contHeader.find("text/xml") > -1:
                     self.__parseErrorResponse()
