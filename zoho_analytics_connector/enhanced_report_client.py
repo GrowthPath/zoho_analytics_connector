@@ -7,6 +7,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 """
 
 import csv
+import io
 import json
 import logging
 import time
@@ -361,11 +362,16 @@ class EnhancedZohoAnalyticsClient(report_client.ReportClient):
             callback_data = self.exportDataUsingSQL_v2(
                 tableOrReportURI=uri, format="CSV", sql=sql, retry_countdown=retry_countdown
             )
-            returned_data = callback_data.getvalue().decode("utf-8-sig").splitlines()
+            returned_data = callback_data.getvalue().decode("utf-8-sig")
             if cache_object:
                 cache_object.set(sql, returned_data, cache_timeout_seconds)
 
-        reader = csv.DictReader(returned_data)
+        if isinstance(returned_data, str):
+            csv_source = io.StringIO(returned_data, newline="")
+        else:
+            # Backward compatibility for list[str] entries written by older cache versions.
+            csv_source = returned_data
+        reader = csv.DictReader(csv_source)
         return reader
 
     def delete_rows(self, table_name, sql, database_name: Optional[str] = None, retry_countdown: int = 5) -> int:

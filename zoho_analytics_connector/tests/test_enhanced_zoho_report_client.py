@@ -426,6 +426,99 @@ def test_add_query_params_round_trips_special_character_sql(literal_value: str) 
     assert parsed_query["ZOHO_SQLQUERY"] == [sql]
 
 
+def test_data_export_using_sql_preserves_csv_special_characters(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    client = object.__new__(EnhancedZohoAnalyticsClient)
+    client.default_databasename = "DearTest"
+    client.login_email_id = "test@example.com"
+    csv_text = '\ufeffprobe_value,description\r\n"line1\nline2\tend","comma, and ""quoted"" text"\r\nordinary,value\r\n'
+    monkeypatch.setattr(client, "getURI", lambda **kwargs: "https://analytics.example.com/api")
+    monkeypatch.setattr(
+        client,
+        "exportDataUsingSQL_v2",
+        lambda **kwargs: io.BytesIO(csv_text.encode("utf-8")),
+    )
+
+    rows = list(client.data_export_using_sql(sql="SELECT probe", table_name="product_movements"))
+
+    assert rows == [
+        {
+            "probe_value": "line1\nline2\tend",
+            "description": 'comma, and "quoted" text',
+        },
+        {"probe_value": "ordinary", "description": "value"},
+    ]
+
+
+def test_data_export_using_sql_caches_raw_multiline_csv(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    client = object.__new__(EnhancedZohoAnalyticsClient)
+    client.default_databasename = "DearTest"
+    client.login_email_id = "test@example.com"
+    csv_text = 'probe_value\r\n"line1\r\nline2"\r\n'
+
+    class _Cache:
+        def __init__(self) -> None:
+            self.value: object | None = None
+
+        def get(self, key: str) -> object | None:
+            return self.value
+
+        def set(self, key: str, value: object, timeout: int) -> None:
+            self.value = value
+
+    cache = _Cache()
+    provider_calls = 0
+
+    def _export(**kwargs) -> io.BytesIO:
+        nonlocal provider_calls
+        provider_calls += 1
+        return io.BytesIO(csv_text.encode())
+
+    monkeypatch.setattr(client, "getURI", lambda **kwargs: "https://analytics.example.com/api")
+    monkeypatch.setattr(client, "exportDataUsingSQL_v2", _export)
+
+    first_rows = list(
+        client.data_export_using_sql(
+            sql="SELECT probe",
+            table_name="product_movements",
+            cache_object=cache,
+        )
+    )
+    second_rows = list(
+        client.data_export_using_sql(
+            sql="SELECT probe",
+            table_name="product_movements",
+            cache_object=cache,
+        )
+    )
+
+    assert first_rows == second_rows == [{"probe_value": "line1\r\nline2"}]
+    assert cache.value == csv_text
+    assert provider_calls == 1
+
+
+def test_data_export_using_sql_reads_legacy_list_cache() -> None:
+    client = object.__new__(EnhancedZohoAnalyticsClient)
+
+    class _LegacyCache:
+        @staticmethod
+        def get(key: str) -> list[str]:
+            return ["probe_value,description", "ordinary,value"]
+
+    rows = list(
+        client.data_export_using_sql(
+            sql="SELECT probe",
+            table_name="product_movements",
+            cache_object=_LegacyCache(),
+        )
+    )
+
+    assert rows == [{"probe_value": "ordinary", "description": "value"}]
+
+
 def test_create_tables(enhanced_zoho_analytics_client):
     # is the table already defined?
     try:
