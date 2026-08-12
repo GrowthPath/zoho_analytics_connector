@@ -459,7 +459,7 @@ class ReportClient:
                     elif code in [
                         7403,
                     ]:
-                        logger.error(f"7403 SQL Parsing Error {respObj.response.text}")
+                        logger.error("7403 SQL Parsing Error")
                         raise ServerError(urlResp=respObj, zoho_error_code=code)
                     elif code in [
                         7407,
@@ -534,8 +534,11 @@ class ReportClient:
                 except (RecoverableRateLimitError, UnrecoverableRateLimitError, BadDataError):
                     raise
                 except ServerError:
-                    logger.error(f"ServerError raised on _sendRequest.  {url=} {payLoad=} {action=} ")
-                    import_data = payLoad.get("ZOHO_IMPORT_DATA") if payLoad else None
+                    if code == 7403:
+                        logger.error("ServerError raised on _sendRequest for Zoho SQL parsing error 7403")
+                    else:
+                        logger.error(f"ServerError raised on _sendRequest.  {url=} {payLoad=} {action=} ")
+                    import_data = payLoad.get("ZOHO_IMPORT_DATA") if payLoad and code != 7403 else None
                     if import_data:
                         logger.error(
                             f"Import data, a csv file as a string. Row 1 is header, col 0 is first col (id): "

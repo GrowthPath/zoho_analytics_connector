@@ -355,6 +355,45 @@ def test_send_request_treats_201_as_success(monkeypatch: pytest.MonkeyPatch) -> 
     assert result == {"status": "success"}
 
 
+def test_send_request_7403_logs_no_raw_sql_or_request_url(
+    monkeypatch: pytest.MonkeyPatch,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    client = object.__new__(ReportClient)
+    client.default_retries = 1
+    sql_sentinel = "location = 'O'Brien's Warehouse'"
+    response_text = json.dumps(
+        {
+            "response": {
+                "error": {
+                    "code": 7403,
+                    "message": f"SQL parsing failed for {sql_sentinel}",
+                }
+            }
+        }
+    )
+    fake_response = SimpleNamespace(
+        status_code=400,
+        response=SimpleNamespace(text=response_text),
+        content=response_text.encode(),
+        headers={"Content-Type": "application/json"},
+    )
+    monkeypatch.setattr(client, "getResp", lambda *args, **kwargs: fake_response)
+
+    with pytest.raises(ServerError) as exc_info:
+        getattr(client, "_ReportClient__sendRequest")(
+            url=f"https://analytics.example.com/api?ZOHO_SQLQUERY={sql_sentinel}",
+            httpMethod="POST",
+            payLoad=None,
+            action="EXPORT",
+            retry_countdown=1,
+        )
+
+    assert exc_info.value.zoho_error_code == 7403
+    assert "7403 SQL Parsing Error" in caplog.text
+    assert sql_sentinel not in caplog.text
+
+
 def test_create_tables(enhanced_zoho_analytics_client):
     # is the table already defined?
     try:
