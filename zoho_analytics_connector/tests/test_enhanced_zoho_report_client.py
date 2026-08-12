@@ -8,7 +8,11 @@ import pytest
 import requests.exceptions
 
 from zoho_analytics_connector.zoho_analytics_connector.enhanced_report_client import EnhancedZohoAnalyticsClient
-from zoho_analytics_connector.zoho_analytics_connector.report_client import ReportClient, ServerError
+from zoho_analytics_connector.zoho_analytics_connector.report_client import (
+    ReportClient,
+    ReportClientHelper,
+    ServerError,
+)
 from zoho_analytics_connector.zoho_analytics_connector.typed_dicts import TableView_v2
 
 try:
@@ -392,6 +396,34 @@ def test_send_request_7403_logs_no_raw_sql_or_request_url(
     assert exc_info.value.zoho_error_code == 7403
     assert "7403 SQL Parsing Error" in caplog.text
     assert sql_sentinel not in caplog.text
+
+
+@pytest.mark.parametrize(
+    "literal_value",
+    [
+        "O''Brien & Sons",
+        r"back\slash",
+        "100% Complete",
+        "A_B",
+        "plus+hash#question?equals=",
+        "Unicode ’ apostrophe",
+        "line1\nline2\tend",
+    ],
+)
+def test_add_query_params_round_trips_special_character_sql(literal_value: str) -> None:
+    """Prove URL encoding preserves already-escaped SQL literal characters."""
+    sql = f"SELECT * FROM \"product_movements\" WHERE location = '{literal_value}'"
+
+    encoded_url = ReportClientHelper.addQueryParams(
+        "https://analytics.example.com/api",
+        authtoken="",
+        action="EXPORT",
+        exportFormat="JSON",
+        sql=sql,
+    )
+    parsed_query = urllib.parse.parse_qs(urllib.parse.urlsplit(encoded_url).query)
+
+    assert parsed_query["ZOHO_SQLQUERY"] == [sql]
 
 
 def test_create_tables(enhanced_zoho_analytics_client):
